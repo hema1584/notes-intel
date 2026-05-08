@@ -1,0 +1,2361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net; connect-src https://api.anthropic.com https://mcp.atlassian.com https://mcp.slack.com; frame-ancestors 'none';">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>notes intel v1.1</title>
+<style>@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Sora:wght@400;500&display=swap');
+ *{box-sizing:border-box;margin:0;padding:0;}
+:root{
+ --bg:#0d0d0f;--bg2:#111114;--border:#1e1e24;--border2:#28282e;
+ --teal:#5DCAA5;--teal-dark:#04342C;--amber:#EF9F27;
+ --blue:#378ADD;--blue-dark:#0d1520;--purple:#AFA9EC;
+ --muted:#555560;--text:#c8c8d4;--text2:#8a8a98;--text3:#505058;
+}
+ html{background:#080809;}body{min-height:100%;background:#080809;}
+ body{font-family:'Sora',sans-serif;color:var(--text);display:flex;flex-direction:column;align-items:center;padding:24px 16px 60px;overflow-y:auto;}
+ .topbar{width:100%;max-width:720px;display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+ .logo{display:flex;align-items:center;gap:10px;}
+ .logo-icon{width:30px;height:30px;background:var(--teal);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+ .logo-name{font-size:15px;font-weight:500;color:#e8e8f0;}
+ .logo-ver{font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:1px;}
+ .mode-row{display:flex;gap:1px;background:#111116;border-radius:8px;padding:3px;border:0.5px solid #1c1c24;}
+ .mchip{font-size:11px;padding:5px 12px;border-radius:6px;border:none;color:#38384a;font-family:'JetBrains Mono',monospace;cursor:pointer;transition:all .15s;background:transparent;position:relative;letter-spacing:0.02em;}
+ .mchip:hover{color:#6a6a7a;background:#141418;}
+ .mchip.on{background:#0a1a14;color:var(--teal);box-shadow:0 0 0 1px #1D9E7560;font-weight:500;}
+ .tooltip{display:none;position:absolute;top:calc(100% + 8px);right:0;background:#1a1a22;border:0.5px solid #2e2e38;border-radius:9px;padding:9px 12px;width:200px;z-index:100;text-align:left;}
+ .mchip:hover .tooltip{display:block;}
+ .tt-name{font-size:11px;font-weight:500;color:#c0c0cc;margin-bottom:3px;font-family:'Sora',sans-serif;}
+ .tt-desc{font-size:11px;color:#505058;line-height:1.5;font-family:'Sora',sans-serif;}
+ .card{width:100%;max-width:720px;background:var(--bg);border-radius:14px;border:0.5px solid #222228;overflow:hidden;margin-bottom:12px;}
+ .input-zone{padding:18px 20px;display:flex;flex-direction:column;gap:11px;}
+ .zone-label{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;}
+ .title-input{background:var(--bg2);border:0.5px solid var(--border);border-radius:8px;padding:9px 14px;font-size:15px;font-family:'Sora',sans-serif;color:var(--text);outline:none;width:100%;transition:border-color .15s;resize:none;overflow:hidden;line-height:1.5;min-height:42px;}
+ .title-input:focus{border-color:#383844;}
+ .title-input::placeholder{color:var(--muted);}
+ .big-input{background:var(--bg2);border:0.5px solid var(--border);border-radius:10px;padding:13px 16px;font-size:15px;font-family:'Sora',sans-serif;color:var(--text);line-height:1.7;min-height:110px;resize:none;outline:none;width:100%;overflow:hidden;transition:border-color .15s;}
+ .big-input:focus{border-color:#383844;}
+ .big-input::placeholder{color:var(--muted);}
+ .attach-strip{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+ .att-btn{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:7px;border:0.5px dashed #383848;font-size:12px;color:#7a7a8a;cursor:pointer;background:transparent;transition:all .15s;font-family:'Sora',sans-serif;}
+ .att-btn:hover{border-color:var(--teal);color:var(--teal);}
+ .att-sep{width:0.5px;height:14px;background:var(--border);}
+ .att-tags{display:flex;gap:5px;flex-wrap:wrap;}
+ .att-tag{display:flex;align-items:center;gap:5px;padding:4px 9px;border-radius:6px;background:var(--bg2);border:0.5px solid var(--border);font-size:11px;color:#505058;font-family:'JetBrains Mono',monospace;}
+ .att-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+ .att-tag .x{cursor:pointer;color:#383840;margin-left:2px;}
+ .att-tag .x:hover{color:#888;}
+ .run-row{display:flex;align-items:center;justify-content:flex-end;gap:12px;}
+ .shortcut-hint{font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;display:flex;align-items:center;gap:5px;}
+ .kbd{background:#1a1a20;border:0.5px solid #2e2e38;border-radius:4px;padding:2px 6px;font-size:10px;color:#505058;}
+ .run-btn{padding:9px 22px;background:var(--teal);border:none;border-radius:8px;font-size:13px;font-weight:500;color:var(--teal-dark);cursor:pointer;font-family:'Sora',sans-serif;transition:opacity .15s;display:flex;align-items:center;gap:7px;}
+ .run-btn:hover{opacity:.88;}
+ .run-btn:disabled{opacity:.4;cursor:not-allowed;}
+ .spinner{width:13px;height:13px;border:2px solid var(--teal-dark);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;display:none;}
+ @keyframes spin{to{transform:rotate(360deg)}}
+ .div-row{width:100%;max-width:720px;display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+ .div-line{flex:1;height:0.5px;background:#18181e;}
+ .div-txt{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--text3);letter-spacing:.1em;}
+ .out-card{padding:16px 18px;}
+ .gist-card{background:#080f0d;border-top:0.5px solid #0F6E5620;}
+ .qa-card{background:#0f0d07;border-top:0.5px solid #BA751720;}
+ .charter-card{background:#0f0d07;border-top:0.5px solid #BA751720;}
+ .jira-card{background:#07090f;border-top:0.5px solid #185FA520;}
+ .card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;}
+ .card-head{display:flex;align-items:center;gap:8px;}
+ .card-pip{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+ .card-lbl{font-size:10px;font-family:'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;}
+ .icon-btn{background:transparent;border:none;cursor:pointer;color:var(--text3);padding:3px;display:flex;align-items:center;border-radius:4px;transition:color .12s;}
+ .icon-btn:hover{color:var(--text2);}
+ .gist-p{font-size:14px;color:#6a8078;line-height:1.75;user-select:text;}
+ .skeleton{background:#111116;border-radius:4px;height:14px;margin-bottom:8px;animation:pulse 1.2s ease-in-out infinite;}
+ .skeleton:last-child{width:65%;}
+ @keyframes pulse{0%,100%{opacity:.4}50%{opacity:.8}}
+ .qa-meta{font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;}
+ .qa-list{display:flex;flex-direction:column;}
+ .qa-item{border-top:0.5px solid #1e1a0f;}
+ .qa-item:first-child{border-top:none;}
+ .qa-row{display:grid;grid-template-columns:18px 18px 1fr auto 18px 18px;align-items:center;gap:9px;padding:10px 0;cursor:pointer;}
+ .qi-cb{width:14px;height:14px;border-radius:3px;cursor:pointer;accent-color:var(--teal);flex-shrink:0;}
+ .qi-num{font-family:'JetBrains Mono',monospace;font-size:10px;color:#2e2820;}
+ .qi-txt{font-size:14px;color:#9a8e76;line-height:1.45;user-select:text;}
+ .sev{font-family:'JetBrains Mono',monospace;font-size:9px;padding:2px 7px;border-radius:4px;white-space:nowrap;}
+ .sev-high{background:#A32D2D18;color:#F09595;border:0.5px solid #A32D2D30;}
+ .sev-med{background:#BA751718;color:#EF9F27;border:0.5px solid #BA751730;}
+ .sev-low{background:#1D9E7518;color:#5DCAA5;border:0.5px solid #1D9E7530;}
+ .qi-detail{padding:0 0 11px 45px;display:none;}
+ .qi-detail.open{display:block;}
+ .qi-desc{font-size:13px;color:#5a5248;line-height:1.65;user-select:text;margin-bottom:9px;}
+ .convert-btn{font-size:10px;font-family:'JetBrains Mono',monospace;color:#4a3e20;background:#0d0b06;border:0.5px solid #2a2210;border-radius:5px;padding:3px 9px;cursor:pointer;transition:all .12s;}
+ .convert-btn:hover{color:var(--amber);border-color:var(--amber);}
+ .tc-block{display:none;margin-top:10px;background:#0a0907;border:0.5px solid #2a2010;border-radius:8px;padding:11px 13px;}
+ .tc-block.open{display:flex;flex-direction:column;gap:8px;}
+ .tc-row{display:flex;flex-direction:column;gap:3px;}
+ .tc-key{font-size:9px;font-family:'JetBrains Mono',monospace;color:#4a3e20;letter-spacing:.08em;text-transform:uppercase;font-weight:500;}
+ .tc-val{font-size:12px;color:#6a6050;line-height:1.55;user-select:text;}
+ .tc-steps{display:flex;flex-direction:column;gap:4px;}
+ .tc-step{font-size:12px;color:#6a6050;line-height:1.5;display:flex;gap:7px;}
+ .tc-step-n{font-family:'JetBrains Mono',monospace;font-size:10px;color:#3a3020;flex-shrink:0;padding-top:1px;font-weight:500;}
+ .tc-bold{font-weight:500;color:#7a7060;}
+ .charter-planned{display:flex;align-items:center;gap:12px;padding:11px 14px;background:#120f06;border:0.5px dashed #2e2510;border-radius:8px;}
+ .planned-pill{font-size:9px;font-family:'JetBrains Mono',monospace;padding:3px 9px;border-radius:3px;background:#1a1506;border:0.5px solid #3a2e10;color:#BA7517;white-space:nowrap;}
+ .planned-txt{font-size:12px;color:#3e3424;line-height:1.5;}
+ .jira-fields{display:flex;flex-direction:column;gap:10px;}
+ .sel-summary{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#0a0d18;border-radius:7px;border:0.5px solid #1a2030;flex-wrap:wrap;}
+ .sel-count{font-size:11px;color:var(--blue);font-family:'JetBrains Mono',monospace;white-space:nowrap;}
+ .sel-tags{display:flex;gap:5px;flex-wrap:wrap;}
+ .sel-tag{font-size:10px;padding:2px 7px;background:#0d1a28;border:0.5px solid #1a2e40;border-radius:4px;color:#4a7a9a;font-family:'JetBrains Mono',monospace;}
+ .sel-empty{font-size:11px;color:#1e2a38;}
+ .jira-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+ .j-field{display:flex;flex-direction:column;gap:5px;}
+ .j-label{font-size:10px;font-family:'JetBrains Mono',monospace;color:#2a3a4a;letter-spacing:.08em;text-transform:uppercase;}
+ .j-input{background:var(--blue-dark);border:0.5px solid #1a2530;border-radius:7px;padding:8px 12px;font-size:13px;font-family:'JetBrains Mono',monospace;color:#5a8aaa;outline:none;width:100%;transition:border-color .15s;}
+ .j-input:focus{border-color:#2a4060;}
+ .j-input::placeholder{color:#1e2e3a;}
+ .j-select{background:var(--blue-dark);border:0.5px solid #1a2530;border-radius:7px;padding:8px 12px;font-size:12px;font-family:'JetBrains Mono',monospace;color:#5a8aaa;outline:none;width:100%;cursor:pointer;}
+ .j-select option{background:#0d1520;}
+ .push-row{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+ .push-note{font-size:11px;color:#1e3050;font-family:'JetBrains Mono',monospace;transition:color .2s;}
+ .push-btn{padding:9px 20px;background:#185FA5;border:none;border-radius:8px;font-size:13px;font-weight:500;color:#B5D4F4;cursor:pointer;font-family:'Sora',sans-serif;display:flex;align-items:center;gap:7px;transition:opacity .15s;}
+ .push-btn:hover{opacity:.85;}
+ .push-btn:disabled{opacity:.35;cursor:not-allowed;}
+ .err-bar{background:#1a0808;border:0.5px solid #5a1a1a;border-radius:8px;padding:10px 14px;font-size:12px;color:#F09595;display:none;font-family:'JetBrains Mono',monospace;}
+ .j-label-hint{font-size:9px;color:#1e2e3a;font-weight:400;text-transform:none;letter-spacing:0;}
+ .j-input-wrap{position:relative;display:flex;align-items:center;}
+ .j-input-wide{flex:1;padding-right:90px;}
+ .j-project-badge{position:absolute;right:10px;font-size:10px;font-family:'JetBrains Mono',monospace;color:#378ADD;background:#0d1a28;border:0.5px solid #1a2e40;border-radius:4px;padding:2px 7px;display:none;white-space:nowrap;}
+ .j-recent{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;}
+ .j-recent-chip{font-size:10px;font-family:'JetBrains Mono',monospace;padding:3px 9px;background:#0a0d18;border:0.5px solid #1a2530;border-radius:5px;color:#3a5a7a;cursor:pointer;transition:all .12s;}
+ .j-recent-chip:hover{color:#378ADD;border-color:#378ADD;}
+ .j-recent-label{font-size:10px;color:#1e2a38;font-family:'JetBrains Mono',monospace;padding-top:3px;}
+ .link-input-row{display:flex;align-items:center;gap:8px;}
+ .link-input{flex:1;background:var(--bg2);border:0.5px solid var(--border);border-radius:7px;padding:7px 12px;font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--text);outline:none;transition:border-color .15s;}
+ .link-input:focus{border-color:#378ADD;}
+ .link-input::placeholder{color:var(--muted);}
+ .link-add-btn{padding:6px 14px;background:#185FA5;border:none;border-radius:7px;font-size:12px;color:#B5D4F4;cursor:pointer;font-family:'Sora',sans-serif;}
+ .link-add-btn:hover{opacity:.85;}
+ .link-cancel-btn{background:transparent;border:0.5px solid var(--border);border-radius:7px;padding:6px 10px;font-size:12px;color:var(--text3);cursor:pointer;}
+ .link-cancel-btn:hover{color:var(--text2);}
+ .j-saved-boards{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;}
+ .j-board-chip{font-size:10px;font-family:'JetBrains Mono',monospace;padding:3px 9px;background:#0a0d18;border:0.5px solid #1a2530;border-radius:5px;color:#3a5a7a;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .12s;}
+ .j-board-chip:hover{color:#378ADD;border-color:#378ADD;}
+ .j-board-chip .bx{color:#1e2e3a;font-size:9px;margin-left:2px;}
+ .j-board-chip .bx:hover{color:#F09595;}
+ .j-board-label{font-size:10px;color:#1e2a38;font-family:'JetBrains Mono',monospace;padding-top:3px;}
+ .j-board-active{background:#0d1a28;border-color:#378ADD;color:#378ADD;}
+ .push-progress{display:flex;flex-direction:column;gap:6px;}
+ .push-progress-item{display:grid;grid-template-columns:18px 1fr auto;align-items:center;gap:8px;font-size:11px;}
+ .ppi-spinner{font-size:12px;color:#378ADD;display:inline-block;width:14px;text-align:center;}
+ .ppi-txt{color:#3a5a7a;font-family:'JetBrains Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+ .ppi-status{font-size:10px;color:#2a3a4a;font-family:'JetBrains Mono',monospace;white-space:nowrap;}
+ .gist-li::before{content:'–';position:absolute;left:0;color:#2a5a48;font-weight:500;}
+ #output-section{display:none;flex-direction:column;gap:0;}
+ #output-section.visible{display:flex;}
+ .gist-lead{font-size:14px;font-weight:500;color:#7ab0a0;line-height:1.6;margin-bottom:12px;user-select:text;}
+ .gist-ul{list-style:none;display:flex;flex-direction:column;gap:6px;padding:0;}
+ .gist-li{font-size:13px;color:#5a7870;line-height:1.65;user-select:text;padding-left:16px;position:relative;}
+ .gist-li::before{content:"–";position:absolute;left:0;color:#2a5a48;font-weight:500;}
+ .gist-groups{display:flex;flex-direction:column;gap:10px;}
+ .gist-group{border:0.5px solid #1a2820;border-radius:8px;overflow:hidden;}
+ .gist-group-hd{display:flex;align-items:center;gap:7px;padding:7px 11px;background:#060f0c;border-bottom:0.5px solid #1a2820;}
+ .gist-group-icon{font-size:11px;flex-shrink:0;}
+ .gist-group-label{font-size:9px;font-family:'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#2a6a54;font-weight:500;}
+ .gist-group-count{font-size:9px;font-family:'JetBrains Mono',monospace;color:#1a3a2c;margin-left:auto;}
+ .gist-group-items{padding:8px 11px;display:flex;flex-direction:column;gap:5px;background:#040d0a;}
+ .gist-point{display:flex;gap:8px;align-items:flex-start;}
+ .gist-point-dot{width:4px;height:4px;border-radius:50%;background:#1D9E75;flex-shrink:0;margin-top:6px;}
+ .gist-point-txt{font-size:13px;color:#5a7870;line-height:1.65;user-select:text;}
+ .gist-tag{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-family:'JetBrains Mono',monospace;padding:1px 6px;border-radius:3px;white-space:nowrap;margin-right:4px;vertical-align:middle;}
+ .gist-tag-decision{background:#0d1a28;color:#378ADD;border:0.5px solid #1a2e40;}
+ .gist-tag-action{background:#1a1200;color:#EF9F27;border:0.5px solid #2a2010;}
+ .gist-tag-risk{background:#1a0808;color:#F09595;border:0.5px solid #3a1010;}
+ .gist-tag-open{background:#16121e;color:#AFA9EC;border:0.5px solid #2a2230;}
+ .clear-btn{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:6px;border:0.5px solid #3a2a2a;background:#1a1010;font-size:11px;color:#c06060;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .15s;flex-shrink:0;white-space:nowrap;}
+ .clear-btn:hover{border-color:#c06060;color:#f09595;background:#220e0e;}
+ .input-tip{font-size:11px;color:#2e2e3a;line-height:1.5;padding:0 2px;}
+ .qa-gen-btn{display:flex;align-items:center;gap:8px;padding:10px 24px;background:#120f06;border:0.5px solid #BA751740;border-radius:9px;font-size:13px;font-weight:500;color:#EF9F27;cursor:pointer;font-family:'Sora',sans-serif;transition:all .18s;}
+ .qa-gen-btn:hover{background:#1a1408;border-color:#EF9F27;box-shadow:0 0 12px #EF9F2718;}
+ .qa-gen-btn:disabled{opacity:.4;cursor:not-allowed;}
+ a.att-tag-link{text-decoration:none;cursor:pointer;color:#505058;}
+ a.att-tag-link:hover{border-color:#378ADD;color:#5a8aaa;background:#0d1520;}
+ .topbar-sep{width:0.5px;height:16px;background:#1c1c24;}
+ .info-badge{width:15px;height:15px;border-radius:50%;background:#1a1a24;border:0.5px solid #2e2e3a;color:#444450;font-size:9px;font-family:'JetBrains Mono',monospace;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;position:relative;flex-shrink:0;}
+ .info-badge:hover,.info-badge:focus{border-color:#5DCAA5;color:#5DCAA5;outline:none;}
+ .info-tooltip{display:none;position:absolute;top:calc(100% + 8px);left:0;background:#1a1a22;border:0.5px solid #2e2e38;border-radius:9px;padding:10px 13px;width:260px;z-index:100;pointer-events:none;}
+ .info-badge:hover .info-tooltip,.info-badge:focus .info-tooltip{display:block;}
+ .info-tooltip-title{font-size:11px;font-weight:500;color:#c0c0cc;margin-bottom:5px;font-family:'Sora',sans-serif;}
+ .info-tooltip-body{font-size:11px;color:#505060;line-height:1.6;font-family:'Sora',sans-serif;}
+ .content-size-bar{display:flex;align-items:center;justify-content:space-between;padding:4px 2px;}
+ .content-size-bar span{font-size:10px;font-family:'JetBrains Mono',monospace;}
+ #content-size-msg{color:#EF9F27;}
+ .content-size-count{color:#2e2e3a;}
+ .att-btn-confluence{border-color:#534AB730;color:#7a74c0;}
+ .att-btn-confluence:hover{border-color:#AFA9EC;color:#AFA9EC;}
+ .confluence-status{font-size:11px;font-family:'JetBrains Mono',monospace;padding:4px 8px;border-radius:5px;display:none;}
+ .confluence-status.loading{color:#5DCAA5;display:inline-flex;align-items:center;gap:6px;}
+ .confluence-status.error{color:#F09595;display:block;}
+ .gist-edit-textarea{width:100%;background:#0a1410;border:0.5px solid #1D9E7540;border-radius:8px;padding:11px 13px;font-size:13px;font-family:'Sora',sans-serif;color:#7ab0a0;line-height:1.7;resize:none;outline:none;min-height:80px;overflow:hidden;}
+ .gist-edit-textarea:focus{border-color:#5DCAA5;}
+ .gist-save-btn{padding:4px 14px;background:#0a1a14;border:0.5px solid #1D9E7540;border-radius:6px;font-size:11px;color:#5DCAA5;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .12s;}
+ .gist-save-btn:hover{background:#0f2a1e;border-color:#5DCAA5;}
+ .gist-cancel-btn{padding:4px 14px;background:transparent;border:0.5px solid #1e1e24;border-radius:6px;font-size:11px;color:#3e3e4a;cursor:pointer;font-family:'JetBrains Mono',monospace;}
+ .gist-cancel-btn:hover{color:#666;}
+ #gist-edit-btn.active{color:#5DCAA5;}
+ .context-zone{padding:13px 18px;}
+ .context-header{display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;}
+ .context-header:hover .context-hint{color:#7F77DD;}
+ .context-hint{font-size:10px;font-family:'JetBrains Mono',monospace;color:#2e2e3a;transition:color .15s;}
+ .context-status{font-size:10px;font-family:'JetBrains Mono',monospace;color:#534AB7;padding:2px 7px;background:#16121e;border-radius:3px;border:0.5px solid #2a2230;display:none;}
+ .context-desc{font-size:11px;color:#3a3448;line-height:1.6;margin:10px 0 12px;font-family:'Sora',sans-serif;}
+ .context-fields{display:flex;flex-direction:column;gap:8px;}
+ .ctx-field{display:flex;flex-direction:column;gap:4px;}
+ .ctx-label{font-size:10px;font-family:'JetBrains Mono',monospace;color:#3a3448;letter-spacing:.06em;text-transform:uppercase;}
+ .ctx-input{background:#0e0c18;border:0.5px solid #2a2230;border-radius:7px;padding:7px 12px;font-size:12px;font-family:'Sora',sans-serif;color:#8a84c0;outline:none;width:100%;transition:border-color .15s;}
+ .ctx-input:focus{border-color:#534AB7;}
+ .ctx-input::placeholder{color:#2e2838;}
+ .ctx-textarea{resize:none;overflow:hidden;line-height:1.6;min-height:52px;}
+ .ctx-save-btn{padding:5px 14px;background:#16121e;border:0.5px solid #534AB740;border-radius:6px;font-size:11px;color:#AFA9EC;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .15s;}
+ .ctx-save-btn:hover{border-color:#AFA9EC;background:#1e1a2a;}
+ .ctx-clear-btn{padding:5px 14px;background:transparent;border:0.5px solid #1e1e24;border-radius:6px;font-size:11px;color:#333340;cursor:pointer;font-family:'JetBrains Mono',monospace;}
+ .ctx-clear-btn:hover{color:#666;border-color:#333;}
+ .ctx-saved-note{font-size:10px;font-family:'JetBrains Mono',monospace;color:#534AB7;}
+ .att-btn-slack{border-color:#4A154B30;color:#9b59b6;}
+ .att-btn-slack:hover{border-color:#9b59b6;color:#c39bd3;}
+ .att-btn-jira{border-color:#185FA530;color:#4a8aaa;}
+ .att-btn-jira:hover{border-color:#378ADD;color:#378ADD;}
+ #file-input{display:none;}
+ .risk-card{background:#0f0d07;border-top:0.5px solid #BA751720;}
+ .risk-item{border-top:0.5px solid #1e1a0f;}
+ .risk-item:first-child{border-top:none;}
+ .risk-row{display:grid;grid-template-columns:18px 18px 1fr auto 18px 18px;align-items:center;gap:9px;padding:10px 0;cursor:pointer;}
+ .ri-num{font-family:'JetBrains Mono',monospace;font-size:10px;color:#2e2820;}
+ .ri-txt{font-size:14px;color:#9a8e76;line-height:1.45;user-select:text;}
+ .risk-sev{font-family:'JetBrains Mono',monospace;font-size:9px;padding:2px 7px;border-radius:4px;white-space:nowrap;}
+ .rs-crit{background:#A32D2D18;color:#F09595;border:0.5px solid #A32D2D30;}
+ .rs-high{background:#BA751718;color:#EF9F27;border:0.5px solid #BA751730;}
+ .rs-med{background:#1D9E7518;color:#5DCAA5;border:0.5px solid #1D9E7530;}
+ .risk-detail{padding:0 0 11px 45px;display:none;}
+ .risk-detail.open{display:block;}
+ .risk-desc{font-size:13px;color:#5a5248;line-height:1.65;user-select:text;margin-bottom:8px;}
+ .risk-failure{background:#0a0907;border:0.5px solid #2a2010;border-radius:7px;padding:9px 12px;margin-bottom:8px;display:flex;flex-direction:column;gap:5px;}
+ .rf-key{font-size:9px;font-family:'JetBrains Mono',monospace;color:#4a3e20;letter-spacing:.08em;text-transform:uppercase;font-weight:500;}
+ .rf-val{font-size:12px;color:#6a6050;line-height:1.55;}
+ .risk-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap;}
+ .risk-gen-btn{display:flex;align-items:center;gap:8px;padding:10px 24px;background:#120f06;border:0.5px solid #BA751740;border-radius:9px;font-size:13px;font-weight:500;color:#EF9F27;cursor:pointer;font-family:'Sora',sans-serif;transition:all .18s;}
+ .risk-gen-btn:hover{background:#1a1408;border-color:#EF9F27;}
+ .risk-gen-btn:disabled{opacity:.4;cursor:not-allowed;}
+ .risk-tc-block{display:none;margin-top:10px;background:#0a0907;border:0.5px solid #2a2010;border-radius:8px;padding:11px 13px;}
+ .risk-tc-block.open{display:flex;flex-direction:column;gap:8px;}
+ .risk-review-panel{display:none;margin-top:10px;background:#0e0c18;border:0.5px solid #2a2230;border-radius:8px;padding:11px 13px;}
+ .cmd-chips{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;}
+ .cmd-chip{font-size:9px;padding:2px 8px;background:#16121e;border:0.5px solid #2a2230;border-radius:4px;color:#534AB7;cursor:pointer;transition:all .12s;}
+ .cmd-chip:hover{border-color:#AFA9EC;color:#AFA9EC;}
+ .rv-diff{margin-top:8px;background:#0a0816;border:0.5px solid #1e1e2a;border-radius:6px;padding:9px 11px;display:none;flex-direction:column;gap:4px;}
+ .rv-diff.open{display:flex;}
+ .diff-row{display:flex;gap:7px;align-items:flex-start;}
+ .diff-sign{font-size:10px;font-weight:500;width:12px;flex-shrink:0;padding-top:2px;font-family:'JetBrains Mono',monospace;}
+ .diff-removed{color:#F09595;}
+ .diff-added{color:#5DCAA5;}
+ .diff-neutral{color:#2e2e3a;}
+ .diff-txt{font-size:11px;line-height:1.5;font-family:'Sora',sans-serif;}
+ .diff-txt-rm{color:#5a2828;text-decoration:line-through;}
+ .diff-txt-add{color:#2a5a48;}
+ .diff-txt-neu{color:#2e2e3a;}
+ #img-preview{display:none;max-width:120px;max-height:80px;border-radius:6px;border:0.5px solid var(--border);object-fit:cover;}</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 4h10M3 8h7M3 12h5" stroke="#04342C" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+    <div><div class="logo-name">notes intel</div><div class="logo-ver">v1.1 · personal assistant</div></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:6px;flex-wrap:nowrap;">
+    <div class="mode-row">
+      <button class="mchip on" data-mode="notes" onclick="setMode(this)">notes
+        <div class="tooltip"><div class="tt-name">Personal notes</div><div class="tt-desc">Your own written notes. AI focuses on key takeaways.</div></div>
+      </button>
+      <button class="mchip" data-mode="meeting" onclick="setMode(this)">meeting
+        <div class="tooltip"><div class="tt-name">Meeting transcript</div><div class="tt-desc">Raw transcript or minutes. AI extracts decisions and actions.</div></div>
+      </button>
+      <button class="mchip" data-mode="designdoc" onclick="setMode(this)">design doc
+        <div class="tooltip"><div class="tt-name">Design document</div><div class="tt-desc">Spec or design doc. AI extracts scope, decisions and testable requirements.</div></div>
+      </button>
+    </div>
+    <div class="topbar-sep" style="flex-shrink:0;"></div>
+    <button class="clear-btn" id="clear-btn" onclick="clearAll()" title="Clear everything">
+      <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Clear All
+    </button>
+  </div>
+</div>
+
+<div class="card" id="context-card" style="margin-bottom:12px;">
+  <div class="context-zone">
+    <div class="context-header" onclick="toggleContext()">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="card-pip" style="background:#7F77DD;"></div>
+        <span class="card-lbl" style="color:#7F77DD;">project context</span>
+        <span class="context-status" id="context-status"></span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span class="context-hint" id="context-hint">click to expand</span>
+        <svg id="context-chev" width="12" height="12" viewBox="0 0 12 12" fill="none" style="transition:transform .18s;color:#3e3e4a;"><path d="M3 4.5l3 3 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+    <div id="context-body" style="display:none;">
+      <p class="context-desc">This context is silently included in every analysis — the AI uses it to give more accurate, project-specific output. Saved automatically.</p>
+      <div class="context-fields">
+        <div class="ctx-field">
+          <label class="ctx-label">Product / Platform</label>
+          <input class="ctx-input" id="ctx-product" oninput="saveContext()" placeholder="e.g. Mobile casual games, Unity, iOS &amp; Android"/>
+        </div>
+        <div class="ctx-field">
+          <label class="ctx-label">QA Focus Areas</label>
+          <input class="ctx-input" id="ctx-qa-focus" oninput="saveContext()" placeholder="e.g. LiveOps, IAP flows, tournament logic, low connectivity, regression"/>
+        </div>
+        <div class="ctx-field">
+          <label class="ctx-label">Team / Terminology</label>
+          <input class="ctx-input" id="ctx-terminology" oninput="saveContext()" placeholder="e.g. Sprints are 2 weeks, smoke = regression, features go to staging before prod"/>
+        </div>
+        <div class="ctx-field">
+          <label class="ctx-label">Output style preference</label>
+          <input class="ctx-input" id="ctx-style" oninput="saveContext()" placeholder="e.g. QA points should reference specific screens, steps should be numbered and testable"/>
+        </div>
+        <div class="ctx-field">
+          <label class="ctx-label">Additional context</label>
+          <textarea class="ctx-input ctx-textarea" id="ctx-extra" oninput="autoResize(this);saveContext()" placeholder="Anything else — game names, known issues, testing standards, platforms to prioritise…" rows="2" oninput="autoResize(this)"></textarea>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;">
+        <span class="ctx-saved-note" id="ctx-saved-note"></span>
+        <div style="display:flex;gap:6px;">
+          <button class="ctx-clear-btn" onclick="clearContext()">clear</button>
+          <button class="ctx-save-btn" onclick="saveContext()">save context</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="input-zone">
+    <div class="zone-label" style="display:flex;align-items:center;gap:7px;">
+      // your content
+      <div class="info-badge" tabindex="0">?
+        <div class="info-tooltip">
+          <div class="info-tooltip-title">What goes here?</div>
+          <div class="info-tooltip-body">Paste any raw text — meeting notes, a web article, personal observations, or a Confluence/Notion dump. You can also attach a screenshot 📷 or add a Confluence page 📄 and it will be read automatically. The AI will generate a summary and QA focus points from whatever you provide.</div>
+        </div>
+      </div>
+    </div>
+<textarea class="big-input" id="main-input" oninput="autoResize(this);checkContentSize(this)" placeholder="Paste your content here — notes, meeting transcript, article."></textarea>
+    <div class="content-size-bar" id="content-size-bar" style="display:none;">
+      <span id="content-size-msg"></span>
+      <span class="content-size-count" id="content-size-count"></span>
+    </div>
+    <div class="input-tip" id="input-tip">Tip: attach a screenshot 📷, add a Confluence page 📄 or paste a Slack thread link 💬 — all read directly.</div>
+    <div class="attach-strip">
+      <div class="att-btn" onclick="document.getElementById('file-input').click()">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M1 7l4 3 4-4 4 3" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+        screenshot
+      </div>
+      <input type="file" id="file-input" accept="image/*" onchange="handleFile(this)"/>
+
+      <div class="att-btn att-btn-confluence" onclick="toggleConfluenceInput()">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 4c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4z" stroke="currentColor" stroke-width="1.2"/><path d="M5 6h6M5 9h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        confluence
+      </div>
+      <div class="att-btn att-btn-slack" onclick="toggleSlackInput()">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M6 2a2 2 0 0 0 0 4h2V2H6zM6 7H2a2 2 0 0 0 0 4h4V7zM10 7v4a2 2 0 0 0 4 0V7h-4zM10 6h4a2 2 0 0 0 0-4h-4v4z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>
+        slack
+      </div>
+      <div class="att-btn att-btn-jira" onclick="toggleJiraFetchInput()">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2l2 4h4l-3 3 1 4-4-2-4 2 1-4-3-3h4z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>
+        jira ticket
+      </div>
+      <div class="att-sep"></div>
+      <div class="att-tags" id="att-tags"></div>
+      <div id="img-preview-wrap" style="display:none;position:relative;">
+      <img id="img-preview" alt="screenshot preview" onclick="openImagePreview()" style="max-width:120px;max-height:90px;border-radius:7px;border:0.5px solid var(--border);object-fit:cover;display:block;cursor:pointer;" title="Click to view full size"/>
+      <button onclick="removeImg()" style="position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;background:#1a1a20;border:0.5px solid #2e2e38;color:#888;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">×</button>
+    </div>
+    </div>
+    <div class="link-input-row" id="confluence-input-row" style="display:none;">
+        <input class="link-input" id="confluence-url-input" placeholder="Paste Confluence page URL or page ID…" onkeydown="confluenceKeydown(event)"/>
+        <button class="link-add-btn" id="confluence-fetch-btn" onclick="addConfluenceRef()">add</button>
+        <button class="link-cancel-btn" onclick="toggleConfluenceInput()">✕</button>
+      </div>
+    <div class="link-input-row" id="slack-input-row" style="display:none;">
+        <input class="link-input" id="slack-url-input" placeholder="Paste Slack message or thread link…" onkeydown="slackKeydown(event)"/>
+        <button class="link-add-btn" onclick="addSlackRef()">add</button>
+        <button class="link-cancel-btn" onclick="toggleSlackInput()">✕</button>
+      </div>
+    <div class="link-input-row" id="jira-fetch-input-row" style="display:none;">
+        <input class="link-input" id="jira-fetch-input" placeholder="Paste Jira ticket ID or URL (e.g. SMR-1234)…" onkeydown="jiraFetchKeydown(event)" oninput="cleanJiraFetchInput(this)"/>
+        <button class="link-add-btn" onclick="addJiraRef()">fetch</button>
+        <button class="link-cancel-btn" onclick="toggleJiraFetchInput()">✕</button>
+      </div>
+    <div class="err-bar" id="err-bar"></div>
+    <div class="run-row">
+      <div class="shortcut-hint">
+        <span class="kbd">⌘</span><span style="color:#2e2e38">+</span><span class="kbd">↵</span>
+        <span style="margin-left:4px;font-size:11px;color:#2e2e38;">to analyse</span>
+      </div>
+      <button class="run-btn" id="run-btn" onclick="runAnalysis()">
+        <div class="spinner" id="spinner"></div>
+        <span id="run-label">analyse →</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="output-section" style="display:none;width:100%;max-width:720px;">
+  <div class="div-row"><div class="div-line"></div><div class="div-txt">output</div><div class="div-line"></div></div>
+
+  <div class="card" id="title-card" style="background:#0d0d0f;">
+    <div style="padding:12px 18px 12px;">
+      <div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:#2e2e38;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;">// title</div>
+      <textarea class="title-input" id="title-input" placeholder="Auto-generated from gist — or type your own" oninput="this._userEdited=true;autoResizeTitle(this)" onfocus="this._userEdited=true" style="width:100%;"></textarea>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="out-card gist-card">
+      <div class="card-top">
+        <div class="card-head"><div class="card-pip" style="background:#5DCAA5"></div><span class="card-lbl" style="color:#5DCAA5">gist</span></div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <button class="icon-btn" id="gist-edit-btn" onclick="toggleGistEdit()" title="edit">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M11.5 2.5a1.5 1.5 0 0 1 2 2L5 13H3v-2L11.5 2.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="icon-btn" onclick="copyEl('gist-body',this)" title="copy"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="9" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M11 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h1" stroke="currentColor" stroke-width="1.2"/></svg></button>
+        </div>
+      </div>
+      <div id="gist-editor" style="display:none;">
+        <textarea id="gist-edit-area" class="gist-edit-textarea" oninput="autoResize(this)"></textarea>
+        <div style="display:flex;gap:6px;margin-top:7px;">
+          <button class="gist-save-btn" onclick="saveGistEdit()">save</button>
+          <button class="gist-cancel-btn" onclick="cancelGistEdit()">cancel</button>
+        </div>
+      </div>
+      <div id="gist-body"><div class="skeleton" style="width:100%"></div><div class="skeleton" style="width:88%"></div><div class="skeleton"></div></div>
+    </div>
+  </div>
+
+  <div id="qa-btn-wrap" style="display:none;width:100%;max-width:720px;justify-content:center;padding:4px 0 8px;">
+    <button id="qa-generate-btn" onclick="generateQA()" class="qa-gen-btn">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 5h10M3 8h7M3 11h5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="13" cy="11" r="2.5" stroke="currentColor" stroke-width="1.2"/><path d="M13 10v1.5M12.25 11.75l.75-.75" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></circle></svg>
+      Generate QA Focus
+    </button>
+  </div>
+
+  <div id="qa-section" style="display:none;width:100%;">
+  <div class="card">
+    <div class="out-card qa-card">
+      <div class="card-top">
+        <div class="card-head"><div class="card-pip" style="background:#EF9F27"></div><span class="card-lbl" style="color:#EF9F27">qa focus</span></div>
+        <span class="qa-meta">› expand &nbsp;·&nbsp; ☐ select to push</span>
+      </div>
+      <div class="qa-list" id="qa-body">
+        <div class="skeleton" style="height:12px;margin-bottom:14px;width:95%"></div>
+        <div class="skeleton" style="height:12px;margin-bottom:14px;width:82%"></div>
+        <div class="skeleton" style="height:12px;width:70%"></div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <div id="risk-btn-wrap" style="display:none;width:100%;max-width:720px;justify-content:center;padding:4px 0 8px;">
+    <button id="risk-generate-btn" onclick="generateRisk()" class="risk-gen-btn">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 1a7 7 0 1 1 0 14A7 7 0 0 1 8 1z" stroke="currentColor" stroke-width="1.2"/><path d="M8 7v4M8 5v.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      Generate Risk Scenarios
+    </button>
+  </div>
+
+  <div id="risk-section" style="display:none;width:100%;">
+  <div class="card">
+    <div class="out-card risk-card">
+      <div class="card-top">
+        <div class="card-head"><div class="card-pip" style="background:#EF9F27"></div><span class="card-lbl" style="color:#EF9F27">risk scenarios</span><span style="font-size:9px;color:#3a3028;font-family:'JetBrains Mono',monospace;padding:1px 6px;background:#1a1200;border:0.5px solid #2a2010;border-radius:3px;margin-left:4px;">player perspective</span></div>
+        <span class="qa-meta">› expand &nbsp;·&nbsp; add to TC or convert</span>
+      </div>
+      <div class="qa-list" id="risk-body">
+        <div class="skeleton" style="height:12px;margin-bottom:14px;width:95%"></div>
+        <div class="skeleton" style="height:12px;margin-bottom:14px;width:82%"></div>
+        <div class="skeleton" style="height:12px;width:70%"></div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <div id="jira-section" style="display:none;width:100%;">
+  <div class="card">
+    <div class="out-card jira-card">
+      <div class="card-top">
+        <div class="card-head"><div class="card-pip" style="background:#378ADD"></div><span class="card-lbl" style="color:#378ADD">push to jira</span></div>
+        <span style="font-size:10px;color:#1e3050;font-family:'JetBrains Mono',monospace;">creates subtasks on parent ticket</span>
+      </div>
+      <div class="jira-fields">
+        <div class="sel-summary" id="sel-summary">
+          <span class="sel-count" id="sel-count">0 selected</span>
+          <div class="sel-tags" id="sel-tags"><span class="sel-empty">— select QA items above to push as test cases</span></div>
+          <button id="copy-all-slack-btn" onclick="copyAllSelectedSlack(this)" style="display:none;margin-left:auto;align-items:center;gap:5px;padding:4px 10px;background:#1a0d28;border:0.5px solid #9b59b640;border-radius:5px;font-size:10px;color:#9b59b6;cursor:pointer;font-family:JetBrains Mono,monospace;flex-shrink:0;">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M6 2a2 2 0 0 0 0 4h2V2H6zM6 7H2a2 2 0 0 0 0 4h4V7zM10 7v4a2 2 0 0 0 4 0V7h-4zM10 6h4a2 2 0 0 0 0-4h-4v4z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>
+            Copy all for Slack
+          </button>
+        </div>
+        <div class="jira-row">
+          <div class="j-field">
+            <div class="j-label">Board <span class="j-label-hint">— paste &amp; save your boards</span> <span id="j-issue-type-badge" style="font-size:9px;font-family:'JetBrains Mono',monospace;color:#534AB7;background:#16121e;border:0.5px solid #2a2230;border-radius:3px;padding:1px 6px;display:none;"></span></div>
+            <div class="j-input-wrap">
+              <input class="j-input j-input-wide" id="jira-board-input" placeholder="e.g. LGQA or AUTO" oninput="boardInputChange(this)" onkeydown="boardKeydown(event)"/>
+              <button onclick="saveBoard()" style="position:absolute;right:6px;font-size:10px;font-family:'JetBrains Mono',monospace;background:#0d1a28;border:0.5px solid #1a2530;border-radius:4px;padding:2px 7px;color:#3a5a7a;cursor:pointer;" id="board-save-btn">save</button>
+            </div>
+            <div class="j-saved-boards" id="j-saved-boards"></div>
+            <div class="j-recent" id="j-recent"></div>
+          </div>
+          <div class="j-field">
+            <div class="j-label">Jira ticket ID</div>
+            <div class="j-input-wrap">
+              <input class="j-input j-input-wide" id="jira-id" placeholder="e.g. LGQA-456 or paste full URL" oninput="formatJiraId(this)"/>
+              <span class="j-project-badge" id="j-project-badge"></span>
+            </div>
+          </div>
+        </div>
+        <div class="push-row">
+          <span class="push-note" id="push-note">Select items and enter a ticket ID to push</span>
+          <button class="push-btn" id="push-btn" onclick="pushToJira()" disabled>
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2v9M4 8l4 4 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Push to Jira
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>var currentMode = 'notes';
+var attachedImage = null; // {base64, mediaType, name}
+var attachedLinks = [];
+var qaData = [];
+var selectedItems = new Set();
+// shared between runAnalysis and generateQA
+var _textBase = '';
+var _msgContent = null;
+// issue type cache: { 'PROJKEY': 'Test Case' | 'Subtask' | 'Task' }
+var _issueTypeCache = {};
+try { _issueTypeCache = JSON.parse(localStorage.getItem('ni_issue_type_cache') || '{}'); } catch(e) {}
+var _qaJsonInstruction = '';
+var riskData = [];
+
+function buildGistInstruction(textBase) {
+  return 'Analyse this content and return a structured summary as a JSON object. Return ONLY the JSON, no markdown, no explanation.\n' +
+    'Format:\n' +
+    '{\n' +
+    '  "summary": "one clear sentence overview of the whole content",\n' +
+    '  "groups": [\n' +
+    '    {\n' +
+    '      "label": "short group name e.g. Decisions, Actions, Risks, Open Questions, Context, Changes, Requirements",\n' +
+    '      "icon": "single emoji that fits the group",\n' +
+    '      "points": ["point 1", "point 2"]\n' +
+    '    }\n' +
+    '  ]\n' +
+    '}\n' +
+    'Rules:\n' +
+    '- Draw from ALL input sources (text, Confluence, Slack, screenshots)\n' +
+    '- Group related points together under a meaningful label\n' +
+    '- Use 2-6 groups depending on content — do not force grouping if content is simple\n' +
+    '- Each point concise but complete — reader understands without re-reading source\n' +
+    '- Tag special points with a prefix: [decision] [action] [risk] [open] — lowercase, in the point text\n' +
+    '- No artificial limit on points per group — include all important ideas\n' +
+    '- No duplicate points across groups\n' +
+    '- Output the JSON object only.';
+}
+
+function setLoading(on) {
+  var btn = document.getElementById('run-btn');
+  var spinner = document.getElementById('spinner');
+  var label = document.getElementById('run-label');
+  if (on) {
+    if (btn) btn.disabled = true;
+    if (spinner) spinner.style.display = 'block';
+    if (label) label.textContent = 'analysing…';
+  } else {
+    if (btn) btn.disabled = false;
+    if (spinner) spinner.style.display = 'none';
+    if (label) label.textContent = 'analyse →';
+  }
+}
+
+var CONTENT_WARN = 6000;
+var CONTENT_MAX = 12000;
+
+function checkContentSize(el) {
+  var len = el.value.length;
+  var bar = document.getElementById('content-size-bar');
+  var msg = document.getElementById('content-size-msg');
+  var count = document.getElementById('content-size-count');
+  if (len > CONTENT_WARN) {
+    bar.style.display = 'flex';
+    count.textContent = Math.round(len/1000)+'k chars';
+    if (len > CONTENT_MAX) {
+      msg.textContent = '⚠ Very large — will use the most relevant sections';
+      msg.style.color = '#F09595';
+    } else {
+      msg.textContent = '⚡ Large content detected — consider pasting the key section only';
+      msg.style.color = '#EF9F27';
+    }
+  } else {
+    bar.style.display = 'none';
+  }
+}
+
+function smartTruncate(text) {
+  if (text.length <= CONTENT_MAX) return text;
+  // take first 8000 + last 2000 chars (intro + conclusion carry most signal)
+  var head = text.substring(0, 8000);
+  var tail = text.substring(text.length - 2000);
+  return head + '\n\n[... content truncated for length ...]\n\n' + tail;
+}
+
+// ── PROJECT CONTEXT ──
+function loadContext() {
+  try {
+    var saved = JSON.parse(localStorage.getItem('ni_project_context') || '{}');
+    if (saved.product) document.getElementById('ctx-product').value = saved.product;
+    if (saved.qaFocus) document.getElementById('ctx-qa-focus').value = saved.qaFocus;
+    if (saved.terminology) document.getElementById('ctx-terminology').value = saved.terminology;
+    if (saved.style) document.getElementById('ctx-style').value = saved.style;
+    if (saved.extra) { document.getElementById('ctx-extra').value = saved.extra; autoResize(document.getElementById('ctx-extra')); }
+    updateContextStatus();
+  } catch(e) {}
+}
+
+function saveContext() {
+  var ctx = {
+    product: document.getElementById('ctx-product').value.trim(),
+    qaFocus: document.getElementById('ctx-qa-focus').value.trim(),
+    terminology: document.getElementById('ctx-terminology').value.trim(),
+    style: document.getElementById('ctx-style').value.trim(),
+    extra: document.getElementById('ctx-extra').value.trim()
+  };
+  try { localStorage.setItem('ni_project_context', JSON.stringify(ctx)); } catch(e) {}
+  updateContextStatus();
+  var note = document.getElementById('ctx-saved-note');
+  note.textContent = '✓ saved';
+  setTimeout(function(){ note.textContent = ''; }, 2000);
+}
+
+function clearContext() {
+  ['ctx-product','ctx-qa-focus','ctx-terminology','ctx-style','ctx-extra'].forEach(function(id){
+    document.getElementById(id).value = '';
+  });
+  try { localStorage.removeItem('ni_project_context'); } catch(e) {}
+  updateContextStatus();
+}
+
+function toggleContext() {
+  var body = document.getElementById('context-body');
+  var chev = document.getElementById('context-chev');
+  var hint = document.getElementById('context-hint');
+  var open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  chev.style.transform = open ? '' : 'rotate(180deg)';
+  hint.textContent = open ? 'click to expand' : 'click to collapse';
+}
+
+function updateContextStatus() {
+  var ctx = getProjectContext();
+  var status = document.getElementById('context-status');
+  var hasCtx = Object.values(ctx).some(function(v){ return v && v.trim(); });
+  status.style.display = hasCtx ? 'inline-block' : 'none';
+  status.textContent = hasCtx ? 'active' : '';
+}
+
+function getProjectContext() {
+  return {
+    product: (document.getElementById('ctx-product') || {}).value || '',
+    qaFocus: (document.getElementById('ctx-qa-focus') || {}).value || '',
+    terminology: (document.getElementById('ctx-terminology') || {}).value || '',
+    style: (document.getElementById('ctx-style') || {}).value || '',
+    extra: (document.getElementById('ctx-extra') || {}).value || ''
+  };
+}
+
+function buildContextBlock() {
+  var ctx = getProjectContext();
+  var lines = [];
+  if (ctx.product) lines.push('Product/Platform: ' + ctx.product);
+  if (ctx.qaFocus) lines.push('QA Focus Areas: ' + ctx.qaFocus);
+  if (ctx.terminology) lines.push('Team Terminology: ' + ctx.terminology);
+  if (ctx.style) lines.push('Output Style: ' + ctx.style);
+  if (ctx.extra) lines.push('Additional Context: ' + ctx.extra);
+  if (!lines.length) return '';
+  return '--- PROJECT CONTEXT (use this to inform all output) ---\n' + lines.join('\n') + '\n--- END CONTEXT ---\n\n';
+}
+
+// Load context on startup
+document.addEventListener('DOMContentLoaded', loadContext);
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
+}
+
+function autoResizeTitle(el) {
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
+}
+
+function clearAll() {
+  // Clear inputs
+  var mainInput = document.getElementById('main-input');
+  mainInput.value = '';
+  mainInput.style.height = 'auto'; // reset auto-expand height
+  mainInput.placeholder = 'Paste your content here — notes, meeting transcript, article.';
+  hideErr();
+  var ti = document.getElementById('title-input');
+  if (ti) { ti.value = ''; ti._userEdited = false; ti.style.height = 'auto'; }
+  // Clear attachments
+  attachedImage = null;
+  attachedLinks = [];
+  var preview = document.getElementById('img-preview');
+  var wrap = document.getElementById('img-preview-wrap');
+  if (preview) preview.style.display = 'none';
+  if (wrap) wrap.style.display = 'none';
+  renderAttTags();
+  // Close any open input rows
+  var linkRow = document.getElementById('link-input-row');
+  var confRow = document.getElementById('confluence-input-row');
+  if (linkRow) linkRow.style.display = 'none';
+  if (confRow) confRow.style.display = 'none';
+  // Clear content size warning
+  var sizeBar = document.getElementById('content-size-bar');
+  if (sizeBar) sizeBar.style.display = 'none';
+  // Hide output section
+  var outSec = document.getElementById('output-section');
+  if (outSec) outSec.style.display = 'none';
+  var qaBtnWrap = document.getElementById('qa-btn-wrap');
+  if (qaBtnWrap) qaBtnWrap.style.display = 'none';
+  var qaSection = document.getElementById('qa-section');
+  if (qaSection) qaSection.style.display = 'none';
+  var riskSection = document.getElementById('risk-section');
+  if (riskSection) riskSection.style.display = 'none';
+  var riskBtnWrap = document.getElementById('risk-btn-wrap');
+  if (riskBtnWrap) riskBtnWrap.style.display = 'none';
+  riskData = [];
+  var jiraSection = document.getElementById('jira-section');
+  if (jiraSection) jiraSection.style.display = 'none';
+  // Clear QA state
+  qaData = [];
+  selectedItems.clear();
+  updateSelected();
+  hideErr();
+  // Reset run button
+  document.getElementById('run-btn').disabled = false;
+  document.getElementById('run-label').textContent = 'analyse →';
+  document.getElementById('spinner').style.display = 'none';
+}
+
+function setMode(el) {
+  document.querySelectorAll('.mchip').forEach(function(c){ c.classList.remove('on'); });
+  el.classList.add('on');
+  currentMode = el.dataset.mode;
+}
+
+document.addEventListener('keydown', function(e){
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') runAnalysis();
+});
+
+// ── IMAGE UPLOAD ──
+function handleFile(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var dataUrl = e.target.result;
+    var parts = dataUrl.split(',');
+    var meta = parts[0]; // e.g. data:image/jpeg;base64
+    var base64 = parts[1];
+    var mediaType = meta.match(/:(.*?);/)[1];
+    attachedImage = { base64: base64, mediaType: mediaType, name: file.name };
+    // show preview
+    var preview = document.getElementById('img-preview');
+    preview.src = dataUrl;
+    preview.style.display = 'block';
+    var wrap = document.getElementById('img-preview-wrap');
+    wrap.style.display = 'inline-block';
+    renderAttTags();
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+
+function toggleSlackInput() {
+  var row = document.getElementById('slack-input-row');
+  var inp = document.getElementById('slack-url-input');
+  // close confluence if open
+  var confRow = document.getElementById('confluence-input-row');
+  if (confRow) confRow.style.display = 'none';
+  var visible = row.style.display !== 'none';
+  row.style.display = visible ? 'none' : 'flex';
+  if (!visible) { inp.value = ''; inp.focus(); }
+}
+
+function slackKeydown(e) {
+  if (e.key === 'Enter') addSlackRef();
+  if (e.key === 'Escape') toggleSlackInput();
+}
+
+function toggleJiraFetchInput() {
+  var row = document.getElementById('jira-fetch-input-row');
+  var inp = document.getElementById('jira-fetch-input');
+  // close others if open
+  document.getElementById('confluence-input-row').style.display = 'none';
+  document.getElementById('slack-input-row').style.display = 'none';
+  var visible = row.style.display !== 'none';
+  row.style.display = visible ? 'none' : 'flex';
+  if (!visible) { inp.value = ''; inp.focus(); }
+}
+
+function jiraFetchKeydown(e) {
+  if (e.key === 'Enter') addJiraRef();
+  if (e.key === 'Escape') toggleJiraFetchInput();
+}
+
+function cleanJiraFetchInput(inp) {
+  var val = inp.value;
+  // If it looks like a URL or has a path, extract just the ticket key
+  var match = val.match(/([A-Z]{2,10}-\d{1,6})/i);
+  if (match && val.length > match[1].length) {
+    inp.value = match[1].toUpperCase();
+  } else if (val.length > 4) {
+    inp.value = val.toUpperCase();
+  }
+}
+
+function addJiraRef() {
+  var inp = document.getElementById('jira-fetch-input');
+  var raw = inp.value.trim();
+  if (!raw) return;
+  // Extract ticket key from URL or plain text — e.g. SMR-1234 or .../browse/SMR-1234
+  var match = raw.match(/([A-Z]{2,10}-\d{1,6})/i);
+  if (!match) {
+    showErr('Could not find a Jira ticket key. Enter a key like SMR-1234 or paste the full Jira URL.');
+    return;
+  }
+  var ticketKey = match[1].toUpperCase();
+  attachedLinks.push({ url: raw, display: '🎫 ' + ticketKey, jiraTicketKey: ticketKey });
+  renderAttTags();
+  toggleJiraFetchInput();
+  hideErr();
+  var mainInput = document.getElementById('main-input');
+  if (!mainInput.value.trim()) {
+    mainInput.placeholder = '✓ Jira ticket added — hit analyse to read and generate gist.';
+  }
+}
+
+function addSlackRef() {
+  var inp = document.getElementById('slack-url-input');
+  var raw = inp.value.trim();
+  if (!raw) return;
+
+  // Parse Slack URL: https://workspace.slack.com/archives/CHANNEL_ID/pTIMESTAMP
+  // timestamp format: p1234567890123456 -> 1234567890.123456
+  var match = raw.match(/archives\/([A-Z0-9]+)\/p([0-9]+)/i);
+  if (!match) {
+    showErr('Could not parse Slack link. Paste a message link from Slack (right-click message → Copy link).');
+    return;
+  }
+
+  var channelId = match[1];
+  var tsRaw = match[2]; // e.g. 1234567890123456
+  // convert to Slack timestamp format: 1234567890.123456
+  var threadTs = tsRaw.slice(0, 10) + '.' + tsRaw.slice(10);
+
+  var display = '#' + channelId + ' · ' + new Date(parseInt(tsRaw.slice(0,10)) * 1000).toLocaleDateString();
+  attachedLinks.push({ url: raw, display: '💬 ' + display, slackChannelId: channelId, slackThreadTs: threadTs });
+  renderAttTags();
+  toggleSlackInput();
+  hideErr();
+
+  var mainInput = document.getElementById('main-input');
+  if (!mainInput.value.trim()) {
+    mainInput.placeholder = '✓ Slack thread added — hit analyse to read and generate gist.';
+  }
+}
+
+function toggleConfluenceInput() {
+  var row = document.getElementById('confluence-input-row');
+  var inp = document.getElementById('confluence-url-input');
+  var visible = row.style.display !== 'none';
+  row.style.display = visible ? 'none' : 'flex';
+  if (!visible) { inp.value = ''; inp.focus(); }
+}
+
+function confluenceKeydown(e) {
+  if (e.key === 'Enter') addConfluenceRef();
+  if (e.key === 'Escape') toggleConfluenceInput();
+}
+
+function addConfluenceRef() {
+  var inp = document.getElementById('confluence-url-input');
+  var raw = inp.value.trim();
+  if (!raw) return;
+
+  // Extract page ID
+  var numMatch = raw.match(/pages\/([0-9]+)/) || raw.match(/pageId=([0-9]+)/);
+  var tinyMatch = raw.match(/\/wiki\/x\/([A-Za-z0-9_-]+)/);
+  var bareNum = /^[0-9]+$/.test(raw.trim());
+
+  var pageId = numMatch ? numMatch[1] : (bareNum ? raw.trim() : null);
+  var tinyId = tinyMatch ? tinyMatch[1] : null;
+  var idToUse = tinyId || pageId;
+
+  if (!idToUse) {
+    showErr('Could not find a page ID. Paste the full Confluence URL or the numeric page ID.');
+    return;
+  }
+
+  // Store reference — AI will read it live during analysis via MCP
+  var display = raw.replace(/^https?:\/\/[^/]+/, '').replace(/\/wiki\/spaces\/[A-Z0-9]+\/pages\/[0-9]+\//, '').replace(/\/wiki\/x\//, '').replace(/\+/g, ' ').substring(0, 40) || 'Confluence page';
+  attachedLinks.push({ url: raw, display: '📄 ' + display, confluenceId: idToUse });
+  renderAttTags();
+  toggleConfluenceInput();
+  hideErr();
+
+  // Update placeholder
+  var mainInput = document.getElementById('main-input');
+  if (!mainInput.value.trim()) {
+    mainInput.placeholder = '✓ Confluence page added — hit analyse to read and generate gist.';
+  }
+}
+
+function removeImg() {
+  attachedImage = null;
+  var preview = document.getElementById('img-preview');
+  preview.src = '';
+  preview.style.display = 'none';
+  document.getElementById('img-preview-wrap').style.display = 'none';
+  renderAttTags();
+}
+
+function removeLink(i) {
+  attachedLinks.splice(i,1);
+  renderAttTags();
+}
+
+function renderAttTags() {
+  var el = document.getElementById('att-tags');
+  var html = '';
+  attachedLinks.forEach(function(l, i) {
+    html += '<a class="att-tag att-tag-link" href="'+l.url+'" target="_blank" rel="noopener noreferrer">'+
+      '<div class="att-dot" style="background:#378ADD"></div>' +
+      '<svg width="10" height="10" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><path d="M6.5 9.5a3.5 3.5 0 0 0 5 0l2-2a3.5 3.5 0 0 0-5-5l-1 1" stroke="#378ADD" stroke-width="1.3" stroke-linecap="round"/><path d="M9.5 6.5a3.5 3.5 0 0 0-5 0l-2 2a3.5 3.5 0 0 0 5 5l1-1" stroke="#378ADD" stroke-width="1.3" stroke-linecap="round"/></svg>' +
+      esc(l.display) +
+      '<span class="x" onclick="event.preventDefault();event.stopPropagation();removeLink('+i+')">×</span>'+
+    '</a>';
+  });
+  el.innerHTML = html;
+}
+
+// ── MAIN ANALYSIS ──
+async function runAnalysis() {
+  if (window._analysisRunning) return; // prevent double execution
+  window._analysisRunning = true;
+  var title = document.getElementById('title-input').value.trim();
+  var contentText = document.getElementById('main-input').value.trim();
+  // reset title auto-edit flag for new run
+  var _ti = document.getElementById('title-input');
+  if (_ti) { _ti._userEdited = false; _ti.value = ''; }
+  var hasConfluenceRef = attachedLinks.some(function(l){ return l.confluenceId; });
+  var hasSlackRef = attachedLinks.some(function(l){ return l.slackChannelId; });
+  var hasJiraRef = attachedLinks.some(function(l){ return l.jiraTicketKey; });
+  if (!contentText && !attachedImage && !hasConfluenceRef && !hasSlackRef && !hasJiraRef) {
+    showErr('Please paste some content, attach a screenshot, add a Confluence page, Slack thread, or Jira ticket.');
+    return;
+  }
+
+  hideErr();
+  setLoading(true);
+  var outSec = document.getElementById('output-section');
+  outSec.style.display = 'flex';
+  outSec.style.flexDirection = 'column';
+  outSec.style.gap = '0';
+  outSec.style.alignItems = 'stretch';
+  selectedItems.clear();
+  qaData = [];
+  updateSelected();
+
+  var modeHints = {
+    notes: 'These are personal notes. Focus on key takeaways and observations.',
+    meeting: 'This is a meeting transcript. Extract decisions, actions, and open questions.',
+    designdoc: 'This is a design document or spec. Extract scope, key decisions, open questions and testable requirements.'
+  };
+
+  _textBase = buildContextBlock() + (title ? 'Title: ' + title + '\n\n' : '') +
+    'Content type: ' + currentMode + '. ' + modeHints[currentMode] + '\n\n';
+  if (contentText) _textBase += 'Content:\n' + smartTruncate(contentText) + '\n\n';
+  if (attachedImage) _textBase += 'A screenshot has been attached.\n\n';
+  var confPages = attachedLinks.filter(function(l){ return l.confluenceId; });
+  var slackThreads = attachedLinks.filter(function(l){ return l.slackChannelId; });
+  var jiraTickets = attachedLinks.filter(function(l){ return l.jiraTicketKey; });
+  var plainLinks = attachedLinks.filter(function(l){ return !l.confluenceId && !l.slackChannelId && !l.jiraTicketKey; });
+
+  if (confPages.length > 0) {
+    _textBase += 'Confluence pages to read (use Atlassian MCP getConfluencePage with cloudId "34aa4a4c-c013-48e8-831e-38a9b5e86a13" to fetch each):\n';
+    confPages.forEach(function(l) {
+      _textBase += '- pageId: ' + l.confluenceId + ' (' + l.display.replace('📄 ','') + ')\n';
+    });
+    _textBase += '\n';
+  }
+
+  if (slackThreads.length > 0) {
+    _textBase += 'Slack threads to read (use Slack MCP slack_read_thread to fetch each, then include all messages in your analysis):\n';
+    slackThreads.forEach(function(l) {
+      _textBase += '- channel_id: ' + l.slackChannelId + ', thread_ts: ' + l.slackThreadTs + ' (' + l.display.replace('💬 ','') + ')\n';
+    });
+    _textBase += '\n';
+  }
+
+  if (jiraTickets.length > 0) {
+    _textBase += 'Jira tickets to read (use Atlassian MCP getJiraIssue with cloudId "34aa4a4c-c013-48e8-831e-38a9b5e86a13" to fetch full details including summary, description, comments, and acceptance criteria for each):\n';
+    jiraTickets.forEach(function(l) {
+      _textBase += '- issueIdOrKey: ' + l.jiraTicketKey + '\n';
+    });
+    _textBase += '\n';
+  }
+
+  if (plainLinks.length > 0) _textBase += 'Referenced links: ' + plainLinks.map(function(l){ return l.url; }).join(', ') + '\n\n';
+
+  _qaJsonInstruction = 'Return ONLY a JSON array (no object wrapper) of exactly 5 QA focus points. ' +
+    'Each item: {"title":"max 70 chars","severity":"high|med|low","detail":"max 90 chars","testcase":{"objective":"max 90 chars","preconditions":"max 90 chars","steps":["s1","s2","s3","s4","s5"],"expected":"max 200 chars"}} ' +
+    'FLOW-AWARE RULES — read before generating: ' +
+    '1. If multiple verification points belong to the same user flow or happy path (e.g. login → action → result), COMBINE them into one test case. ' +
+    '   Use the steps array to cover each check in sequence, and use the expected field to list multiple expected outcomes separated by semicolons. ' +
+    '   Do not split a single coherent flow into multiple test cases just to fill 5 slots. ' +
+    '2. Only create separate test cases when the scenarios are genuinely distinct — different entry points, different states, or different failure modes. ' +
+    '3. Each of the 5 items must cover a distinct area — no overlapping verification points across items. ' +
+    '4. Before finalising, scan all 5 and merge any that test the same flow or condition. Replace the merged slot with a new distinct area. ' +
+    '5. Order by severity desc. Steps array can have up to 5 entries. Output the array only.';
+
+  // build message content — include image if attached
+  _msgContent = null;
+  if (attachedImage) {
+    _msgContent = [
+      { type: 'image', source: { type: 'base64', media_type: attachedImage.mediaType, data: attachedImage.base64 } },
+      { type: 'text', text: _textBase }
+    ];
+  }
+
+  try {
+    // ── GIST ONLY ──
+    var gistPrompt = (_msgContent && typeof _msgContent !== 'string')
+      ? [..._msgContent, { type: 'text', text: buildGistInstruction(_textBase) }]
+      : _textBase + '\n\n' + buildGistInstruction(_textBase);
+
+    // streaming gist — text appears as it generates
+    var hasConfluencePages = attachedLinks.some(function(l){ return l.confluenceId; });
+    var hasSlackThreads = attachedLinks.some(function(l){ return l.slackChannelId; });
+    var hasJiraTickets = attachedLinks.some(function(l){ return l.jiraTicketKey; });
+    var needsMcp = hasConfluencePages || hasSlackThreads || hasJiraTickets;
+    var gistBody = {
+      model: needsMcp ? 'claude-sonnet-4-20250514' : 'claude-haiku-4-5-20251001',
+      max_tokens: 800,
+      stream: true,
+      messages: [{ role: 'user', content: gistPrompt }]
+    };
+    if (needsMcp) {
+      gistBody.mcp_servers = [];
+      if (hasConfluencePages || hasJiraTickets) gistBody.mcp_servers.push({ type: 'url', url: 'https://mcp.atlassian.com/v1/mcp', name: 'atlassian-mcp' });
+      if (hasSlackThreads) gistBody.mcp_servers.push({ type: 'url', url: 'https://mcp.slack.com/mcp', name: 'slack-mcp' });
+    }
+    var r1 = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify(gistBody)
+    });
+
+    // show gist card immediately with streaming cursor
+    document.getElementById('gist-body').innerHTML = '<p class="gist-p" id="gist-stream" style="color:#6a8078;font-size:14px;line-height:1.75;"></p>';
+    var streamEl = document.getElementById('gist-stream');
+    var gistText = '';
+    var reader = r1.body.getReader();
+    var decoder = new TextDecoder();
+    while (true) {
+      var chunk = await reader.read();
+      if (chunk.done) break;
+      var lines = decoder.decode(chunk.value).split('\n');
+      for (var li = 0; li < lines.length; li++) {
+        var line = lines[li].trim();
+        if (!line.startsWith('data:')) continue;
+        var jsonStr = line.slice(5).trim();
+        if (jsonStr === '[DONE]') continue;
+        try {
+          var evt = JSON.parse(jsonStr);
+          if (evt.type === 'content_block_delta' && evt.delta && evt.delta.text) {
+            gistText += evt.delta.text;
+            // show raw text while streaming so user sees progress
+            if (streamEl) streamEl.textContent = gistText;
+          }
+        } catch(pe) {}
+      }
+    }
+    // once complete, render structured format
+    renderGist(gistText);
+
+    // show generate QA button after gist renders
+    showQAButton();
+
+  } catch(e) {
+    showErr('Analysis failed: ' + (e && e.message ? e.message.substring(0, 100) : 'unknown error'));
+  } finally {
+    setLoading(false);
+    window._analysisRunning = false;
+  }
+}
+
+async function generateQA() {
+  var qaBtn = document.getElementById('qa-generate-btn');
+  if (qaBtn) {
+    qaBtn.disabled = true;
+    qaBtn.innerHTML = '<div class="loading-spinner-sm" style="border-top-color:#EF9F27;"></div> generating…';
+  }
+
+  // show QA card with skeleton
+  var qaCard = document.getElementById('qa-section');
+  if (qaCard) qaCard.style.display = 'block';
+  document.getElementById('qa-body').innerHTML =
+    '<div class="skeleton" style="height:12px;margin-bottom:14px;width:95%"></div>' +
+    '<div class="skeleton" style="height:12px;margin-bottom:14px;width:82%"></div>' +
+    '<div class="skeleton" style="height:12px;width:70%"></div>';
+
+  try {
+    // ── CALL 2: QA Focus (compact JSON) ──
+    // include edited gist if user has modified it
+    var gistBody = document.getElementById('gist-body');
+    var currentGist = gistBody ? (gistBody.innerText || gistBody.textContent || '').trim() : '';
+    var gistAddendum = currentGist ? '\n\nEDITED SUMMARY (user has refined this — use it to guide QA focus):\n' + currentGist + '\n' : '';
+
+    var qaPrompt = (_msgContent && typeof _msgContent !== 'string')
+      ? [..._msgContent, { type: 'text', text: gistAddendum + _qaJsonInstruction }]
+      : _textBase + gistAddendum + '\n\n' + _qaJsonInstruction;
+
+    var r2 = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(Object.assign({
+        model: (attachedLinks.some(function(l){ return l.confluenceId || l.slackChannelId; })) ? 'claude-sonnet-4-20250514' : 'claude-haiku-4-5-20251001',
+        max_tokens: 3000,
+        temperature: 0,
+        system: 'You output only raw JSON arrays. No markdown, no explanation, no trailing text. Every string value must be on a single line — no newlines or line breaks inside strings. Use only straight ASCII quotes. Every string under 90 chars. Be deterministic.',
+        messages: [{ role: 'user', content: qaPrompt }]
+      }, (function() {
+        var servers = [];
+        if (attachedLinks.some(function(l){ return l.confluenceId; })) servers.push({ type: 'url', url: 'https://mcp.atlassian.com/v1/mcp', name: 'atlassian-mcp' });
+        if (attachedLinks.some(function(l){ return l.slackChannelId; })) servers.push({ type: 'url', url: 'https://mcp.slack.com/mcp', name: 'slack-mcp' });
+        return servers.length ? { mcp_servers: servers } : {};
+      })()))
+    });
+    var d2 = await r2.json();
+    // collect all text blocks — MCP calls produce multiple content blocks
+    var raw2 = (d2.content || [])
+      .filter(function(b){ return b.type === 'text'; })
+      .map(function(b){ return b.text; })
+      .join('');
+
+
+    // also check mcp_tool_result blocks if text is empty
+    if (!raw2.trim()) {
+      raw2 = (d2.content || [])
+        .filter(function(b){ return b.type === 'mcp_tool_result'; })
+        .map(function(b){ return (b.content||[]).map(function(c){ return c.text||''; }).join(''); })
+        .join('');
+    }
+
+    var clean2 = raw2.replace(/```json|```/g, '').trim();
+    // find outermost JSON array
+    var s = clean2.indexOf('['), e = clean2.lastIndexOf(']');
+    // fallback: maybe it returned an object with a qa key
+    if (s === -1) {
+      var os = clean2.indexOf('{'), oe = clean2.lastIndexOf('}');
+      if (os > -1) {
+        try {
+          var obj = JSON.parse(clean2.slice(os, oe+1));
+          if (obj.qa && Array.isArray(obj.qa)) { renderQA(obj.qa); return; }
+        } catch(pe) {}
+      }
+    }
+    if (s === -1 || e === -1) throw new Error('No QA array in response: ' + clean2.substring(0, 200));
+    clean2 = clean2.slice(s, e + 1);
+    // Sanitise: strip control chars, smart quotes, fix common JSON issues
+    clean2 = clean2
+      .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')   // control chars
+      .replace(/[\u2018\u2019]/g, "\'")                          // smart single quotes
+      .replace(/[\u201C\u201D]/g, '\"')                          // smart double quotes
+      .replace(/\r?\n/g, ' ')                                      // newlines inside values
+      .replace(/([^\\])"\s*:\s*"([^"]*?)\n([^"]*?)"/g, '$1": "$2 $3"') // newline inside string value
+      .replace(/,\s*([\]}])/g, '$1')                               // trailing commas
+      .replace(/,\s*([\]}])/g, '$1');                              // trailing commas (double pass)
+    // Try parsing; if it fails, attempt per-item extraction as fallback
+    var qaArray;
+    try {
+      qaArray = JSON.parse(clean2);
+    } catch(parseErr) {
+      // Fallback: extract individual objects from the array string
+      var items = [];
+      var depth = 0, start = -1;
+      for (var ci = 0; ci < clean2.length; ci++) {
+        if (clean2[ci] === '{') { if (depth === 0) start = ci; depth++; }
+        else if (clean2[ci] === '}') {
+          depth--;
+          if (depth === 0 && start !== -1) {
+            try { items.push(JSON.parse(clean2.slice(start, ci+1))); } catch(ie) {}
+            start = -1;
+          }
+        }
+      }
+      if (items.length === 0) throw new Error('JSON parse failed: ' + parseErr.message + ' | raw: ' + clean2.substring(0, 300));
+      qaArray = items;
+    }
+    renderQA(qaArray);
+    // show jira section
+    var jiraCard = document.getElementById('jira-section');
+    if (jiraCard) jiraCard.style.display = 'block';
+    // Show risk generate button after QA
+    var riskBtn = document.getElementById('risk-btn-wrap');
+    if (riskBtn) riskBtn.style.display = 'flex';
+
+  } catch(e) {
+    showErr('QA generation failed: ' + (e && e.message ? e.message.substring(0, 80) : 'unknown error'));
+  } finally {
+    if (qaBtn) {
+      qaBtn.disabled = false;
+      qaBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 5h10M3 8h7M3 11h5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg> Generate QA Focus';
+    }
+  }
+}
+
+function showRetryUI(st, err, itemIdx) {
+  if (!st) return;
+  var msg = err && err.message ? esc(err.message.substring(0, 60)) : 'failed';
+  var btnStyle = 'font-size:9px;font-family:JetBrains Mono,monospace;padding:1px 6px;background:#1a0808;border:0.5px solid #F09595;border-radius:3px;color:#F09595;cursor:pointer;margin-left:4px;';
+  st.innerHTML = '<span style="color:#F09595;font-size:10px;">'+msg+'</span>' +
+    ' <button onclick="retryPush('+itemIdx+',this)" style="'+btnStyle+'">retry</button>';
+}
+
+async function retryPush(i, btn) {
+  var dot = document.getElementById('ppi-dot-'+i);
+  var st = document.getElementById('ppi-st-'+i);
+  var parentKey = document.getElementById('jira-id').value.trim().toUpperCase();
+  if (dot) { dot.textContent = '◌'; dot.style.color = '#378ADD'; dot.style.animation = 'spin .8s linear infinite'; }
+  if (st) { st.textContent = 'retrying…'; st.style.color = '#2a3a4a'; }
+  try {
+    var result = await createSubtaskViaMCP(qaData[i], parentKey);
+    if (dot) { dot.textContent = '✓'; dot.style.color = '#5DCAA5'; dot.style.animation = 'none'; }
+    if (st) { var safeUrl = result.url && result.url.startsWith('https://tactileentertainment.atlassian.net') ? result.url : '#';
+      st.innerHTML = '<a href="'+safeUrl+'" target="_blank" rel="noopener noreferrer" style="color:#378ADD;font-family:JetBrains Mono,monospace;font-size:10px;text-decoration:none;">'+esc(result.key)+' ↗</a>'; }
+  } catch(e) {
+    if (dot) { dot.textContent = '✗'; dot.style.color = '#F09595'; dot.style.animation = 'none'; }
+    var failMsg = e.message ? esc(e.message.substring(0, 60)) : 'failed';
+    if (st) {
+      st.innerHTML = '<span style="color:#F09595;font-size:10px;">'+failMsg+'</span>' +
+        ' <button onclick="retryPush('+i+',this)" style="font-size:9px;font-family:JetBrains Mono,monospace;padding:1px 6px;background:#1a0808;border:0.5px solid #F09595;border-radius:3px;color:#F09595;cursor:pointer;margin-left:4px;">retry</button>';
+    }
+  }
+}
+
+function showQAButton() {
+  var wrap = document.getElementById('qa-btn-wrap');
+  if (wrap) wrap.style.display = 'flex';
+}
+
+async function resolveIssueType(projectKey) {
+  // Return cached value if available
+  if (_issueTypeCache[projectKey]) return _issueTypeCache[projectKey];
+
+  // Ask Sonnet to fetch issue types via MCP and return the best match
+  var prompt = [
+    "Use the Atlassian MCP getJiraProjectIssueTypesMetadata tool to fetch available issue types for this project.",
+    "- cloudId: 34aa4a4c-c013-48e8-831e-38a9b5e86a13",
+    "- projectKey: "+projectKey,
+    "",
+    "From the returned issue types, find the best match using this priority order:",
+    "1. Test Case",
+    "2. Subtask",
+    "3. Task",
+    "4. If none of the above exist, return the name of the first subtask-level issue type available.",
+    "",
+    "Return ONLY a JSON object like: {\"issueTypeName\": \"Test Case\"}"
+  ].join("\n");
+
+  try {
+    var resp = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 300,
+        mcp_servers: [{ type: "url", url: "https://mcp.atlassian.com/v1/mcp", name: "atlassian-mcp" }],
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+    if (!resp.ok) throw new Error("API error "+resp.status);
+    var data = await resp.json();
+    var raw = (data.content || []).filter(function(b){ return b.type === "text"; }).map(function(b){ return b.text; }).join("");
+    var clean = raw.replace(/```json|```/g, "").trim();
+    var s = clean.indexOf("{"), e = clean.lastIndexOf("}");
+    if (s > -1 && e > -1) {
+      var parsed = JSON.parse(clean.slice(s, e+1));
+      if (parsed.issueTypeName) {
+        // Cache and persist
+        _issueTypeCache[projectKey] = parsed.issueTypeName;
+        try { localStorage.setItem('ni_issue_type_cache', JSON.stringify(_issueTypeCache)); } catch(ex) {}
+        return parsed.issueTypeName;
+      }
+    }
+  } catch(ex) {}
+  // Safe fallback — Test Case is the primary use case
+  return "Test Case";
+}
+
+async function createSubtaskViaMCP(tc, parentKey) {
+  if (!tc || !tc.testcase) throw new Error('Invalid test case data');
+  if (!parentKey || !parentKey.match(/^[A-Z]{2,10}-\d+$/i)) throw new Error('Invalid parent ticket key: ' + parentKey);
+  var projectKey = parentKey.split("-")[0].toUpperCase();
+  var safeTitle = tc.title.replace(/[^a-zA-Z0-9 \-_.(),:]/g, " ");
+  var due = new Date(); due.setMonth(due.getMonth() + 1);
+  var dueDate = due.toISOString().split('T')[0];
+  // Resolve issue type for this board — auto-detect with localStorage cache
+  var issueTypeName = await resolveIssueType(projectKey);
+
+  // Build ADF description so Jira renders sections and steps correctly
+  function adfParagraph(text) {
+    return { type: "paragraph", content: [{ type: "text", text: text }] };
+  }
+  function adfHeading(text, level) {
+    return { type: "heading", attrs: { level: level }, content: [{ type: "text", text: text }] };
+  }
+  function adfBullet(items) {
+    return { type: "bulletList", content: items.map(function(t) {
+      return { type: "listItem", content: [{ type: "paragraph", content: [{ type: "text", text: t }] }] };
+    })};
+  }
+  function adfOrdered(items) {
+    return { type: "orderedList", content: items.map(function(t) {
+      return { type: "listItem", content: [{ type: "paragraph", content: [{ type: "text", text: t }] }] };
+    })};
+  }
+
+  var adfDoc = {
+    type: "doc", version: 1,
+    content: [
+      adfHeading("Objective", 3),
+      adfParagraph(tc.testcase.objective),
+      adfHeading("Preconditions", 3),
+      adfBullet(tc.testcase.preconditions.split(/[.;]\s+/).filter(function(s){ return s.trim().length > 2; })),
+      adfHeading("Steps", 3),
+      adfOrdered(tc.testcase.steps),
+      adfHeading("Expected Result", 3),
+      adfParagraph(tc.testcase.expected)
+    ]
+  };
+
+  var prompt = [
+    "You are an automation assistant. Create a Jira issue of type '"+issueTypeName+"' using the Atlassian MCP createJiraIssue tool.",
+    "",
+    "Use these EXACT parameters — do not modify any values:",
+    "- cloudId: 34aa4a4c-c013-48e8-831e-38a9b5e86a13",
+    "- projectKey: "+projectKey,
+    "- issueTypeName: "+issueTypeName,
+    "- summary: [TC] "+safeTitle,
+    "- parent: "+parentKey,
+    "- contentFormat: adf",
+    "- description: "+JSON.stringify(JSON.stringify(adfDoc)),
+    "- additional_fields: "+JSON.stringify({duedate: dueDate}),
+    "",
+    "Pass the description field as the exact ADF JSON string above — do not reformat or summarise it.",
+    "After creating the issue, call getTransitionsForJiraIssue to list available transitions, then:",
+    "- If a transition named \'Prepare Testcase\' exists, use transitionJiraIssue with that transition.",
+    "- Otherwise use the transition named \'To Do\', or if neither exists, use the first available transition.",
+    "",
+    "Return ONLY JSON like: {\"key\":\"PROJ-123\",\"url\":\"https://tactileentertainment.atlassian.net/browse/PROJ-123\"}"
+  ].join("\n");
+
+  var resp = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 1000,
+      mcp_servers: [{ type: "url", url: "https://mcp.atlassian.com/v1/mcp", name: "atlassian-mcp" }],
+      messages: [{ role: "user", content: prompt }]
+    })
+  });
+  if (!resp.ok) throw new Error("API error "+resp.status);
+  var data = await resp.json();
+  var raw = (data.content || []).filter(function(b){ return b.type === "text"; }).map(function(b){ return b.text; }).join("");
+  var clean = raw.replace(/```json|```/g, "").trim();
+  var s = clean.indexOf("{"), e = clean.lastIndexOf("}");
+  if (s === -1 || e === -1) throw new Error("No JSON in response: "+clean.substring(0,120));
+  var parsed = JSON.parse(clean.slice(s, e+1));
+  if (!parsed.key) throw new Error("No key returned");
+  return parsed;
+}
+
+async function pushToJira() {
+  var parentKey = document.getElementById('jira-id').value.trim().toUpperCase();
+  var keyMatch = parentKey.match(/^([A-Z]{2,10})-/);
+  if (keyMatch) saveRecent(keyMatch[1]);
+
+  var btn = document.getElementById('push-btn');
+  var note = document.getElementById('push-note');
+  var items = Array.from(selectedItems);
+  btn.disabled = true;
+
+  var progressHTML = items.map(function(i) {
+    return '<div class="push-progress-item">'+
+      '<span class="ppi-dot" id="ppi-dot-'+i+'">◌</span>'+
+      '<span class="ppi-txt">'+esc(qaData[i] ? qaData[i].title.substring(0,55) : '')+'</span>'+
+      '<span class="ppi-status" id="ppi-st-'+i+'">queued</span>'+
+    '</div>';
+  }).join('');
+  note.innerHTML = '<div class="push-progress">'+progressHTML+'</div>';
+
+  var created = 0, failed = 0;
+  for (var idx = 0; idx < items.length; idx++) {
+    var i = items[idx];
+    var dot = document.getElementById('ppi-dot-'+i);
+    var st = document.getElementById('ppi-st-'+i);
+    if (dot) { dot.textContent = '◌'; dot.style.color = '#378ADD'; dot.style.animation = 'spin .8s linear infinite'; }
+    if (st) { st.textContent = 'creating…'; st.style.color = '#2a3a4a'; }
+    try {
+      var result = await createSubtaskViaMCP(qaData[i], parentKey);
+      created++;
+      if (dot) { dot.textContent = '✓'; dot.style.color = '#5DCAA5'; dot.style.animation = 'none'; }
+      if (st) { var safeUrl = result.url && result.url.startsWith('https://tactileentertainment.atlassian.net') ? result.url : '#';
+      st.innerHTML = '<a href="'+safeUrl+'" target="_blank" rel="noopener noreferrer" style="color:#378ADD;font-family:JetBrains Mono,monospace;font-size:10px;text-decoration:none;">'+esc(result.key)+' ↗</a>'; }
+    } catch(e) {
+      failed++;
+      if (dot) { dot.textContent = '✗'; dot.style.color = '#F09595'; dot.style.animation = 'none'; }
+      var failMsg = e.message ? esc(e.message.substring(0, 60)) : 'failed';
+      if (st) {
+        st.innerHTML = '<span style="color:#F09595;font-size:10px;">'+failMsg+'</span>' +
+          ' <button onclick="retryPush('+i+',this)" style="font-size:9px;font-family:JetBrains Mono,monospace;padding:1px 6px;background:#1a0808;border:0.5px solid #F09595;border-radius:3px;color:#F09595;cursor:pointer;margin-left:4px;">retry</button>';
+      }
+      console.error('Push failed:', e);
+    }
+  }
+
+  var summary = '<div style="margin-top:8px;font-size:11px;font-family:JetBrains Mono,monospace;color:'+(failed===0?'#5DCAA5':'#EF9F27')+'">'+
+    created+' subtask'+(created!==1?'s':'')+' created on '+parentKey+(failed>0?' · '+failed+' failed':'')+
+  '</div>';
+  note.innerHTML += summary;
+  btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Done';
+  btn.style.background = failed===0 ? '#0F6E56' : '#633806';
+  btn.style.color = '#9FE1CB';
+  btn.disabled = false;
+  // if all failed, allow retry — otherwise stay in done state
+  if (failed > 0 && created === 0) {
+    setTimeout(function() {
+      btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2v9M4 8l4 4 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg> Retry';
+      btn.style.background = ''; btn.style.color = '';
+    }, 3000);
+  }
+}
+
+function copyToClipboard(text, btn) {
+  // Use modern API if available (HTTPS/localhost), fallback for file://
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(function() { flashCopy(btn); }).catch(function() { fallbackCopy(text, btn); });
+  } else {
+    fallbackCopy(text, btn);
+  }
+}
+function fallbackCopy(text, btn) {
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try { document.execCommand('copy'); flashCopy(btn); } catch(e) {}
+  document.body.removeChild(ta);
+}
+function copyEl(id, btn) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  copyToClipboard(el.innerText||el.textContent, btn);
+}
+function copyQI(i, btn) {
+  var item = qaData[i];
+  if (!item) return;
+  copyToClipboard(item.title+'\n\n'+item.detail, btn);
+}
+function flashCopy(btn) {
+  var orig = btn.innerHTML;
+  var origColor = btn.style.color;
+  btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-7" stroke="#5DCAA5" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  btn.style.color = '#5DCAA5';
+  setTimeout(function() { btn.innerHTML = orig; btn.style.color = origColor; }, 1400);
+}
+// ── JIRA ID FORMATTING ──
+var recentProjects = [];
+try { recentProjects = JSON.parse(localStorage.getItem('di_recent_projects') || '[]'); } catch(e){}
+
+function formatJiraId(input) {
+  var val = input.value;
+  var urlMatch = val.match(/browse\/([A-Z]{2,10}-\d{1,6})/i);
+  if (urlMatch) {
+    input.value = urlMatch[1].toUpperCase();
+    var k = urlMatch[1].split('-')[0];
+    showBadge(k); autofillBoard(k); updatePushState(); return;
+  }
+  var clean = val.replace(/[^A-Z0-9-]/gi,'').toUpperCase();
+  var match = clean.match(/^([A-Z]{2,10})-?(\d{0,6})$/);
+  if (match) {
+    input.value = match[2] ? match[1]+'-'+match[2] : match[1];
+    if (match[2]) { showBadge(match[1]); autofillBoard(match[1]); }
+    else hideBadge();
+  } else { hideBadge(); }
+  updatePushState();
+}
+
+function autofillBoard(key) {
+  var boardInp = document.getElementById('jira-board-input');
+  if (boardInp && !boardInp.value.trim()) {
+    boardInp.value = key;
+    activeBoard = key;
+    renderSavedBoards();
+    updateIssueTypeBadge(key);
+  }
+}
+
+function showBadge(key) {
+  var b = document.getElementById('j-project-badge');
+  if (b) { b.textContent = key; b.style.display = 'block'; }
+}
+function hideBadge() {
+  var b = document.getElementById('j-project-badge');
+  if (b) b.style.display = 'none';
+}
+
+function saveRecent(key) {
+  if (!recentProjects.includes(key)) {
+    recentProjects.unshift(key);
+    recentProjects = recentProjects.slice(0,5);
+    try { localStorage.setItem('di_recent_projects', JSON.stringify(recentProjects)); } catch(e){}
+  }
+  renderRecent();
+}
+
+function renderRecent() {
+  var el = document.getElementById('j-recent');
+  if (!el) return;
+  if (!recentProjects.length) { el.innerHTML = ''; return; }
+  el.innerHTML = '<span class="j-recent-label">recent:</span>' +
+    recentProjects.map(function(k) {
+      return '<span class="j-recent-chip" onclick="useRecent(\''+k+'\')">'+k+'</span>';
+    }).join('');
+}
+
+function useRecent(key) {
+  var input = document.getElementById('jira-id');
+  var cur = input ? input.value : '';
+  var numPart = cur.match(/-?(\d+)$/);
+  if (input) input.value = numPart ? key+'-'+numPart[1] : key+'-';
+  showBadge(key);
+  if (input) input.focus();
+  updatePushState();
+}
+
+// ── BOARD MANAGEMENT ──
+var savedBoards = [];
+try { savedBoards = JSON.parse(localStorage.getItem('di_saved_boards') || '[]'); } catch(e){}
+var activeBoard = '';
+
+function boardInputChange(inp) {
+  var raw = inp.value.trim();
+  var val = '';
+  if (raw.indexOf('atlassian.net') !== -1 || raw.indexOf('http') !== -1) {
+    var m = raw.match(/projects[^A-Za-z]+([A-Za-z]{2,10})/i)
+      || raw.match(/projectKey[^A-Za-z]+([A-Za-z]{2,10})/i)
+      || raw.match(/([A-Z]{2,10})-[0-9]/);
+    val = m ? m[1].toUpperCase() : '';
+  } else {
+    val = raw.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  }
+  inp.value = val;
+  activeBoard = val;
+  renderSavedBoards();
+  updatePushState();
+}
+
+function boardKeydown(e) {
+  if (e.key === 'Enter') saveBoard();
+}
+
+function saveBoard() {
+  var inp = document.getElementById('jira-board-input');
+  var val = inp ? inp.value.trim().toUpperCase().replace(/[^A-Z0-9]/g,'') : '';
+  if (!val) return;
+  if (!savedBoards.includes(val)) {
+    savedBoards.unshift(val);
+    savedBoards = savedBoards.slice(0, 8);
+    try { localStorage.setItem('di_saved_boards', JSON.stringify(savedBoards)); } catch(e){}
+  }
+  activeBoard = val;
+  renderSavedBoards();
+  updatePushState();
+}
+
+function selectBoard(b) {
+  activeBoard = b;
+  var inp = document.getElementById('jira-board-input');
+  if (inp) inp.value = b;
+  renderSavedBoards();
+  updatePushState();
+  updateIssueTypeBadge(b);
+}
+
+function removeBoard(b) {
+  savedBoards = savedBoards.filter(function(x){ return x !== b; });
+  try { localStorage.setItem('di_saved_boards', JSON.stringify(savedBoards)); } catch(e){}
+  if (activeBoard === b) {
+    activeBoard = '';
+    var inp = document.getElementById('jira-board-input');
+    if (inp) inp.value = '';
+  }
+  renderSavedBoards();
+  updatePushState();
+}
+
+function renderSavedBoards() {
+  var el = document.getElementById('j-saved-boards');
+  if (!el) return;
+  if (!savedBoards.length) { el.innerHTML = ''; return; }
+  el.innerHTML = savedBoards.map(function(b) {
+    var active = b === activeBoard ? ' j-board-active' : '';
+    return '<span class="j-board-chip'+active+'" onclick="selectBoard(\''+b+'\')">' + b +
+      '<span class="bx" onclick="event.stopPropagation();removeBoard(\''+b+'\')">×</span></span>';
+  }).join('');
+}
+
+renderRecent();
+renderSavedBoards();
+
+function updateIssueTypeBadge(key) {
+  var badge = document.getElementById('j-issue-type-badge');
+  if (!badge || !key) return;
+  var cached = _issueTypeCache[key.toUpperCase()];
+  if (cached) {
+    badge.textContent = cached;
+    badge.style.display = 'inline';
+    badge.title = 'Detected issue type for '+key+' — click to re-detect';
+    badge.style.cursor = 'pointer';
+    badge.onclick = function() { clearIssueTypeCache(key); };
+  } else {
+    badge.textContent = 'auto-detect';
+    badge.style.display = 'inline';
+    badge.style.cursor = 'default';
+    badge.title = 'Issue type will be auto-detected on first push';
+    badge.onclick = null;
+  }
+}
+
+function clearIssueTypeCache(key) {
+  if (!key) return;
+  delete _issueTypeCache[key.toUpperCase()];
+  try { localStorage.setItem('ni_issue_type_cache', JSON.stringify(_issueTypeCache)); } catch(e) {}
+  updateIssueTypeBadge(key);
+}
+
+function toggleGistEdit() {
+  var editor = document.getElementById('gist-editor');
+  var body = document.getElementById('gist-body');
+  var btn = document.getElementById('gist-edit-btn');
+  var area = document.getElementById('gist-edit-area');
+  var isOpen = editor.style.display !== 'none';
+  if (isOpen) {
+    cancelGistEdit();
+  } else {
+    // Flatten structured groups or plain list to editable lines
+    var lines = [];
+    var lead = body.querySelector('.gist-lead');
+    if (lead) lines.push(lead.textContent.trim());
+    var groups = body.querySelectorAll('.gist-group');
+    if (groups.length) {
+      groups.forEach(function(g) {
+        var label = g.querySelector('.gist-group-label');
+        if (label) lines.push('--- ' + label.textContent.trim() + ' ---');
+        g.querySelectorAll('.gist-point-txt').forEach(function(pt) { lines.push(pt.textContent.trim()); });
+      });
+    } else {
+      body.querySelectorAll('.gist-li').forEach(function(li){ lines.push(li.textContent.trim()); });
+    }
+    area.value = lines.length ? lines.join('\n') : (body.innerText || body.textContent);
+    autoResize(area);
+    editor.style.display = 'block';
+    body.style.display = 'none';
+    btn.classList.add('active');
+    area.focus();
+  }
+}
+
+function saveGistEdit() {
+  var area = document.getElementById('gist-edit-area');
+  var body = document.getElementById('gist-body');
+  var editor = document.getElementById('gist-editor');
+  var btn = document.getElementById('gist-edit-btn');
+  // render edited text as plain bullet list
+  var lines = area.value.split('\n').filter(function(l){ return l.trim().length > 0; });
+  var html = '';
+  if (lines.length > 0) {
+    html += '<div class="gist-lead">'+esc(lines[0])+'</div>';
+    if (lines.length > 1) {
+      html += '<ul class="gist-ul">'+lines.slice(1).map(function(l){
+        return '<li class="gist-li">'+esc(l.replace(/^[-•*]\s*/,'').trim())+'</li>';
+      }).join('')+'</ul>';
+    }
+  }
+  body.innerHTML = html;
+  body.style.display = 'block';
+  editor.style.display = 'none';
+  btn.classList.remove('active');
+}
+
+function cancelGistEdit() {
+  var editor = document.getElementById('gist-editor');
+  var body = document.getElementById('gist-body');
+  var btn = document.getElementById('gist-edit-btn');
+  editor.style.display = 'none';
+  body.style.display = 'block';
+  btn.classList.remove('active');
+}
+
+function renderGist(text) {
+  var html = '';
+  var parsed = null;
+  var summary = '';
+
+  // Try parse structured JSON first
+  try {
+    var clean = text.replace(/```json|```/g, '').trim();
+    var s = clean.indexOf('{'), e = clean.lastIndexOf('}');
+    if (s > -1 && e > -1) {
+      parsed = JSON.parse(clean.slice(s, e+1));
+    }
+  } catch(pe) { parsed = null; }
+
+  if (parsed && parsed.summary && parsed.groups && parsed.groups.length) {
+    summary = parsed.summary;
+    html += '<div class="gist-lead">'+esc(parsed.summary)+'</div>';
+    html += '<div class="gist-groups">';
+    parsed.groups.forEach(function(g) {
+      if (!g.points || !g.points.length) return;
+      html += '<div class="gist-group">';
+      html += '<div class="gist-group-hd">';
+      html += '<span class="gist-group-icon">'+esc(g.icon||'·')+'</span>';
+      html += '<span class="gist-group-label">'+esc(g.label||'')+'</span>';
+      html += '<span class="gist-group-count">'+g.points.length+' point'+(g.points.length!==1?'s':'')+'</span>';
+      html += '</div>';
+      html += '<div class="gist-group-items">';
+      g.points.forEach(function(pt) {
+        var cleaned = pt.trim();
+        // Extract tag prefix
+        var tagHtml = '';
+        var tagMatch = cleaned.match(/^\[(decision|action|risk|open)\]\s*/i);
+        if (tagMatch) {
+          var tag = tagMatch[1].toLowerCase();
+          var tagClass = 'gist-tag-'+tag;
+          var tagLabel = tag === 'decision' ? '⚡ decision' : tag === 'action' ? '→ action' : tag === 'risk' ? '⚠ risk' : '? open';
+          tagHtml = '<span class="gist-tag '+tagClass+'">'+tagLabel+'</span>';
+          cleaned = cleaned.replace(tagMatch[0], '');
+        }
+        html += '<div class="gist-point"><div class="gist-point-dot"></div><div class="gist-point-txt">'+tagHtml+esc(cleaned)+'</div></div>';
+      });
+      html += '</div></div>';
+    });
+    html += '</div>';
+  } else {
+    // Fallback — plain text parse (keeps old behaviour for non-JSON responses)
+    var summaryMatch = text.match(/SUMMARY[:\s]+(.+?)(?=KEY POINTS|$)/is);
+    var pointsMatch = text.match(/KEY POINTS[:\s]+(.+)$/is);
+    if (summaryMatch) {
+      summary = summaryMatch[1].trim().replace(/[.!?]+$/,'');
+      html += '<div class="gist-lead">'+esc(summary)+'</div>';
+    }
+    if (pointsMatch) {
+      var pts = pointsMatch[1].trim().split('\n')
+        .map(function(s){ return s.replace(/^[-•*\d.]+\s*/, '').trim(); })
+        .filter(function(s){ return s.length > 4; });
+      if (pts.length) html += '<ul class="gist-ul">'+pts.map(function(p){ return '<li class="gist-li">'+esc(p)+'</li>'; }).join('')+'</ul>';
+    } else if (!summaryMatch) {
+      var parts = text.split(/\.\s+/).filter(function(s){ return s.trim().length > 4; });
+      if (!parts.length) parts = [text];
+      summary = parts[0].replace(/[.!?]+$/,'');
+      html += '<div class="gist-lead">'+esc(summary)+'</div>';
+      if (parts.length > 1) html += '<ul class="gist-ul">'+parts.slice(1).map(function(s){ return '<li class="gist-li">'+esc(s.trim())+'</li>'; }).join('')+'</ul>';
+    }
+  }
+
+  document.getElementById('gist-body').innerHTML = html;
+
+  // Auto-populate title
+  var titleEl = document.getElementById('title-input');
+  if (titleEl && !titleEl._userEdited && summary) {
+    titleEl.value = summary.substring(0, 120);
+    autoResizeTitle(titleEl);
+  }
+}
+
+function renderQA(items) {
+  qaData = items;
+  var html = items.map(function(item, i) {
+    var sc = item.severity === 'high' ? 'sev-high' : item.severity === 'med' ? 'sev-med' : 'sev-low';
+    return '<div class="qa-item" id="qi-'+i+'">'+
+      '<div class="qa-row" onclick="rowToggle(event,'+i+')">'+
+        '<input type="checkbox" class="qi-cb" onchange="toggleSelect('+i+',this)"/>'+
+        '<span class="qi-num">0'+(i+1)+'</span>'+
+        '<span class="qi-txt">'+esc(item.title)+'</span>'+
+        '<span class="sev '+sc+'">'+item.severity+'</span>'+
+        '<button class="icon-btn" id="qi-slack-btn-'+i+'" onclick="event.stopPropagation();copySlackTC('+i+',this)" title="Copy for Slack" style="color:#9b59b6;">'+
+          '<svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M6 2a2 2 0 0 0 0 4h2V2H6zM6 7H2a2 2 0 0 0 0 4h4V7zM10 7v4a2 2 0 0 0 4 0V7h-4zM10 6h4a2 2 0 0 0 0-4h-4v4z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>'+
+        '</button>'+
+        '<button class="icon-btn" onclick="event.stopPropagation();toggleReview('+i+')" title="Review / edit steps" style="color:#534AB7;">'+
+          '<svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2 3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H9l-3 2v-2H3a1 1 0 0 1-1-1V3z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>'+
+        '</button>'+
+        '<button class="icon-btn" onclick="event.stopPropagation();toggleQA('+i+')" title="expand"><svg id="chev-'+i+'" width="13" height="13" viewBox="0 0 12 12" fill="none" style="transition:transform .18s"><path d="M3 4.5l3 3 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>'+
+      '</div>'+
+      '<div class="qi-detail" id="qid-'+i+'">'+
+        '<p class="qi-desc">'+esc(item.detail)+'</p>'+
+        '<button class="convert-btn" onclick="toggleTC('+i+',this)">&#x21C4; convert to test case</button>'+
+        '<div class="tc-block" id="tc-'+i+'"></div>'+
+        '<div class="review-panel" id="rv-'+i+'" style="display:none;margin-top:10px;background:#0e0c18;border:0.5px solid #2a2230;border-radius:8px;padding:11px 13px;">'+
+          '<div style="font-size:9px;font-family:JetBrains Mono,monospace;color:#534AB7;letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px;">✎ review / edit steps</div>'+
+          '<textarea id="rv-comment-'+i+'" placeholder="Paste updated steps (1. 2. 3.) to replace steps, or type a comment to append to detail…" '+
+            'style="width:100%;background:#16121e;border:0.5px solid #2a2230;border-radius:6px;padding:8px 10px;font-size:12px;font-family:Sora,sans-serif;color:#8a84c0;line-height:1.6;resize:none;outline:none;min-height:72px;overflow:hidden;" '+
+            'oninput="autoResize(this)"></textarea>'+
+          '<div style="display:flex;gap:6px;margin-top:7px;align-items:center;">'+
+            '<button onclick="applyReview('+i+')" style="padding:4px 12px;background:#16121e;border:0.5px solid #534AB740;border-radius:5px;font-size:10px;color:#AFA9EC;cursor:pointer;font-family:JetBrains Mono,monospace;">apply</button>'+
+            '<button onclick="closeReview('+i+')" style="padding:4px 10px;background:transparent;border:0.5px solid #1e1e24;border-radius:5px;font-size:10px;color:#3e3e4a;cursor:pointer;font-family:JetBrains Mono,monospace;">cancel</button>'+
+            '<span id="rv-status-'+i+'" style="font-size:10px;font-family:JetBrains Mono,monospace;color:#534AB7;"></span>'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+  document.getElementById('qa-body').innerHTML = html;
+}
+
+function rowToggle(event, i) {
+  if (event.target.closest('.qi-cb') || event.target.closest('.icon-btn')) return;
+  toggleQA(i);
+}
+
+function toggleQA(i) {
+  var d = document.getElementById('qid-'+i);
+  var c = document.getElementById('chev-'+i);
+  if (!d) return;
+  var open = d.classList.contains('open');
+  d.classList.toggle('open', !open);
+  if (c) c.style.transform = open ? '' : 'rotate(180deg)';
+}
+
+function toggleTC(i, btn) {
+  var block = document.getElementById('tc-'+i);
+  var item = qaData[i];
+  if (!block || !item) return;
+  if (block.classList.contains('open')) {
+    block.classList.remove('open');
+    btn.textContent = '\u21C4 convert to test case';
+    return;
+  }
+  renderTCBlock(i);
+  block.classList.add('open');
+  btn.textContent = '\u21C4 collapse test case';
+}
+
+function renderTCBlock(i) {
+  var block = document.getElementById('tc-'+i);
+  var item = qaData[i];
+  if (!block || !item) return;
+  var steps = item.testcase.steps.map(function(s,n){
+    return '<div class="tc-step"><span class="tc-step-n">'+(n+1)+'.</span>'+esc(s)+'</div>';
+  }).join('');
+  block.innerHTML =
+    '<div class="tc-row"><div class="tc-key">title</div><div class="tc-val tc-bold">'+esc(item.title)+'</div></div>'+
+    '<div class="tc-row"><div class="tc-key">objective</div><div class="tc-val tc-bold">'+esc(item.testcase.objective)+'</div></div>'+
+    '<div class="tc-row"><div class="tc-key">preconditions</div><div class="tc-val">'+esc(item.testcase.preconditions)+'</div></div>'+
+    '<div class="tc-row"><div class="tc-key">steps</div><div class="tc-steps">'+steps+'</div></div>'+
+    '<div class="tc-row"><div class="tc-key">expected result</div><div class="tc-val tc-bold">'+esc(item.testcase.expected)+'</div></div>'+
+    '<div style="margin-top:9px;padding-top:8px;border-top:0.5px solid #2a2010;">'+
+      '<button onclick="copySlackTC('+i+',this)" style="display:flex;align-items:center;gap:6px;padding:5px 12px;background:#0d0b06;border:0.5px solid #BA751740;border-radius:5px;font-size:10px;color:#EF9F27;cursor:pointer;font-family:JetBrains Mono,monospace;transition:all .12s;">'+
+        '<svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M6 2a2 2 0 0 0 0 4h2V2H6zM6 7H2a2 2 0 0 0 0 4h4V7zM10 7v4a2 2 0 0 0 4 0V7h-4zM10 6h4a2 2 0 0 0 0-4h-4v4z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>'+
+        'Copy for Slack'+
+      '</button>'+
+    '</div>';
+}
+
+function formatSlackTC(item) {
+  var tc = item.testcase || {};
+  var steps = (tc.steps || []).map(function(s,n){ return '  '+(n+1)+'. '+s; }).join('\n');
+  return '[TC] '+item.title+'\n' +
+    'Severity: '+(item.severity||'').charAt(0).toUpperCase()+(item.severity||'').slice(1)+'\n' +
+    '\n' +
+    'Objective\n'+(tc.objective||item.detail||'')+'\n' +
+    '\n' +
+    'Preconditions\n'+(tc.preconditions||'')+'\n' +
+    '\n' +
+    'Steps\n'+(steps||'No steps generated')+'\n' +
+    '\n' +
+    'Expected Result\n'+(tc.expected||'');
+}
+
+function copySlackTC(i, btn) {
+  var item = qaData[i];
+  if (!item) return;
+  copyToClipboard(formatSlackTC(item), btn);
+}
+
+function copyAllSelectedSlack(btn) {
+  if (!selectedItems || selectedItems.size === 0) return;
+  var parts = Array.from(selectedItems).map(function(i) {
+    var item = qaData[i];
+    if (!item) return '';
+    return formatSlackTC(item);
+  }).filter(Boolean);
+  copyToClipboard(parts.join('\n\n' + '-'.repeat(40) + '\n\n'), btn);
+}
+
+function closeReview(i) {
+  var panel = document.getElementById('rv-'+i);
+  if (panel) panel.style.display = 'none';
+}
+
+function toggleReview(i) {
+  var panel = document.getElementById('rv-'+i);
+  if (!panel) return;
+  var isOpen = panel.style.display !== 'none';
+  // ensure detail row is open first
+  var detail = document.getElementById('qid-'+i);
+  if (detail && !detail.classList.contains('open')) {
+    toggleQA(i);
+  }
+  panel.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) {
+    var ta = document.getElementById('rv-comment-'+i);
+    if (ta) { ta.focus(); autoResize(ta); }
+  }
+}
+
+async function applyReview(i) {
+  var ta = document.getElementById('rv-comment-'+i);
+  var status = document.getElementById('rv-status-'+i);
+  if (!ta || !qaData[i]) return;
+  var input = ta.value.trim();
+  if (!input) return;
+  if (status) { status.textContent = 'applying…'; }
+
+  // Check for "move to TC X" instruction first
+  var moveMatch = input.match(/move\s+(?:this\s+)?(?:to|into)\s+tc\s*(0?[1-5])/i);
+  if (moveMatch) {
+    var targetIdx = parseInt(moveMatch[1]) - 1;
+    if (targetIdx !== i && targetIdx >= 0 && targetIdx < qaData.length) {
+      // Append current expected to target
+      var point = qaData[i].testcase.expected;
+      qaData[targetIdx].testcase.expected += '; ' + point;
+      qaData[targetIdx].testcase.steps.push('[Moved] ' + qaData[i].title.substring(0,60));
+      var targetBlock = document.getElementById('tc-'+targetIdx);
+      if (targetBlock && targetBlock.classList.contains('open')) { renderTCBlock(targetIdx); targetBlock.classList.add('open'); }
+      if (status) { status.textContent = '✓ moved to TC 0'+(targetIdx+1); }
+      ta.value = '';
+      setTimeout(function(){ if (status) status.textContent = ''; }, 2500);
+      return;
+    }
+  }
+
+  // Use Haiku to interpret and apply the instruction
+  var tc = qaData[i].testcase;
+  var prompt = 'You are editing a QA test case. Apply this instruction to the test case and return ONLY a JSON patch object with the fields that changed.\n' +
+    'Instruction: '+input+'\n\n' +
+    'Current test case:\n' + JSON.stringify(tc, null, 2) + '\n\n' +
+    'Return ONLY a JSON object with changed fields e.g. {"steps": [...]} or {"expected": "..."} or {"steps":[...],"expected":"..."}\n' +
+    'Do not return the full test case — only the changed fields. No markdown, no explanation.';
+
+  try {
+    var r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 600,
+        system: 'Output only raw JSON objects. No markdown, no explanation.',
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    var d = await r.json();
+    var raw = (d.content||[]).filter(function(b){ return b.type==='text'; }).map(function(b){ return b.text; }).join('');
+    var clean = raw.replace(/```json|```/g,'').trim();
+    var s = clean.indexOf('{'), e = clean.lastIndexOf('}');
+    if (s > -1 && e > -1) {
+      var patch = JSON.parse(clean.slice(s, e+1));
+      var changed = [];
+      if (patch.steps) { tc.steps = patch.steps; changed.push('steps'); }
+      if (patch.expected) { tc.expected = patch.expected; changed.push('expected'); }
+      if (patch.objective) { tc.objective = patch.objective; changed.push('objective'); }
+      if (patch.preconditions) { tc.preconditions = patch.preconditions; changed.push('preconditions'); }
+      if (status) { status.textContent = '✓ '+changed.join(' + ')+' updated'; }
+    } else {
+      if (status) { status.textContent = '? could not parse — try rephrasing'; }
+    }
+  } catch(ex) {
+    if (status) { status.textContent = '✗ failed — try again'; }
+  } finally {
+    // Re-render TC block if open regardless of success/failure
+    var block = document.getElementById('tc-'+i);
+    if (block && block.classList.contains('open')) { renderTCBlock(i); block.classList.add('open'); }
+    ta.value = '';
+    setTimeout(function(){ if (status) status.textContent = ''; }, 3000);
+  }
+}
+
+async function generateRisk() {
+  var riskBtn = document.getElementById('risk-generate-btn');
+  if (riskBtn) { riskBtn.disabled = true; riskBtn.innerHTML = '<div style="width:11px;height:11px;border:1.5px solid #EF9F2760;border-top-color:#EF9F27;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;"></div> generating…'; }
+  var riskSec = document.getElementById('risk-section');
+  if (riskSec) riskSec.style.display = 'block';
+  document.getElementById('risk-body').innerHTML =
+    '<div class="skeleton" style="height:12px;margin-bottom:14px;width:95%"></div>' +
+    '<div class="skeleton" style="height:12px;margin-bottom:14px;width:82%"></div>' +
+    '<div class="skeleton" style="height:12px;width:70%"></div>';
+
+  var gistBody = document.getElementById('gist-body');
+  var currentGist = gistBody ? (gistBody.innerText || '').trim() : '';
+  var qaContext = qaData.map(function(q,i){ return (i+1)+'. '+q.title; }).join('\n');
+
+  var riskInstruction = 'You are a QA engineer and experienced mobile game player. Analyse the content and identify 5 risk-prone scenarios from a PLAYER perspective.\n' +
+    'Think about: race conditions, offline/reconnect edge cases, interrupted flows (mid-IAP, mid-level), UI state mismatches, logic errors a real player would hit naturally during play.\n' +
+    'Already covered by QA focus (do NOT repeat these):\n' + qaContext + '\n\n' +
+    'Return ONLY a JSON array of exactly 5 items:\n' +
+    '[{"title":"max 70 chars","severity":"critical|high|med","detail":"max 100 chars — what the player experiences","failureMode":"max 120 chars — what breaks technically","whereToCheck":"max 100 chars — which code area or flow to inspect"}]\n' +
+    'Order by severity desc. No markdown, no explanation. Array only.';
+
+  var mcpServers = [];
+  if (attachedLinks.some(function(l){ return l.confluenceId || l.jiraTicketKey; })) mcpServers.push({ type: 'url', url: 'https://mcp.atlassian.com/v1/mcp', name: 'atlassian-mcp' });
+  if (attachedLinks.some(function(l){ return l.slackChannelId; })) mcpServers.push({ type: 'url', url: 'https://mcp.slack.com/mcp', name: 'slack-mcp' });
+
+  var reqBody = {
+    model: mcpServers.length ? 'claude-sonnet-4-20250514' : 'claude-haiku-4-5-20251001',
+    max_tokens: 2000,
+    temperature: 0,
+    system: 'You output only raw JSON arrays. No markdown. No explanation. All strings single-line, under 120 chars.',
+    messages: [{ role: 'user', content: _textBase + (currentGist ? '\nGIST:\n' + currentGist + '\n\n' : '') + riskInstruction }]
+  };
+  if (mcpServers.length) reqBody.mcp_servers = mcpServers;
+
+  try {
+    var r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(reqBody) });
+    var d = await r.json();
+    var raw = (d.content || []).filter(function(b){ return b.type === 'text'; }).map(function(b){ return b.text; }).join('');
+    var clean = raw.replace(/```json|```/g, '').trim();
+    var s = clean.indexOf('['), e = clean.lastIndexOf(']');
+    if (s === -1 || e === -1) throw new Error('No array in response');
+    clean = clean.slice(s, e+1).replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '').replace(/,\s*([\]}])/g, '$1');
+    riskData = JSON.parse(clean);
+    renderRisk(riskData);
+  } catch(e) {
+    showErr('Risk generation failed: ' + (e && e.message ? e.message.substring(0, 80) : 'unknown error'));
+    var rb = document.getElementById('risk-body');
+    if (rb) rb.innerHTML = '<div style="font-size:11px;color:#F09595;padding:8px 0;font-family:JetBrains Mono,monospace;">Generation failed — try again.</div>';
+  } finally {
+    var riskBtnEl = document.getElementById('risk-generate-btn');
+    if (riskBtnEl) {
+      riskBtnEl.disabled = false;
+      riskBtnEl.innerHTML = '<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 1a7 7 0 1 1 0 14A7 7 0 0 1 8 1z" stroke="currentColor" stroke-width="1.2"/><path d="M8 7v4M8 5v.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> Generate Risk Scenarios';
+    }
+  }
+}
+
+function renderRisk(items) {
+  var html = items.map(function(item, i) {
+    var sc = item.severity === 'critical' ? 'rs-crit' : item.severity === 'high' ? 'rs-high' : 'rs-med';
+    return '<div class="risk-item" id="ri-'+i+'">'+
+      '<div class="risk-row" onclick="riskRowToggle(event,'+i+')">'+
+        '<span style="font-size:12px;color:#EF9F27;">⚡</span>'+
+        '<span class="ri-num">0'+(i+1)+'</span>'+
+        '<span class="ri-txt">'+esc(item.title)+'</span>'+
+        '<span class="risk-sev '+sc+'">'+esc(item.severity)+'</span>'+
+        '<button class="icon-btn" onclick="event.stopPropagation();copyRiskSlack('+i+',this)" title="Copy for Slack" style="color:#9b59b6;">'+
+          '<svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M6 2a2 2 0 0 0 0 4h2V2H6zM6 7H2a2 2 0 0 0 0 4h4V7zM10 7v4a2 2 0 0 0 4 0V7h-4zM10 6h4a2 2 0 0 0 0-4h-4v4z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>'+
+        '</button>'+
+        '<button class="icon-btn" onclick="event.stopPropagation();riskToggleExpand('+i+')" title="expand"><svg id="ri-chev-'+i+'" width="13" height="13" viewBox="0 0 12 12" fill="none" style="transition:transform .18s"><path d="M3 4.5l3 3 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>'+
+      '</div>'+
+      '<div class="risk-detail" id="rid-'+i+'">'+
+        '<p class="risk-desc">'+esc(item.detail)+'</p>'+
+        '<div class="risk-failure">'+
+          '<div class="rf-key">failure mode</div><div class="rf-val">'+esc(item.failureMode)+'</div>'+
+          '<div class="rf-key" style="margin-top:5px;">where to check</div><div class="rf-val">'+esc(item.whereToCheck)+'</div>'+
+        '</div>'+
+        '<div class="risk-actions">'+
+          '<button class="convert-btn" onclick="toggleRiskTC('+i+',this)">&#x21C4; convert to test case</button>'+
+          '<button class="convert-btn" onclick="toggleRiskReview('+i+')" style="color:#534AB7;border-color:#2a2230;">&#x270E; add to TC / review</button>'+
+        '</div>'+
+        '<div class="risk-tc-block" id="ri-tc-'+i+'"></div>'+
+        '<div class="risk-review-panel" id="ri-rv-'+i+'">'+
+          '<div style="font-size:9px;font-family:JetBrains Mono,monospace;color:#534AB7;letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px;">✎ add to TC / convert</div>'+
+          '<div class="cmd-chips">'+
+            '<span class="cmd-chip" onclick="riskChip('+i+',this)">add to TC 01</span>'+
+            '<span class="cmd-chip" onclick="riskChip('+i+',this)">add to TC 02</span>'+
+            '<span class="cmd-chip" onclick="riskChip('+i+',this)">add to TC 03</span>'+
+            '<span class="cmd-chip" onclick="riskChip('+i+',this)">add to TC 04</span>'+
+            '<span class="cmd-chip" onclick="riskChip('+i+',this)">add to TC 05</span>'+
+          '</div>'+
+          '<textarea id="ri-rv-input-'+i+'" placeholder="e.g. add to TC 02 · or describe what to merge…" '+
+            'style="width:100%;background:#16121e;border:0.5px solid #2a2230;border-radius:6px;padding:8px 10px;font-size:12px;font-family:Sora,sans-serif;color:#8a84c0;line-height:1.6;resize:none;outline:none;min-height:56px;overflow:hidden;" '+
+            'oninput="autoResize(this)"></textarea>'+
+          '<div style="display:flex;gap:6px;margin-top:7px;align-items:center;">'+
+            '<button onclick="applyRiskReview('+i+')" style="padding:4px 12px;background:#16121e;border:0.5px solid #534AB740;border-radius:5px;font-size:10px;color:#AFA9EC;cursor:pointer;font-family:JetBrains Mono,monospace;">apply</button>'+
+            '<button onclick="closeRiskReview('+i+')" style="padding:4px 10px;background:transparent;border:0.5px solid #1e1e24;border-radius:5px;font-size:10px;color:#3e3e4a;cursor:pointer;font-family:JetBrains Mono,monospace;">cancel</button>'+
+            '<span id="ri-rv-status-'+i+'" style="font-size:10px;font-family:JetBrains Mono,monospace;color:#534AB7;"></span>'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+  document.getElementById('risk-body').innerHTML = html;
+}
+
+function riskRowToggle(event, i) {
+  if (event.target.closest('.icon-btn') || event.target.closest('.convert-btn')) return;
+  riskToggleExpand(i);
+}
+
+function riskToggleExpand(i) {
+  var d = document.getElementById('rid-'+i);
+  var c = document.getElementById('ri-chev-'+i);
+  if (!d) return;
+  var open = d.classList.contains('open');
+  d.classList.toggle('open', !open);
+  if (c) c.style.transform = open ? '' : 'rotate(180deg)';
+}
+
+function toggleRiskTC(i, btn) {
+  var block = document.getElementById('ri-tc-'+i);
+  var item = riskData[i];
+  if (!block || !item) return;
+  if (block.classList.contains('open')) {
+    block.classList.remove('open');
+    btn.textContent = '\u21C4 convert to test case';
+    return;
+  }
+  // Build a test case from risk item
+  if (!item.testcase) {
+    item.testcase = {
+      objective: 'Verify ' + item.title,
+      preconditions: 'App in stable state. Network and session available.',
+      steps: [
+        'Set up conditions: ' + (item.detail || '').substring(0, 80),
+        'Trigger the scenario described in the risk',
+        'Observe system behaviour during and after the trigger',
+        'Check state consistency across client and server'
+      ],
+      expected: item.failureMode ? 'System handles gracefully: ' + item.failureMode.substring(0, 80) : 'No crash or data loss occurs'
+    };
+  }
+  var steps = item.testcase.steps.map(function(s,n){ return '<div class="tc-step"><span class="tc-step-n">'+(n+1)+'.</span>'+esc(s)+'</div>'; }).join('');
+  block.innerHTML =
+    '<div class="tc-row"><div class="tc-key">objective</div><div class="tc-val tc-bold">'+esc(item.testcase.objective)+'</div></div>'+
+    '<div class="tc-row"><div class="tc-key">preconditions</div><div class="tc-val">'+esc(item.testcase.preconditions)+'</div></div>'+
+    '<div class="tc-row"><div class="tc-key">steps</div><div class="tc-steps">'+steps+'</div></div>'+
+    '<div class="tc-row"><div class="tc-key">expected result</div><div class="tc-val tc-bold">'+esc(item.testcase.expected)+'</div></div>'+
+    '<div style="margin-top:8px;padding-top:7px;border-top:0.5px solid #2a2010;display:flex;gap:7px;flex-wrap:wrap;">'+
+      '<button onclick="copyRiskSlack('+i+',this)" style="display:flex;align-items:center;gap:5px;padding:4px 11px;background:#0d0b06;border:0.5px solid #BA751740;border-radius:5px;font-size:10px;color:#EF9F27;cursor:pointer;font-family:JetBrains Mono,monospace;">'+
+        '<svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M6 2a2 2 0 0 0 0 4h2V2H6zM6 7H2a2 2 0 0 0 0 4h4V7zM10 7v4a2 2 0 0 0 4 0V7h-4zM10 6h4a2 2 0 0 0 0-4h-4v4z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>'+
+        'Copy for Slack</button>'+
+      '<button onclick="pushRiskToJira('+i+',this)" style="display:flex;align-items:center;gap:5px;padding:4px 11px;background:#07090f;border:0.5px solid #185FA540;border-radius:5px;font-size:10px;color:#378ADD;cursor:pointer;font-family:JetBrains Mono,monospace;">'+
+        '<svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M8 2v9M4 8l4 4 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>'+
+        'Push to Jira</button>'+
+    '</div>';
+  block.classList.add('open');
+  btn.textContent = '\u21C4 collapse test case';
+}
+
+function toggleRiskReview(i) {
+  var panel = document.getElementById('ri-rv-'+i);
+  if (!panel) return;
+  var open = panel.style.display !== 'none';
+  panel.style.display = open ? 'none' : 'block';
+  if (!open) {
+    var ta = document.getElementById('ri-rv-input-'+i);
+    if (ta) { ta.focus(); autoResize(ta); }
+  }
+}
+
+function closeRiskReview(i) {
+  var panel = document.getElementById('ri-rv-'+i);
+  if (panel) panel.style.display = 'none';
+}
+
+function riskChip(i, el) {
+  var ta = document.getElementById('ri-rv-input-'+i);
+  if (ta) { ta.value = el.textContent; ta.focus(); }
+}
+
+function applyRiskReview(i) {
+  var ta = document.getElementById('ri-rv-input-'+i);
+  var status = document.getElementById('ri-rv-status-'+i);
+  if (!ta || !riskData[i]) return;
+  var input = ta.value.trim();
+  if (!input) return;
+
+  // Parse "add to TC XX" instruction
+  var tcMatch = input.match(/tc\s*(0?[1-5])/i) || input.match(/testcase\s*(0?[1-5])/i);
+  if (tcMatch) {
+    var tcIdx = parseInt(tcMatch[1]) - 1;
+    if (tcIdx >= 0 && tcIdx < qaData.length) {
+      var risk = riskData[i];
+      var tc = qaData[tcIdx].testcase;
+      // Append risk scenario as a new step
+      tc.steps = tc.steps || [];
+      tc.steps.push('[Risk] ' + risk.title);
+      // Append to expected
+      tc.expected = tc.expected + '; ' + (risk.failureMode || risk.detail).substring(0, 80);
+      // Re-render if open
+      var block = document.getElementById('tc-'+tcIdx);
+      if (block && block.classList.contains('open')) { renderTCBlock(tcIdx); block.classList.add('open'); }
+      if (status) { status.textContent = '✓ added to TC 0'+(tcIdx+1); }
+      ta.value = '';
+      setTimeout(function(){ if (status) status.textContent = ''; }, 2500);
+      return;
+    }
+  }
+
+  // Fallback — show as status note
+  if (status) { status.textContent = '? try: add to TC 01–05'; }
+}
+
+function copyRiskSlack(i, btn) {
+  var item = riskData[i];
+  if (!item) return;
+  var tc = item.testcase;
+  var msg = '[Risk] ' + item.title + '\n' +
+    'Severity: ' + (item.severity||'').charAt(0).toUpperCase() + (item.severity||'').slice(1) + '\n\n' +
+    'Player scenario\n' + item.detail + '\n\n' +
+    'Failure mode\n' + (item.failureMode||'') + '\n\n' +
+    'Where to check\n' + (item.whereToCheck||'');
+  if (tc) {
+    var steps = (tc.steps||[]).map(function(s,n){ return '  '+(n+1)+'. '+s; }).join('\n');
+    msg += '\n\nTest Case\nObjective: '+tc.objective+'\nSteps\n'+steps+'\nExpected: '+tc.expected;
+  }
+  copyToClipboard(msg, btn);
+}
+
+async function pushRiskToJira(i, btn) {
+  var item = riskData[i];
+  if (!item || !item.testcase) return;
+  var parentKey = document.getElementById('jira-id') ? document.getElementById('jira-id').value.trim().toUpperCase() : '';
+  if (!parentKey.match(/^[A-Z]{2,10}-\d+$/)) {
+    showErr('Enter a Jira ticket ID in the Push to Jira panel first.');
+    return;
+  }
+  var origTxt = btn.textContent;
+  btn.textContent = 'pushing…';
+  btn.disabled = true;
+  try {
+    var result = await createSubtaskViaMCP(item, parentKey);
+    var safeUrl = result.url && result.url.startsWith('https://tactileentertainment.atlassian.net') ? result.url : '#';
+    btn.innerHTML = '<a href="'+safeUrl+'" target="_blank" rel="noopener noreferrer" style="color:#378ADD;text-decoration:none;">'+esc(result.key)+' ↗</a>';
+  } catch(e) {
+    btn.textContent = '✗ failed — retry';
+    btn.disabled = false;
+  }
+}
+
+function toggleSelect(i, cb) {
+  if (cb.checked) selectedItems.add(i); else selectedItems.delete(i);
+  updateSelected();
+}
+
+function updateSelected() {
+  var count = selectedItems.size;
+  document.getElementById('sel-count').textContent = count + ' selected';
+  var tagsEl = document.getElementById('sel-tags');
+  if (!tagsEl) return;
+  if (count === 0) {
+    tagsEl.innerHTML = '<span class="sel-empty">— select QA items above to push as test cases</span>';
+  } else {
+    tagsEl.innerHTML = Array.from(selectedItems).map(function(i) {
+      var t = qaData[i] ? qaData[i].title : '';
+      return '<span class="sel-tag">'+esc(t.length>30 ? t.substring(0,28)+'…' : t)+'</span>';
+    }).join('');
+  }
+  // Show copy-all-slack button in Jira panel when 2+ selected
+  var copyAllBtn = document.getElementById('copy-all-slack-btn');
+  if (copyAllBtn) copyAllBtn.style.display = count >= 2 ? 'flex' : 'none';
+  updatePushState();
+}
+
+function updatePushState() {
+  var id = document.getElementById('jira-id') ? document.getElementById('jira-id').value.trim() : '';
+  var board = document.getElementById('jira-board-input') ? document.getElementById('jira-board-input').value.trim() : '';
+  // board can be auto-derived from ticket key if empty
+  var ticketKey = id.match(/^([A-Z]{2,10})-\d+$/);
+  var effectiveBoard = board || (ticketKey ? ticketKey[1] : '');
+  var ready = selectedItems.size > 0 && ticketKey && effectiveBoard.length > 0;
+  var btn = document.getElementById('push-btn');
+  if (btn) btn.disabled = !ready;
+  var note = document.getElementById('push-note');
+  if (!note) return;
+  if (ready) {
+    note.style.color = '#4a8aaa';
+    note.textContent = 'Ready — push '+selectedItems.size+' test case'+(selectedItems.size>1?'s':'')+' to '+id;
+  } else {
+    note.style.color = '';
+    note.textContent = 'Select items and enter a ticket ID to push';
+  }
+}
+
+function openImagePreview() {
+  var src = document.getElementById('img-preview').src;
+  var lb = document.getElementById('img-lightbox');
+  var lbImg = document.getElementById('img-lightbox-img');
+  if (!src || !lb) return;
+  lbImg.src = src;
+  lb.style.display = 'flex';
+}
+
+function closeImagePreview() {
+  var lb = document.getElementById('img-lightbox');
+  if (lb) lb.style.display = 'none';
+}
+
+function safeQA(i) { return (qaData && i >= 0 && i < qaData.length) ? qaData[i] : null; }
+function safeRisk(i) { return (riskData && i >= 0 && i < riskData.length) ? riskData[i] : null; }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function showErr(msg) {
+  var b = document.getElementById('err-bar');
+  if (b) { b.textContent = String(msg || 'Unknown error').substring(0, 200); b.style.display = 'block'; }
+}
+function hideErr() {
+  var b = document.getElementById('err-bar');
+  if (b) b.style.display = 'none';
+}
+// Global safety net
+window.addEventListener('error', function(e) {
+  if (e && e.message && e.message.indexOf('Script error') === -1) {
+    showErr('JS error: ' + e.message.substring(0, 120) + (e.lineno ? ' (line ' + e.lineno + ')' : ''));
+  }
+});
+window.addEventListener('unhandledrejection', function(e) {
+  var msg = (e && e.reason) ? (e.reason.message || String(e.reason)).substring(0, 120) : 'Promise error';
+  showErr('Async error: ' + msg);
+});</script>
+<div id="img-lightbox" onclick="closeImagePreview()" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:1000;align-items:center;justify-content:center;cursor:pointer;">
+  <img id="img-lightbox-img" style="max-width:90vw;max-height:90vh;border-radius:10px;object-fit:contain;"/>
+  <div style="position:absolute;top:20px;right:24px;color:#888;font-size:22px;cursor:pointer;">×</div>
+</div>
+</body>
+</html>
