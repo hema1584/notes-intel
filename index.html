@@ -31,7 +31,7 @@
  .card{width:100%;max-width:720px;background:var(--bg);border-radius:14px;border:0.5px solid #222228;overflow:hidden;margin-bottom:12px;}
  .input-zone{padding:18px 20px;display:flex;flex-direction:column;gap:11px;}
  .zone-label{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;}
- .title-input{background:var(--bg2);border:0.5px solid var(--border);border-radius:8px;padding:9px 14px;font-size:15px;font-family:'Sora',sans-serif;color:var(--text);outline:none;width:100%;transition:border-color .15s;resize:none;overflow:hidden;line-height:1.5;min-height:42px;}
+ .title-input{background:var(--bg2);border:0.5px solid var(--border);border-radius:8px;padding:9px 14px;font-size:15px;font-family:'Sora',sans-serif;color:var(--text);outline:none;width:100%;transition:border-color .15s;resize:none;overflow:hidden;line-height:1.6;min-height:46px;height:auto;}
  .title-input:focus{border-color:#383844;}
  .title-input::placeholder{color:var(--muted);}
  .big-input{background:var(--bg2);border:0.5px solid var(--border);border-radius:10px;padding:13px 16px;font-size:15px;font-family:'Sora',sans-serif;color:var(--text);line-height:1.7;min-height:110px;resize:none;outline:none;width:100%;overflow:hidden;transition:border-color .15s;}
@@ -68,7 +68,7 @@
  .card-lbl{font-size:10px;font-family:'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;}
  .icon-btn{background:transparent;border:none;cursor:pointer;color:var(--text3);padding:3px;display:flex;align-items:center;border-radius:4px;transition:color .12s;}
  .icon-btn:hover{color:var(--text2);}
- .gist-p{font-size:14px;color:#6a8078;line-height:1.75;user-select:text;}
+ .gist-p{font-size:15px;color:#9DCFC0;line-height:1.75;user-select:text;}
  .skeleton{background:#111116;border-radius:4px;height:14px;margin-bottom:8px;animation:pulse 1.2s ease-in-out infinite;}
  .skeleton:last-child{width:65%;}
  @keyframes pulse{0%,100%{opacity:.4}50%{opacity:.8}}
@@ -78,26 +78,26 @@
  .qa-item:first-child{border-top:none;}
  .qa-row{display:grid;grid-template-columns:18px 18px 1fr auto 18px 18px;align-items:center;gap:9px;padding:10px 0;cursor:pointer;}
  .qi-cb{width:14px;height:14px;border-radius:3px;cursor:pointer;accent-color:var(--teal);flex-shrink:0;}
- .qi-num{font-family:'JetBrains Mono',monospace;font-size:10px;color:#2e2820;}
- .qi-txt{font-size:14px;color:#9a8e76;line-height:1.45;user-select:text;}
+ .qi-num{font-family:'JetBrains Mono',monospace;font-size:10px;color:#5a4e38;}
+ .qi-txt{font-size:14px;color:#c8b896;line-height:1.45;user-select:text;}
  .sev{font-family:'JetBrains Mono',monospace;font-size:9px;padding:2px 7px;border-radius:4px;white-space:nowrap;}
  .sev-high{background:#A32D2D18;color:#F09595;border:0.5px solid #A32D2D30;}
  .sev-med{background:#BA751718;color:#EF9F27;border:0.5px solid #BA751730;}
  .sev-low{background:#1D9E7518;color:#5DCAA5;border:0.5px solid #1D9E7530;}
  .qi-detail{padding:0 0 11px 45px;display:none;}
  .qi-detail.open{display:block;}
- .qi-desc{font-size:13px;color:#5a5248;line-height:1.65;user-select:text;margin-bottom:9px;}
+ .qi-desc{font-size:14px;color:#9a8e7a;line-height:1.65;user-select:text;margin-bottom:9px;}
  .convert-btn{font-size:10px;font-family:'JetBrains Mono',monospace;color:#4a3e20;background:#0d0b06;border:0.5px solid #2a2210;border-radius:5px;padding:3px 9px;cursor:pointer;transition:all .12s;}
  .convert-btn:hover{color:var(--amber);border-color:var(--amber);}
  .tc-block{display:none;margin-top:10px;background:#0a0907;border:0.5px solid #2a2010;border-radius:8px;padding:11px 13px;}
  .tc-block.open{display:flex;flex-direction:column;gap:8px;}
  .tc-row{display:flex;flex-direction:column;gap:3px;}
- .tc-key{font-size:9px;font-family:'JetBrains Mono',monospace;color:#4a3e20;letter-spacing:.08em;text-transform:uppercase;font-weight:500;}
- .tc-val{font-size:12px;color:#6a6050;line-height:1.55;user-select:text;}
+ .tc-key{font-size:9px;font-family:'JetBrains Mono',monospace;color:#8a7040;letter-spacing:.08em;text-transform:uppercase;font-weight:500;}
+ .tc-val{font-size:13px;color:#a09070;line-height:1.55;user-select:text;}
  .tc-steps{display:flex;flex-direction:column;gap:4px;}
- .tc-step{font-size:12px;color:#6a6050;line-height:1.5;display:flex;gap:7px;}
- .tc-step-n{font-family:'JetBrains Mono',monospace;font-size:10px;color:#3a3020;flex-shrink:0;padding-top:1px;font-weight:500;}
- .tc-bold{font-weight:500;color:#7a7060;}
+ .tc-step{font-size:13px;color:#a09070;line-height:1.5;display:flex;gap:7px;}
+ .tc-step-n{font-family:'JetBrains Mono',monospace;font-size:10px;color:#7a6040;flex-shrink:0;padding-top:1px;font-weight:500;}
+ .tc-bold{font-weight:700;color:#d4bc80;}
  .charter-planned{display:flex;align-items:center;gap:12px;padding:11px 14px;background:#120f06;border:0.5px dashed #2e2510;border-radius:8px;}
  .planned-pill{font-size:9px;font-family:'JetBrains Mono',monospace;padding:3px 9px;border-radius:3px;background:#1a1506;border:0.5px solid #3a2e10;color:#BA7517;white-space:nowrap;}
  .planned-txt{font-size:12px;color:#3e3424;line-height:1.5;}
@@ -106,29 +106,29 @@
  .sel-count{font-size:11px;color:var(--blue);font-family:'JetBrains Mono',monospace;white-space:nowrap;}
  .sel-tags{display:flex;gap:5px;flex-wrap:wrap;}
  .sel-tag{font-size:10px;padding:2px 7px;background:#0d1a28;border:0.5px solid #1a2e40;border-radius:4px;color:#4a7a9a;font-family:'JetBrains Mono',monospace;}
- .sel-empty{font-size:11px;color:#1e2a38;}
+ .sel-empty{font-size:11px;color:#3a5a7a;}
  .jira-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
  .j-field{display:flex;flex-direction:column;gap:5px;}
- .j-label{font-size:10px;font-family:'JetBrains Mono',monospace;color:#2a3a4a;letter-spacing:.08em;text-transform:uppercase;}
- .j-input{background:var(--blue-dark);border:0.5px solid #1a2530;border-radius:7px;padding:8px 12px;font-size:13px;font-family:'JetBrains Mono',monospace;color:#5a8aaa;outline:none;width:100%;transition:border-color .15s;}
+ .j-label{font-size:10px;font-family:'JetBrains Mono',monospace;color:#5a8aaa;letter-spacing:.08em;text-transform:uppercase;}
+ .j-input{background:var(--blue-dark);border:0.5px solid #1a2530;border-radius:7px;padding:8px 12px;font-size:13px;font-family:'JetBrains Mono',monospace;color:#7aaaca;outline:none;width:100%;transition:border-color .15s;}
  .j-input:focus{border-color:#2a4060;}
- .j-input::placeholder{color:#1e2e3a;}
+ .j-input::placeholder{color:#2e4a5a;}
  .j-select{background:var(--blue-dark);border:0.5px solid #1a2530;border-radius:7px;padding:8px 12px;font-size:12px;font-family:'JetBrains Mono',monospace;color:#5a8aaa;outline:none;width:100%;cursor:pointer;}
  .j-select option{background:#0d1520;}
  .push-row{display:flex;align-items:center;justify-content:space-between;gap:10px;}
- .push-note{font-size:11px;color:#1e3050;font-family:'JetBrains Mono',monospace;transition:color .2s;}
+ .push-note{font-size:11px;color:#4a7aaa;font-family:'JetBrains Mono',monospace;transition:color .2s;}
  .push-btn{padding:9px 20px;background:#185FA5;border:none;border-radius:8px;font-size:13px;font-weight:500;color:#B5D4F4;cursor:pointer;font-family:'Sora',sans-serif;display:flex;align-items:center;gap:7px;transition:opacity .15s;}
  .push-btn:hover{opacity:.85;}
  .push-btn:disabled{opacity:.35;cursor:not-allowed;}
  .err-bar{background:#1a0808;border:0.5px solid #5a1a1a;border-radius:8px;padding:10px 14px;font-size:12px;color:#F09595;display:none;font-family:'JetBrains Mono',monospace;}
- .j-label-hint{font-size:9px;color:#1e2e3a;font-weight:400;text-transform:none;letter-spacing:0;}
+ .j-label-hint{font-size:9px;color:#3a5a7a;font-weight:400;text-transform:none;letter-spacing:0;}
  .j-input-wrap{position:relative;display:flex;align-items:center;}
  .j-input-wide{flex:1;padding-right:90px;}
  .j-project-badge{position:absolute;right:10px;font-size:10px;font-family:'JetBrains Mono',monospace;color:#378ADD;background:#0d1a28;border:0.5px solid #1a2e40;border-radius:4px;padding:2px 7px;display:none;white-space:nowrap;}
  .j-recent{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;}
  .j-recent-chip{font-size:10px;font-family:'JetBrains Mono',monospace;padding:3px 9px;background:#0a0d18;border:0.5px solid #1a2530;border-radius:5px;color:#3a5a7a;cursor:pointer;transition:all .12s;}
  .j-recent-chip:hover{color:#378ADD;border-color:#378ADD;}
- .j-recent-label{font-size:10px;color:#1e2a38;font-family:'JetBrains Mono',monospace;padding-top:3px;}
+ .j-recent-label{font-size:10px;color:#3a5a7a;font-family:'JetBrains Mono',monospace;padding-top:3px;}
  .link-input-row{display:flex;align-items:center;gap:8px;}
  .link-input{flex:1;background:var(--bg2);border:0.5px solid var(--border);border-radius:7px;padding:7px 12px;font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--text);outline:none;transition:border-color .15s;}
  .link-input:focus{border-color:#378ADD;}
@@ -142,7 +142,7 @@
  .j-board-chip:hover{color:#378ADD;border-color:#378ADD;}
  .j-board-chip .bx{color:#1e2e3a;font-size:9px;margin-left:2px;}
  .j-board-chip .bx:hover{color:#F09595;}
- .j-board-label{font-size:10px;color:#1e2a38;font-family:'JetBrains Mono',monospace;padding-top:3px;}
+ .j-board-label{font-size:10px;color:#3a5a7a;font-family:'JetBrains Mono',monospace;padding-top:3px;}
  .j-board-active{background:#0d1a28;border-color:#378ADD;color:#378ADD;}
  .push-progress{display:flex;flex-direction:column;gap:6px;}
  .push-progress-item{display:grid;grid-template-columns:18px 1fr auto;align-items:center;gap:8px;font-size:11px;}
@@ -152,20 +152,23 @@
  .gist-li::before{content:'–';position:absolute;left:0;color:#2a5a48;font-weight:500;}
  #output-section{display:none;flex-direction:column;gap:0;}
  #output-section.visible{display:flex;}
- .gist-lead{font-size:14px;font-weight:500;color:#7ab0a0;line-height:1.6;margin-bottom:12px;user-select:text;}
+ .gist-lead{font-size:15px;font-weight:500;color:#9DCFC0;line-height:1.65;margin-bottom:12px;user-select:text;}
  .gist-ul{list-style:none;display:flex;flex-direction:column;gap:6px;padding:0;}
- .gist-li{font-size:13px;color:#5a7870;line-height:1.65;user-select:text;padding-left:16px;position:relative;}
+ .gist-li{font-size:14px;color:#88b8ac;line-height:1.65;user-select:text;padding-left:16px;position:relative;}
  .gist-li::before{content:"–";position:absolute;left:0;color:#2a5a48;font-weight:500;}
- .gist-groups{display:flex;flex-direction:column;gap:10px;}
+ .gist-groups{display:flex;flex-direction:column;gap:8px;}
  .gist-group{border:0.5px solid #1a2820;border-radius:8px;overflow:hidden;}
- .gist-group-hd{display:flex;align-items:center;gap:7px;padding:7px 11px;background:#060f0c;border-bottom:0.5px solid #1a2820;}
+ .gist-group-hd{display:flex;align-items:center;gap:7px;padding:6px 11px;background:#060f0c;border-bottom:0.5px solid #1a2820;}
  .gist-group-icon{font-size:11px;flex-shrink:0;}
- .gist-group-label{font-size:9px;font-family:'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#2a6a54;font-weight:500;}
- .gist-group-count{font-size:9px;font-family:'JetBrains Mono',monospace;color:#1a3a2c;margin-left:auto;}
- .gist-group-items{padding:8px 11px;display:flex;flex-direction:column;gap:5px;background:#040d0a;}
- .gist-point{display:flex;gap:8px;align-items:flex-start;}
+ .gist-group-label{font-size:9px;font-family:'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#5DCAA5;font-weight:500;}
+ .gist-group-count{font-size:9px;font-family:'JetBrains Mono',monospace;color:#2a5a48;margin-left:auto;}
+ .gist-group-items{padding:8px 11px;display:flex;flex-direction:column;gap:4px;background:#040d0a;}
+ .gist-point{display:flex;gap:8px;align-items:baseline;}
+ .gist-point-key{font-size:11px;font-family:'JetBrains Mono',monospace;color:#2a6a54;font-weight:500;flex-shrink:0;white-space:nowrap;}
  .gist-point-dot{width:4px;height:4px;border-radius:50%;background:#1D9E75;flex-shrink:0;margin-top:6px;}
- .gist-point-txt{font-size:13px;color:#5a7870;line-height:1.65;user-select:text;}
+ .gist-point-txt{font-size:13px;color:#88b8ac;line-height:1.55;user-select:text;}
+ .gist-chips{display:flex;flex-wrap:wrap;gap:5px;padding:8px 11px;background:#040d0a;}
+ .gist-chip{font-size:11px;padding:2px 9px;border-radius:12px;background:#0a1a14;border:0.5px solid #1a3a28;color:#5DCAA5;font-family:'JetBrains Mono',monospace;white-space:nowrap;}
  .gist-tag{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-family:'JetBrains Mono',monospace;padding:1px 6px;border-radius:3px;white-space:nowrap;margin-right:4px;vertical-align:middle;}
  .gist-tag-decision{background:#0d1a28;color:#378ADD;border:0.5px solid #1a2e40;}
  .gist-tag-action{background:#1a1200;color:#EF9F27;border:0.5px solid #2a2010;}
@@ -195,7 +198,7 @@
  .confluence-status{font-size:11px;font-family:'JetBrains Mono',monospace;padding:4px 8px;border-radius:5px;display:none;}
  .confluence-status.loading{color:#5DCAA5;display:inline-flex;align-items:center;gap:6px;}
  .confluence-status.error{color:#F09595;display:block;}
- .gist-edit-textarea{width:100%;background:#0a1410;border:0.5px solid #1D9E7540;border-radius:8px;padding:11px 13px;font-size:13px;font-family:'Sora',sans-serif;color:#7ab0a0;line-height:1.7;resize:none;outline:none;min-height:80px;overflow:hidden;}
+ .gist-edit-textarea{width:100%;background:#0a1410;border:0.5px solid #1D9E7540;border-radius:8px;padding:11px 13px;font-size:14px;font-family:'Sora',sans-serif;color:#9DCFC0;line-height:1.7;resize:none;outline:none;min-height:120px;overflow:hidden;height:auto;}
  .gist-edit-textarea:focus{border-color:#5DCAA5;}
  .gist-save-btn{padding:4px 14px;background:#0a1a14;border:0.5px solid #1D9E7540;border-radius:6px;font-size:11px;color:#5DCAA5;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .12s;}
  .gist-save-btn:hover{background:#0f2a1e;border-color:#5DCAA5;}
@@ -203,6 +206,7 @@
  .gist-cancel-btn:hover{color:#666;}
  #gist-edit-btn.active{color:#5DCAA5;}
  .context-zone{padding:13px 18px;}
+
  .context-header{display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;}
  .context-header:hover .context-hint{color:#7F77DD;}
  .context-hint{font-size:10px;font-family:'JetBrains Mono',monospace;color:#2e2e3a;transition:color .15s;}
@@ -229,18 +233,18 @@
  .risk-item{border-top:0.5px solid #1e1a0f;}
  .risk-item:first-child{border-top:none;}
  .risk-row{display:grid;grid-template-columns:18px 18px 1fr auto 18px 18px;align-items:center;gap:9px;padding:10px 0;cursor:pointer;}
- .ri-num{font-family:'JetBrains Mono',monospace;font-size:10px;color:#2e2820;}
- .ri-txt{font-size:14px;color:#9a8e76;line-height:1.45;user-select:text;}
+ .ri-num{font-family:'JetBrains Mono',monospace;font-size:10px;color:#5a4e38;}
+ .ri-txt{font-size:14px;color:#c8b896;line-height:1.45;user-select:text;}
  .risk-sev{font-family:'JetBrains Mono',monospace;font-size:9px;padding:2px 7px;border-radius:4px;white-space:nowrap;}
  .rs-crit{background:#A32D2D18;color:#F09595;border:0.5px solid #A32D2D30;}
  .rs-high{background:#BA751718;color:#EF9F27;border:0.5px solid #BA751730;}
  .rs-med{background:#1D9E7518;color:#5DCAA5;border:0.5px solid #1D9E7530;}
  .risk-detail{padding:0 0 11px 45px;display:none;}
  .risk-detail.open{display:block;}
- .risk-desc{font-size:13px;color:#5a5248;line-height:1.65;user-select:text;margin-bottom:8px;}
+ .risk-desc{font-size:14px;color:#9a8e7a;line-height:1.65;user-select:text;margin-bottom:8px;}
  .risk-failure{background:#0a0907;border:0.5px solid #2a2010;border-radius:7px;padding:9px 12px;margin-bottom:8px;display:flex;flex-direction:column;gap:5px;}
- .rf-key{font-size:9px;font-family:'JetBrains Mono',monospace;color:#4a3e20;letter-spacing:.08em;text-transform:uppercase;font-weight:500;}
- .rf-val{font-size:12px;color:#6a6050;line-height:1.55;}
+ .rf-key{font-size:9px;font-family:'JetBrains Mono',monospace;color:#8a7040;letter-spacing:.08em;text-transform:uppercase;font-weight:500;}
+ .rf-val{font-size:13px;color:#a09070;line-height:1.55;}
  .risk-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap;}
  .risk-gen-btn{display:flex;align-items:center;gap:8px;padding:10px 24px;background:#120f06;border:0.5px solid #BA751740;border-radius:9px;font-size:13px;font-weight:500;color:#EF9F27;cursor:pointer;font-family:'Sora',sans-serif;transition:all .18s;}
  .risk-gen-btn:hover{background:#1a1408;border-color:#EF9F27;}
@@ -339,6 +343,7 @@
   </div>
 </div>
 
+
 <div class="card">
   <div class="input-zone">
     <div class="zone-label" style="display:flex;align-items:center;gap:7px;">
@@ -429,7 +434,8 @@
           <button class="icon-btn" id="gist-edit-btn" onclick="toggleGistEdit()" title="edit">
             <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M11.5 2.5a1.5 1.5 0 0 1 2 2L5 13H3v-2L11.5 2.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
           </button>
-          <button class="icon-btn" onclick="copyEl('gist-body',this)" title="copy"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="9" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M11 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h1" stroke="currentColor" stroke-width="1.2"/></svg></button>
+          <button class="icon-btn" onclick="copyGistSlack(this)" title="copy for Slack"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="9" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M11 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h1" stroke="currentColor" stroke-width="1.2"/></svg></button>
+          <button class="icon-btn" onclick="copyGistAsImage(this)" title="copy as image"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.2"/><circle cx="5.5" cy="7.5" r="1.5" stroke="currentColor" stroke-width="1"/><path d="M1 10l3.5-3 3 3 2.5-2.5 4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         </div>
       </div>
       <div id="gist-editor" style="display:none;">
@@ -494,7 +500,7 @@
     <div class="out-card jira-card">
       <div class="card-top">
         <div class="card-head"><div class="card-pip" style="background:#378ADD"></div><span class="card-lbl" style="color:#378ADD">push to jira</span></div>
-        <span style="font-size:10px;color:#1e3050;font-family:'JetBrains Mono',monospace;">creates subtasks on parent ticket</span>
+        <span style="font-size:10px;color:#4a7aaa;font-family:'JetBrains Mono',monospace;">creates subtasks on parent ticket</span>
       </div>
       <div class="jira-fields">
         <div class="sel-summary" id="sel-summary">
@@ -551,26 +557,60 @@ var _qaJsonInstruction = '';
 var riskData = [];
 
 function buildGistInstruction(textBase) {
-  return 'Analyse this content and return a structured summary as a JSON object. Return ONLY the JSON, no markdown, no explanation.\n' +
+  return 'Read all input content and return a QA briefing card as a JSON object. Return ONLY the JSON, no markdown, no explanation.\n' +
+    '\n' +
+    'Think of this like a team lead briefing a QA engineer in 30 seconds before they start testing.\n' +
+    'Be sharp. Be useful. Cut everything that does not help someone test this.\n' +
+    '\n' +
     'Format:\n' +
     '{\n' +
-    '  "summary": "one clear sentence overview of the whole content",\n' +
+    '  "title": "5-8 word crisp label for this feature/task — NOT a sentence, e.g. Card Trading Send Flow, Haptic QR Upload Tool",\n' +
+    '  "summary": "One sentence: what this is and what makes it distinct. No Jira metadata.",\n' +
     '  "groups": [\n' +
     '    {\n' +
-    '      "label": "short group name e.g. Decisions, Actions, Risks, Open Questions, Context, Changes, Requirements",\n' +
-    '      "icon": "single emoji that fits the group",\n' +
-    '      "points": ["point 1", "point 2"]\n' +
+    '      "label": "group label",\n' +
+    '      "icon": "single relevant emoji",\n' +
+    '      "style": "bullets | chips",\n' +
+    '      "points": ["point"]\n' +
     '    }\n' +
     '  ]\n' +
     '}\n' +
-    'Rules:\n' +
-    '- Draw from ALL input sources (text, Confluence, Slack, screenshots)\n' +
-    '- Group related points together under a meaningful label\n' +
-    '- Use 2-6 groups depending on content — do not force grouping if content is simple\n' +
-    '- Each point concise but complete — reader understands without re-reading source\n' +
-    '- Tag special points with a prefix: [decision] [action] [risk] [open] — lowercase, in the point text\n' +
-    '- No artificial limit on points per group — include all important ideas\n' +
+    '\n' +
+    'GROUP RULES:\n' +
+    '- 2–4 groups max. Merge if content is thin. Never pad.\n' +
+    '- NEVER include Jira metadata — no ticket IDs, assignees, statuses, sprint names\n' +
+    '- NEVER create groups called Actions, Risks, Next Steps, Recommendations\n' +
     '- No duplicate points across groups\n' +
+    '\n' +
+    'ALLOWED GROUPS (use only what content supports):\n' +
+    '\n' +
+    '1. "Feature Overview" — style: bullets\n' +
+    '   Max 3 points. Each point = one key fact about what this does.\n' +
+    '   Lead with the most important behaviour. Cut anything the title already says.\n' +
+    '   Bad: "A new feature that allows players to send cards" (restates title)\n' +
+    '   Good: "Gold (5-star) cards are blocked from being sent" (new, specific)\n' +
+    '\n' +
+    '2. "Key Changes" — style: bullets — only if something changed from a previous state\n' +
+    '   What is different now. What was removed or replaced. What is new vs before.\n' +
+    '\n' +
+    '3. "Acceptance Criteria" — style: bullets — only if explicit criteria exist in the content\n' +
+    '   Summarise each criterion into one short line — what must be true for this to pass.\n' +
+    '   Strip implementation detail, keep the testable condition. Max 10 words per point.\n' +
+    '   Bad: "On confirm: card deducted from sender, delivered to recipient, send counter decremented"\n' +
+    '   Good: "Confirm triggers card deduction, delivery, and counter decrement"\n' +
+    '\n' +
+    '4. "Test Scope" — style: chips\n' +
+    '   Specific, feature-derived chips — derived from the actual content, not generic dimensions.\n' +
+    '   Each chip = one testable area. Make them specific to what this feature actually does.\n' +
+    '   Format rule: add "— [angle]" suffix ONLY when the chip alone does not tell you what to check.\n' +
+    '   e.g. "Camera permission denied — graceful fallback" (needs angle) vs "QR scan happy path" (self-explanatory)\n' +
+    '   Exception: platform chips like "iOS + Android" never need a suffix — parity is implied.\n' +
+    '   GROUPING RULE: if multiple chips share the same subject (e.g. "Haptic feedback — level play", "Haptic feedback — booster", "Haptic feedback — win screen")\n' +
+    '   collapse them into ONE chip listing the scenarios: "Haptic feedback — level play, booster, win/fail"\n' +
+    '   Never repeat the same subject across multiple chips. Group and compress instead.\n' +
+    '   If input says "smoke" → only happy path chips. If "regression" → include adjacent risk chips.\n' +
+    '   Max 8 words per chip including suffix. No full sentences.\n' +
+    '\n' +
     '- Output the JSON object only.';
 }
 
@@ -660,10 +700,12 @@ function toggleContext() {
   var body = document.getElementById('context-body');
   var chev = document.getElementById('context-chev');
   var hint = document.getElementById('context-hint');
+  var card = document.getElementById('context-card');
   var open = body.style.display !== 'none';
   body.style.display = open ? 'none' : 'block';
   chev.style.transform = open ? '' : 'rotate(180deg)';
   hint.textContent = open ? 'click to expand' : 'click to collapse';
+
 }
 
 function updateContextStatus() {
@@ -699,14 +741,23 @@ function buildContextBlock() {
 // Load context on startup
 document.addEventListener('DOMContentLoaded', loadContext);
 
+// ── EDITOR CONTEXT ──
+
+
+
+
+
+
+
 function autoResize(el) {
   el.style.height = 'auto';
   el.style.height = el.scrollHeight + 'px';
 }
 
 function autoResizeTitle(el) {
+  if (!el) return;
   el.style.height = 'auto';
-  el.style.height = el.scrollHeight + 'px';
+  el.style.height = (el.scrollHeight + 2) + 'px';
 }
 
 function clearAll() {
@@ -737,6 +788,13 @@ function clearAll() {
   // Hide output section
   var outSec = document.getElementById('output-section');
   if (outSec) outSec.style.display = 'none';
+  // Reset gist body to skeleton so it's fresh on next run
+  var gistBody = document.getElementById('gist-body');
+  if (gistBody) gistBody.innerHTML = '<div class="skeleton" style="width:100%"></div><div class="skeleton" style="width:88%"></div><div class="skeleton"></div>';
+  var gistEditor = document.getElementById('gist-editor');
+  if (gistEditor) gistEditor.style.display = 'none';
+  var gistBodyEl = document.getElementById('gist-body');
+  if (gistBodyEl) gistBodyEl.style.display = 'block';
   var qaBtnWrap = document.getElementById('qa-btn-wrap');
   if (qaBtnWrap) qaBtnWrap.style.display = 'none';
   var qaSection = document.getElementById('qa-section');
@@ -753,7 +811,12 @@ function clearAll() {
   selectedItems.clear();
   updateSelected();
   hideErr();
-  // Reset run button
+  // Reset run button and all analysis state
+  window._analysisRunning = false;
+  _textBase = '';
+  _msgContent = null;
+  _qaJsonInstruction = '';
+
   document.getElementById('run-btn').disabled = false;
   document.getElementById('run-label').textContent = 'analyse →';
   document.getElementById('spinner').style.display = 'none';
@@ -815,6 +878,7 @@ function toggleJiraFetchInput() {
   // close others if open
   document.getElementById('confluence-input-row').style.display = 'none';
   document.getElementById('slack-input-row').style.display = 'none';
+
   var visible = row.style.display !== 'none';
   row.style.display = visible ? 'none' : 'flex';
   if (!visible) { inp.value = ''; inp.focus(); }
@@ -828,7 +892,7 @@ function jiraFetchKeydown(e) {
 function cleanJiraFetchInput(inp) {
   var val = inp.value;
   // If it looks like a URL or has a path, extract just the ticket key
-  var match = val.match(/([A-Z]{2,10}-\d{1,6})/i);
+  var match = val.match(/([A-Z][A-Z0-9]{1,9}-\d{1,6})/i);
   if (match && val.length > match[1].length) {
     inp.value = match[1].toUpperCase();
   } else if (val.length > 4) {
@@ -841,7 +905,7 @@ function addJiraRef() {
   var raw = inp.value.trim();
   if (!raw) return;
   // Extract ticket key from URL or plain text — e.g. SMR-1234 or .../browse/SMR-1234
-  var match = raw.match(/([A-Z]{2,10}-\d{1,6})/i);
+  var match = raw.match(/([A-Z][A-Z0-9]{1,9}-\d{1,6})/i);
   if (!match) {
     showErr('Could not find a Jira ticket key. Enter a key like SMR-1234 or paste the full Jira URL.');
     return;
@@ -962,6 +1026,7 @@ function renderAttTags() {
 }
 
 // ── MAIN ANALYSIS ──
+
 async function runAnalysis() {
   if (window._analysisRunning) return; // prevent double execution
   window._analysisRunning = true;
@@ -975,6 +1040,7 @@ async function runAnalysis() {
   var hasJiraRef = attachedLinks.some(function(l){ return l.jiraTicketKey; });
   if (!contentText && !attachedImage && !hasConfluenceRef && !hasSlackRef && !hasJiraRef) {
     showErr('Please paste some content, attach a screenshot, add a Confluence page, Slack thread, or Jira ticket.');
+    window._analysisRunning = false;
     return;
   }
 
@@ -1028,18 +1094,23 @@ async function runAnalysis() {
     _textBase += '\n';
   }
 
+
+
   if (plainLinks.length > 0) _textBase += 'Referenced links: ' + plainLinks.map(function(l){ return l.url; }).join(', ') + '\n\n';
 
   _qaJsonInstruction = 'Return ONLY a JSON array (no object wrapper) of exactly 5 QA focus points. ' +
     'Each item: {"title":"max 70 chars","severity":"high|med|low","detail":"max 90 chars","testcase":{"objective":"max 90 chars","preconditions":"max 90 chars","steps":["s1","s2","s3","s4","s5"],"expected":"max 200 chars"}} ' +
-    'FLOW-AWARE RULES — read before generating: ' +
-    '1. If multiple verification points belong to the same user flow or happy path (e.g. login → action → result), COMBINE them into one test case. ' +
-    '   Use the steps array to cover each check in sequence, and use the expected field to list multiple expected outcomes separated by semicolons. ' +
-    '   Do not split a single coherent flow into multiple test cases just to fill 5 slots. ' +
-    '2. Only create separate test cases when the scenarios are genuinely distinct — different entry points, different states, or different failure modes. ' +
-    '3. Each of the 5 items must cover a distinct area — no overlapping verification points across items. ' +
-    '4. Before finalising, scan all 5 and merge any that test the same flow or condition. Replace the merged slot with a new distinct area. ' +
-    '5. Order by severity desc. Steps array can have up to 5 entries. Output the array only.';
+    'RULES — read carefully before generating: ' +
+    '1. Base test cases on the GIST SUMMARY + ticket description + any Jira comments present in the input. ' +
+    '   Jira comments often contain QA instructions, scope notes, or constraints — treat them as requirements. ' +
+    '2. PRECONDITIONS — if the Jira ticket or input mentions a test build, branch, or APK, include it explicitly in preconditions. ' +
+    '   e.g. "Build: CTS branch r4821 installed on device · Feature flag enabled · Haptic-capable device" ' +
+    '3. FLOW-AWARE — if multiple checks belong to the same user flow, COMBINE into one test case with sequential steps and semicolon-separated expected results. ' +
+    '   Do not split a single coherent flow into multiple slots just to fill 5. ' +
+    '4. Only create separate test cases for genuinely distinct scenarios — different entry points, states, or failure modes. ' +
+    '5. Each item must cover a distinct area — no overlapping verification points. ' +
+    '6. Before finalising, scan all 5 and merge any that test the same condition. Replace merged slot with a new distinct area. ' +
+    '7. Order by severity desc. Steps array can have up to 5 entries. Output the array only.';
 
   // build message content — include image if attached
   _msgContent = null;
@@ -1051,6 +1122,7 @@ async function runAnalysis() {
   }
 
   try {
+
     // ── GIST ONLY ──
     var gistPrompt = (_msgContent && typeof _msgContent !== 'string')
       ? [..._msgContent, { type: 'text', text: buildGistInstruction(_textBase) }]
@@ -1063,7 +1135,7 @@ async function runAnalysis() {
     var needsMcp = hasConfluencePages || hasSlackThreads || hasJiraTickets;
     var gistBody = {
       model: needsMcp ? 'claude-sonnet-4-20250514' : 'claude-haiku-4-5-20251001',
-      max_tokens: 800,
+      max_tokens: 4000,
       stream: true,
       messages: [{ role: 'user', content: gistPrompt }]
     };
@@ -1077,13 +1149,18 @@ async function runAnalysis() {
       headers: { 'Content-Type': 'application/json', 'anthropic-version': '2023-06-01' },
       body: JSON.stringify(gistBody)
     });
+    if (!r1.ok) {
+      var errBody = await r1.text();
+      throw new Error('API error ' + r1.status + ': ' + errBody.substring(0, 120));
+    }
 
     // show gist card immediately with streaming cursor
-    document.getElementById('gist-body').innerHTML = '<p class="gist-p" id="gist-stream" style="color:#6a8078;font-size:14px;line-height:1.75;"></p>';
+    document.getElementById('gist-body').innerHTML = '<p class="gist-p" id="gist-stream" style="color:#9DCFC0;font-size:15px;line-height:1.75;"></p>';
     var streamEl = document.getElementById('gist-stream');
     var gistText = '';
     var reader = r1.body.getReader();
     var decoder = new TextDecoder();
+    var streamWordCount = 0;
     while (true) {
       var chunk = await reader.read();
       if (chunk.done) break;
@@ -1097,13 +1174,28 @@ async function runAnalysis() {
           var evt = JSON.parse(jsonStr);
           if (evt.type === 'content_block_delta' && evt.delta && evt.delta.text) {
             gistText += evt.delta.text;
-            // show raw text while streaming so user sees progress
-            if (streamEl) streamEl.textContent = gistText;
+            streamWordCount++;
+            // Don't stream raw JSON — show a progress indicator instead
+            if (streamEl) {
+              var looksLikeJson = gistText.trimStart().startsWith('{') || gistText.trimStart().startsWith('[');
+              if (looksLikeJson) {
+                streamEl.textContent = 'Reading and structuring content…';
+                streamEl.style.color = '#2a6a54';
+                streamEl.style.fontStyle = 'italic';
+              } else {
+                streamEl.style.color = '#9DCFC0';
+                streamEl.style.fontStyle = '';
+                streamEl.textContent = gistText;
+              }
+            }
           }
         } catch(pe) {}
       }
     }
-    // once complete, render structured format
+    // once complete, render structured format — check for truncation
+    if (!gistText.trim()) {
+      throw new Error('Empty gist response — the document may be too large or the MCP fetch failed.');
+    }
     renderGist(gistText);
 
     // show generate QA button after gist renders
@@ -1159,6 +1251,7 @@ async function generateQA() {
         return servers.length ? { mcp_servers: servers } : {};
       })()))
     });
+    if (!r2.ok) { var e2txt = await r2.text(); throw new Error('QA API error ' + r2.status + ': ' + e2txt.substring(0,80)); }
     var d2 = await r2.json();
     // collect all text blocks — MCP calls produce multiple content blocks
     var raw2 = (d2.content || [])
@@ -1323,7 +1416,7 @@ async function resolveIssueType(projectKey) {
 
 async function createSubtaskViaMCP(tc, parentKey) {
   if (!tc || !tc.testcase) throw new Error('Invalid test case data');
-  if (!parentKey || !parentKey.match(/^[A-Z]{2,10}-\d+$/i)) throw new Error('Invalid parent ticket key: ' + parentKey);
+  if (!parentKey || !parentKey.match(/^[A-Z][A-Z0-9]{1,9}-\d+$/i)) throw new Error('Invalid parent ticket key: ' + parentKey);
   var projectKey = parentKey.split("-")[0].toUpperCase();
   var safeTitle = tc.title.replace(/[^a-zA-Z0-9 \-_.(),:]/g, " ");
   var due = new Date(); due.setMonth(due.getMonth() + 1);
@@ -1394,20 +1487,24 @@ async function createSubtaskViaMCP(tc, parentKey) {
       messages: [{ role: "user", content: prompt }]
     })
   });
-  if (!resp.ok) throw new Error("API error "+resp.status);
+  if (!resp.ok) { var errTxt = await resp.text(); throw new Error("Jira API error "+resp.status+": "+errTxt.substring(0,80)); }
   var data = await resp.json();
   var raw = (data.content || []).filter(function(b){ return b.type === "text"; }).map(function(b){ return b.text; }).join("");
+  if (!raw.trim()) throw new Error("Empty response from Jira MCP — check MCP connection");
   var clean = raw.replace(/```json|```/g, "").trim();
   var s = clean.indexOf("{"), e = clean.lastIndexOf("}");
   if (s === -1 || e === -1) throw new Error("No JSON in response: "+clean.substring(0,120));
-  var parsed = JSON.parse(clean.slice(s, e+1));
-  if (!parsed.key) throw new Error("No key returned");
+  var parsed;
+  try { parsed = JSON.parse(clean.slice(s, e+1)); } catch(pe) { throw new Error("JSON parse failed: "+pe.message.substring(0,60)); }
+  if (!parsed.key) throw new Error("No ticket key returned — check Jira permissions");
   return parsed;
 }
 
 async function pushToJira() {
-  var parentKey = document.getElementById('jira-id').value.trim().toUpperCase();
-  var keyMatch = parentKey.match(/^([A-Z]{2,10})-/);
+  var rawId = document.getElementById('jira-id').value.trim();
+  var keyExtract = rawId.match(/([A-Z][A-Z0-9]{1,9}-\d+)/i);
+  var parentKey = keyExtract ? keyExtract[1].toUpperCase() : rawId.toUpperCase();
+  var keyMatch = parentKey.match(/^([A-Z][A-Z0-9]{1,9})-/);
   if (keyMatch) saveRecent(keyMatch[1]);
 
   var btn = document.getElementById('push-btn');
@@ -1489,6 +1586,206 @@ function copyEl(id, btn) {
   if (!el) return;
   copyToClipboard(el.innerText||el.textContent, btn);
 }
+
+async function copyGistAsImage(btn) {
+  var origHTML = btn.innerHTML;
+  btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#5DCAA5" stroke-width="1.2"/></svg>';
+  btn.style.color = '#5DCAA5';
+  try {
+    await downloadGistSimple(origHTML, btn);
+  } catch(e) {
+    showErr('Image capture failed: ' + (e.message || 'unknown'));
+    btn.innerHTML = origHTML;
+    btn.style.color = '';
+  }
+}
+
+async function downloadGistSimple(origHTML, btn) {
+  // Simple fallback: render gist text content onto a canvas with styling
+  var body = document.getElementById('gist-body');
+  if (!body) { btn.innerHTML = origHTML; btn.style.color = ''; return; }
+
+  var lines = [];
+  var lead = body.querySelector('.gist-lead');
+  if (lead) lines.push({ type: 'lead', text: lead.textContent.trim() });
+  body.querySelectorAll('.gist-group').forEach(function(g) {
+    var icon = g.querySelector('.gist-group-icon');
+    var label = g.querySelector('.gist-group-label');
+    if (label) lines.push({ type: 'header', text: (icon ? icon.textContent.trim() + ' ' : '') + label.textContent.trim().toUpperCase() });
+    g.querySelectorAll('.gist-point-txt').forEach(function(pt) {
+      lines.push({ type: 'point', text: pt.textContent.trim() });
+    });
+  });
+  if (!lines.length) {
+    body.querySelectorAll('.gist-li').forEach(function(li) {
+      lines.push({ type: 'point', text: li.textContent.trim() });
+    });
+  }
+
+  var W = 760, PAD = 36, scale = 2;
+  var maxW = W - PAD * 2;
+
+  // ── Measure total height first ──
+  var tmpCanvas = document.createElement('canvas');
+  var tmpCtx = tmpCanvas.getContext('2d');
+
+  function wrapText(ctx, text, maxW, fontSize, fontStr) {
+    ctx.font = fontStr;
+    var words = text.split(' ');
+    var rows = [], line = '';
+    words.forEach(function(w) {
+      var test = line ? line + ' ' + w : w;
+      if (ctx.measureText(test).width > maxW && line) {
+        rows.push(line); line = w;
+      } else { line = test; }
+    });
+    if (line) rows.push(line);
+    return rows;
+  }
+
+  var totalH = PAD + 32; // top padding + label row
+  lines.forEach(function(l) {
+    if (l.type === 'lead') {
+      var rows = wrapText(tmpCtx, l.text, maxW, 15, '600 15px sans-serif');
+      totalH += rows.length * 22 + 18;
+    } else if (l.type === 'header') {
+      totalH += 42;
+    } else {
+      var rows = wrapText(tmpCtx, l.text, maxW - 18, 13, '400 13px sans-serif');
+      totalH += rows.length * 20 + 6;
+    }
+  });
+  totalH += PAD;
+
+  var canvas = document.createElement('canvas');
+  canvas.width = W * scale;
+  canvas.height = totalH * scale;
+  var ctx = canvas.getContext('2d');
+  ctx.scale(scale, scale);
+
+  // ── Background ──
+  ctx.fillStyle = '#080f0d';
+  ctx.fillRect(0, 0, W, totalH);
+
+  // ── Top teal accent line ──
+  ctx.fillStyle = '#1D9E75';
+  ctx.fillRect(0, 0, W, 2);
+
+  // ── GIST label ──
+  ctx.fillStyle = '#5DCAA5';
+  ctx.font = '500 10px monospace';
+  ctx.letterSpacing = '2px';
+  ctx.fillText('● GIST', PAD, 26);
+  ctx.letterSpacing = '0px';
+
+  var y = PAD + 32;
+
+  lines.forEach(function(l) {
+    if (l.type === 'lead') {
+      ctx.fillStyle = '#9DCFC0';
+      ctx.font = '600 15px sans-serif';
+      var rows = wrapText(ctx, l.text, maxW, 15, '600 15px sans-serif');
+      rows.forEach(function(row) { ctx.fillText(row, PAD, y); y += 22; });
+      y += 18;
+
+    } else if (l.type === 'header') {
+      y += 4;
+      // Group header background
+      ctx.fillStyle = '#0a1a14';
+      ctx.beginPath();
+      ctx.roundRect(PAD - 10, y - 16, W - PAD * 2 + 20, 30, 6);
+      ctx.fill();
+      // Left accent bar
+      ctx.fillStyle = '#5DCAA5';
+      ctx.fillRect(PAD - 10, y - 16, 3, 30);
+      // Label text
+      ctx.fillStyle = '#5DCAA5';
+      ctx.font = '600 9px monospace';
+      ctx.letterSpacing = '1.5px';
+      ctx.fillText(l.text, PAD, y);
+      ctx.letterSpacing = '0px';
+      y += 26;
+
+    } else {
+      // Bullet dash
+      ctx.fillStyle = '#2a6a4a';
+      ctx.font = '400 13px sans-serif';
+      ctx.fillText('–', PAD + 2, y);
+      // Point text with wrap
+      ctx.fillStyle = '#88b8ac';
+      ctx.font = '400 13px sans-serif';
+      var rows = wrapText(ctx, l.text, maxW - 18, 13, '400 13px sans-serif');
+      rows.forEach(function(row, ri) {
+        ctx.fillText(row, PAD + 18, y + ri * 20);
+      });
+      y += rows.length * 20 + 6;
+    }
+  });
+
+  // ── notes intel watermark ──
+  ctx.fillStyle = '#1a3a2a';
+  ctx.font = '400 9px monospace';
+  ctx.fillText('notes intel v1.1', W - PAD - 100, totalH - 12);
+
+  return new Promise(function(resolve) {
+    canvas.toBlob(async function(blob) {
+      // Try clipboard first
+      try {
+        var item = new ClipboardItem({ 'image/png': blob });
+        await navigator.clipboard.write([item]);
+        btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-7" stroke="#5DCAA5" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        setTimeout(function() { btn.innerHTML = origHTML; btn.style.color = ''; }, 2000);
+      } catch(e) {
+        // Download fallback
+        var dl = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = dl; var tn = (document.getElementById('title-input') ? document.getElementById('title-input').value.trim() : '').replace(/[^a-z0-9\s-]/gi,'').replace(/\s+/g,'-').toLowerCase() || 'notes-intel-gist'; a.download = tn + '.png';
+        document.body.appendChild(a); a.click();
+        document.body.removeChild(a); URL.revokeObjectURL(dl);
+        btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-7" stroke="#5DCAA5" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        setTimeout(function() { btn.innerHTML = origHTML; btn.style.color = ''; }, 2000);
+      }
+      resolve();
+    }, 'image/png');
+  });
+}
+
+function copyGistSlack(btn) {
+  var body = document.getElementById('gist-body');
+  if (!body) return;
+  var lines = [];
+
+  // Lead summary — bold in Slack
+  var lead = body.querySelector('.gist-lead');
+  if (lead) lines.push('*' + lead.textContent.trim() + '*');
+
+  // Structured groups
+  var groups = body.querySelectorAll('.gist-group');
+  if (groups.length) {
+    groups.forEach(function(g) {
+      var icon = g.querySelector('.gist-group-icon');
+      var label = g.querySelector('.gist-group-label');
+      if (label) {
+        lines.push('');
+        lines.push((icon ? icon.textContent.trim() + ' ' : '') + '*' + label.textContent.trim().toUpperCase() + '*');
+      }
+      g.querySelectorAll('.gist-point-txt').forEach(function(pt) {
+        var txt = pt.textContent.trim();
+        if (txt) lines.push('• ' + txt);
+      });
+      var chips = Array.from(g.querySelectorAll('.gist-chip')).map(function(c){ return c.textContent.trim(); }).filter(Boolean);
+      if (chips.length) lines.push(chips.join(' · '));
+    });
+  } else {
+    // Plain bullet list fallback
+    body.querySelectorAll('.gist-li').forEach(function(li) {
+      var txt = li.textContent.trim();
+      if (txt) lines.push('• ' + txt);
+    });
+  }
+
+  copyToClipboard(lines.join('\n'), btn);
+}
 function copyQI(i, btn) {
   var item = qaData[i];
   if (!item) return;
@@ -1506,20 +1803,27 @@ var recentProjects = [];
 try { recentProjects = JSON.parse(localStorage.getItem('di_recent_projects') || '[]'); } catch(e){}
 
 function formatJiraId(input) {
-  var val = input.value;
-  var urlMatch = val.match(/browse\/([A-Z]{2,10}-\d{1,6})/i);
-  if (urlMatch) {
+  var val = input.value.trim();
+  // Extract ticket key from any Jira URL format
+  var urlMatch = val.match(/([A-Z][A-Z0-9]{1,9}-\d{1,6})/i);
+  if (urlMatch && (val.indexOf('http') === 0 || val.indexOf('atlassian') > -1 || val.indexOf('/') > -1)) {
     input.value = urlMatch[1].toUpperCase();
-    var k = urlMatch[1].split('-')[0];
+    var k = urlMatch[1].split('-')[0].toUpperCase();
     showBadge(k); autofillBoard(k); updatePushState(); return;
   }
+  // Plain key entry — format as user types
   var clean = val.replace(/[^A-Z0-9-]/gi,'').toUpperCase();
-  var match = clean.match(/^([A-Z]{2,10})-?(\d{0,6})$/);
+  var match = clean.match(/^([A-Z][A-Z0-9]{1,9})-?(\d{0,6})$/);
   if (match) {
     input.value = match[2] ? match[1]+'-'+match[2] : match[1];
     if (match[2]) { showBadge(match[1]); autofillBoard(match[1]); }
     else hideBadge();
-  } else { hideBadge(); }
+  } else {
+    // If it contains a valid key anywhere (e.g. partial paste), extract it
+    var anyKey = clean.match(/([A-Z][A-Z0-9]{1,9}-\d+)/);
+    if (anyKey) { input.value = anyKey[1]; showBadge(anyKey[1].split('-')[0]); autofillBoard(anyKey[1].split('-')[0]); }
+    else hideBadge();
+  }
   updatePushState();
 }
 
@@ -1582,7 +1886,7 @@ function boardInputChange(inp) {
   if (raw.indexOf('atlassian.net') !== -1 || raw.indexOf('http') !== -1) {
     var m = raw.match(/projects[^A-Za-z]+([A-Za-z]{2,10})/i)
       || raw.match(/projectKey[^A-Za-z]+([A-Za-z]{2,10})/i)
-      || raw.match(/([A-Z]{2,10})-[0-9]/);
+      || raw.match(/([A-Z][A-Z0-9]{1,9})-[0-9]/);
     val = m ? m[1].toUpperCase() : '';
   } else {
     val = raw.toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -1646,6 +1950,16 @@ function renderSavedBoards() {
 renderRecent();
 renderSavedBoards();
 
+// Wire paste handler for jira-id — oninput misses paste in some browsers
+document.addEventListener('DOMContentLoaded', function() {
+  var jiraIdInput = document.getElementById('jira-id');
+  if (jiraIdInput) {
+    jiraIdInput.addEventListener('paste', function() {
+      setTimeout(function() { formatJiraId(jiraIdInput); }, 20);
+    });
+  }
+});
+
 function updateIssueTypeBadge(key) {
   var badge = document.getElementById('j-issue-type-badge');
   if (!badge || !key) return;
@@ -1681,26 +1995,54 @@ function toggleGistEdit() {
   if (isOpen) {
     cancelGistEdit();
   } else {
-    // Flatten structured groups or plain list to editable lines
+    // Flatten full gist content to editable text — summary + all groups + all points
     var lines = [];
+    // Summary lead
     var lead = body.querySelector('.gist-lead');
     if (lead) lines.push(lead.textContent.trim());
+    // Structured groups
     var groups = body.querySelectorAll('.gist-group');
     if (groups.length) {
       groups.forEach(function(g) {
         var label = g.querySelector('.gist-group-label');
-        if (label) lines.push('--- ' + label.textContent.trim() + ' ---');
-        g.querySelectorAll('.gist-point-txt').forEach(function(pt) { lines.push(pt.textContent.trim()); });
+        var icon = g.querySelector('.gist-group-icon');
+        var iconTxt = icon ? icon.textContent.trim() + ' ' : '';
+        if (label) lines.push('');
+        if (label) lines.push(iconTxt + label.textContent.trim().toUpperCase());
+        // Handle both bullet points and chips
+        g.querySelectorAll('.gist-point-txt').forEach(function(pt) {
+          var txt = pt.textContent.trim();
+          if (txt) lines.push('- ' + txt);
+        });
+        g.querySelectorAll('.gist-chip').forEach(function(chip) {
+          var txt = chip.textContent.trim();
+          if (txt) lines.push('· ' + txt);
+        });
       });
     } else {
-      body.querySelectorAll('.gist-li').forEach(function(li){ lines.push(li.textContent.trim()); });
+      // Plain bullet list fallback
+      body.querySelectorAll('.gist-li').forEach(function(li){
+        var txt = li.textContent.trim();
+        if (txt) lines.push('- ' + txt);
+      });
     }
-    area.value = lines.length ? lines.join('\n') : (body.innerText || body.textContent);
-    autoResize(area);
+    var fullText = lines.join('\n').trim();
+    area.value = fullText || (body.innerText || body.textContent || '').trim();
+    // Force proper height calculation
+    // Show editor first so scrollHeight is calculated on a visible element
     editor.style.display = 'block';
     body.style.display = 'none';
     btn.classList.add('active');
-    area.focus();
+    // Now expand to full content height
+    area.style.height = 'auto';
+    area.style.height = Math.max(area.scrollHeight + 8, 160) + 'px';
+    setTimeout(function() {
+      // Re-calculate after paint in case fonts/layout shifted
+      area.style.height = 'auto';
+      area.style.height = Math.max(area.scrollHeight + 8, 160) + 'px';
+      area.focus();
+      area.setSelectionRange(0, 0);
+    }, 40);
   }
 }
 
@@ -1709,17 +2051,34 @@ function saveGistEdit() {
   var body = document.getElementById('gist-body');
   var editor = document.getElementById('gist-editor');
   var btn = document.getElementById('gist-edit-btn');
-  // render edited text as plain bullet list
-  var lines = area.value.split('\n').filter(function(l){ return l.trim().length > 0; });
+  // Render edited text — detect section headers (ALL CAPS lines) and bullet points
+  var lines = area.value.split('\n');
   var html = '';
-  if (lines.length > 0) {
-    html += '<div class="gist-lead">'+esc(lines[0])+'</div>';
-    if (lines.length > 1) {
-      html += '<ul class="gist-ul">'+lines.slice(1).map(function(l){
-        return '<li class="gist-li">'+esc(l.replace(/^[-•*]\s*/,'').trim())+'</li>';
+  var firstLine = true;
+  var currentPoints = [];
+  function flushPoints() {
+    if (currentPoints.length) {
+      html += '<ul class="gist-ul">'+currentPoints.map(function(p){
+        return '<li class="gist-li">'+esc(p)+'</li>';
       }).join('')+'</ul>';
+      currentPoints = [];
     }
   }
+  lines.forEach(function(l) {
+    var t = l.trim();
+    if (!t) return;
+    if (firstLine) {
+      html += '<div class="gist-lead">'+esc(t)+'</div>';
+      firstLine = false;
+    } else if (/^[A-Z0-9 ⚙📋🔧💡⚠🎯🔍]+$/.test(t.replace(/^[^a-zA-Z]+/, '')) && t.length < 50 && !t.startsWith('-')) {
+      // Looks like a section header — render as subtle subheading
+      flushPoints();
+      html += '<div style="font-size:9px;font-family:\'JetBrains Mono\',monospace;color:#2a6a54;letter-spacing:.1em;text-transform:uppercase;margin:10px 0 5px;padding-left:2px;">'+esc(t)+'</div>';
+    } else {
+      currentPoints.push(t.replace(/^[-•*]\s*/, '').trim());
+    }
+  });
+  flushPoints();
   body.innerHTML = html;
   body.style.display = 'block';
   editor.style.display = 'none';
@@ -1745,38 +2104,47 @@ function renderGist(text) {
     var clean = text.replace(/```json|```/g, '').trim();
     var s = clean.indexOf('{'), e = clean.lastIndexOf('}');
     if (s > -1 && e > -1) {
-      parsed = JSON.parse(clean.slice(s, e+1));
+      var jsonStr = clean.slice(s, e+1);
+      // Clean common streaming artefacts that break JSON.parse
+      jsonStr = jsonStr
+        .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')  // control chars
+        .replace(/[\u2018\u2019]/g, "'")                            // smart single quotes
+        .replace(/[\u201C\u201D]/g, '"');                           // smart double quotes
+      parsed = JSON.parse(jsonStr);
     }
   } catch(pe) { parsed = null; }
 
   if (parsed && parsed.summary && parsed.groups && parsed.groups.length) {
     summary = parsed.summary;
+    // Use title field if present for crisp title, summary for lead
+    var titleField = parsed.title || '';
     html += '<div class="gist-lead">'+esc(parsed.summary)+'</div>';
     html += '<div class="gist-groups">';
     parsed.groups.forEach(function(g) {
       if (!g.points || !g.points.length) return;
+      var isChips = g.style === 'chips';
       html += '<div class="gist-group">';
       html += '<div class="gist-group-hd">';
       html += '<span class="gist-group-icon">'+esc(g.icon||'·')+'</span>';
       html += '<span class="gist-group-label">'+esc(g.label||'')+'</span>';
-      html += '<span class="gist-group-count">'+g.points.length+' point'+(g.points.length!==1?'s':'')+'</span>';
+      if (!isChips) html += '<span class="gist-group-count">'+g.points.length+'</span>';
       html += '</div>';
-      html += '<div class="gist-group-items">';
-      g.points.forEach(function(pt) {
-        var cleaned = pt.trim();
-        // Extract tag prefix
-        var tagHtml = '';
-        var tagMatch = cleaned.match(/^\[(decision|action|risk|open)\]\s*/i);
-        if (tagMatch) {
-          var tag = tagMatch[1].toLowerCase();
-          var tagClass = 'gist-tag-'+tag;
-          var tagLabel = tag === 'decision' ? '⚡ decision' : tag === 'action' ? '→ action' : tag === 'risk' ? '⚠ risk' : '? open';
-          tagHtml = '<span class="gist-tag '+tagClass+'">'+tagLabel+'</span>';
-          cleaned = cleaned.replace(tagMatch[0], '');
-        }
-        html += '<div class="gist-point"><div class="gist-point-dot"></div><div class="gist-point-txt">'+tagHtml+esc(cleaned)+'</div></div>';
-      });
-      html += '</div></div>';
+      if (isChips) {
+        // Render as scannable chips
+        html += '<div class="gist-chips">';
+        g.points.forEach(function(pt) {
+          html += '<span class="gist-chip">'+esc(pt.trim())+'</span>';
+        });
+        html += '</div>';
+      } else {
+        // Render as bullet points
+        html += '<div class="gist-group-items">';
+        g.points.forEach(function(pt) {
+          html += '<div class="gist-point"><div class="gist-point-dot"></div><div class="gist-point-txt">'+esc(pt.trim())+'</div></div>';
+        });
+        html += '</div>';
+      }
+      html += '</div>';
     });
     html += '</div>';
   } else {
@@ -1803,11 +2171,11 @@ function renderGist(text) {
 
   document.getElementById('gist-body').innerHTML = html;
 
-  // Auto-populate title
+  // Auto-populate title — use crisp title field if present, else trim summary
   var titleEl = document.getElementById('title-input');
-  if (titleEl && !titleEl._userEdited && summary) {
-    titleEl.value = summary.substring(0, 120);
-    autoResizeTitle(titleEl);
+  if (titleEl && !titleEl._userEdited) {
+    var autoTitle = (parsed && parsed.title) ? parsed.title : (summary ? summary.split('.')[0].substring(0, 80) : '');
+    if (autoTitle) { titleEl.value = autoTitle; autoResizeTitle(titleEl); }
   }
 }
 
@@ -1939,24 +2307,32 @@ function toggleReview(i) {
   var panel = document.getElementById('rv-'+i);
   if (!panel) return;
   var isOpen = panel.style.display !== 'none';
-  // ensure detail row is open first
+  if (isOpen) {
+    panel.style.display = 'none';
+    return;
+  }
+  // Ensure the QA detail row is expanded first — review lives inside it
   var detail = document.getElementById('qid-'+i);
   if (detail && !detail.classList.contains('open')) {
     toggleQA(i);
   }
-  panel.style.display = isOpen ? 'none' : 'block';
-  if (!isOpen) {
+  // Also ensure TC block is open so review appears below it naturally
+  panel.style.display = 'block';
+  // Focus and scroll into view
+  setTimeout(function() {
     var ta = document.getElementById('rv-comment-'+i);
-    if (ta) { ta.focus(); autoResize(ta); }
-  }
+    if (ta) { autoResize(ta); ta.focus(); }
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 80);
 }
 
 async function applyReview(i) {
   var ta = document.getElementById('rv-comment-'+i);
   var status = document.getElementById('rv-status-'+i);
-  if (!ta || !qaData[i]) return;
+  if (!ta || !qaData[i]) { if (status) status.textContent = '✗ no test case data'; return; }
   var input = ta.value.trim();
-  if (!input) return;
+  if (!input) { if (ta) ta.focus(); return; }
+  if (!qaData[i].testcase) { if (status) status.textContent = '✗ open the test case first'; return; }
   if (status) { status.textContent = 'applying…'; }
 
   // Check for "move to TC X" instruction first
@@ -1988,7 +2364,7 @@ async function applyReview(i) {
   try {
     var r = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 600,
@@ -1996,6 +2372,7 @@ async function applyReview(i) {
         messages: [{ role: 'user', content: prompt }]
       })
     });
+    if (!r.ok) throw new Error('Review API error ' + r.status);
     var d = await r.json();
     var raw = (d.content||[]).filter(function(b){ return b.type==='text'; }).map(function(b){ return b.text; }).join('');
     var clean = raw.replace(/```json|```/g,'').trim();
@@ -2058,6 +2435,7 @@ async function generateRisk() {
 
   try {
     var r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(reqBody) });
+    if (!r.ok) { var re = await r.text(); throw new Error('Risk API error ' + r.status + ': ' + re.substring(0,80)); }
     var d = await r.json();
     var raw = (d.content || []).filter(function(b){ return b.type === 'text'; }).map(function(b){ return b.text; }).join('');
     var clean = raw.replace(/```json|```/g, '').trim();
@@ -2257,7 +2635,7 @@ async function pushRiskToJira(i, btn) {
   var item = riskData[i];
   if (!item || !item.testcase) return;
   var parentKey = document.getElementById('jira-id') ? document.getElementById('jira-id').value.trim().toUpperCase() : '';
-  if (!parentKey.match(/^[A-Z]{2,10}-\d+$/)) {
+  if (!parentKey.match(/^[A-Z][A-Z0-9]{1,9}-\d+$/)) {
     showErr('Enter a Jira ticket ID in the Push to Jira panel first.');
     return;
   }
@@ -2281,29 +2659,31 @@ function toggleSelect(i, cb) {
 
 function updateSelected() {
   var count = selectedItems.size;
-  document.getElementById('sel-count').textContent = count + ' selected';
+  var selCount = document.getElementById('sel-count');
+  if (selCount) selCount.textContent = count + ' selected';
   var tagsEl = document.getElementById('sel-tags');
-  if (!tagsEl) return;
-  if (count === 0) {
-    tagsEl.innerHTML = '<span class="sel-empty">— select QA items above to push as test cases</span>';
-  } else {
-    tagsEl.innerHTML = Array.from(selectedItems).map(function(i) {
-      var t = qaData[i] ? qaData[i].title : '';
-      return '<span class="sel-tag">'+esc(t.length>30 ? t.substring(0,28)+'…' : t)+'</span>';
-    }).join('');
+  if (tagsEl) {
+    if (count === 0) {
+      tagsEl.innerHTML = '<span class="sel-empty">— select QA items above to push as test cases</span>';
+    } else {
+      tagsEl.innerHTML = Array.from(selectedItems).map(function(i) {
+        var t = safeQA(i) ? safeQA(i).title : '';
+        return '<span class="sel-tag">'+esc(t.length>30 ? t.substring(0,28)+'…' : t)+'</span>';
+      }).join('');
+    }
   }
-  // Show copy-all-slack button in Jira panel when 2+ selected
   var copyAllBtn = document.getElementById('copy-all-slack-btn');
   if (copyAllBtn) copyAllBtn.style.display = count >= 2 ? 'flex' : 'none';
+  // Always reach updatePushState — never bail early
   updatePushState();
 }
 
 function updatePushState() {
   var id = document.getElementById('jira-id') ? document.getElementById('jira-id').value.trim() : '';
   var board = document.getElementById('jira-board-input') ? document.getElementById('jira-board-input').value.trim() : '';
-  // board can be auto-derived from ticket key if empty
-  var ticketKey = id.match(/^([A-Z]{2,10})-\d+$/);
-  var effectiveBoard = board || (ticketKey ? ticketKey[1] : '');
+  // Extract ticket key from whatever is in the field — URL or plain key
+  var ticketKey = id.match(/^([A-Z][A-Z0-9]{1,9})-\d+$/) || id.match(/([A-Z][A-Z0-9]{1,9}-\d+)/i);
+  var effectiveBoard = board || (ticketKey ? ticketKey[1].split('-')[0] : '');
   var ready = selectedItems.size > 0 && ticketKey && effectiveBoard.length > 0;
   var btn = document.getElementById('push-btn');
   if (btn) btn.disabled = !ready;
