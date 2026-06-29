@@ -1,0 +1,332 @@
+const { app, BrowserWindow, shell, dialog } = require('electron');
+const { autoUpdater } = require('electron-updater');
+const fs   = require('node:fs');
+const http = require('node:http');
+const net  = require('node:net');
+const os   = require('node:os');
+const path = require('node:path');
+const { spawn } = require('node:child_process');
+
+let mainWindow  = null;
+let proxyServer = null;
+let proxyPort   = null;
+
+// ---------------------------------------------------------------------------
+// Logging — written to %LOCALAPPDATA%\NotesIntel\main.log
+// ---------------------------------------------------------------------------
+
+const logDir  = path.join(process.env.LOCALAPPDATA || app.getPath('userData'), 'NotesIntel');
+const logFile = path.join(logDir, 'main.log');
+
+function log(msg) {
+  try {
+    fs.mkdirSync(logDir, { recursive: true });
+    fs.appendFileSync(logFile, `[${new Date().toISOString()}] ${msg}\n`, 'utf8');
+  } catch { /* never crash on log failure */ }
+}
+
+// ---------------------------------------------------------------------------
+// Claude CLI helpers (identical to QA Dashboard)
+// ---------------------------------------------------------------------------
+
+function resolveClaudeCli() {
+  const candidates = [
+    path.join(os.homedir(), '.local', 'bin', 'claude.exe'),  // Claude desktop install (Windows)
+    path.join(os.homedir(), '.local', 'bin', 'claude'),
+    path.join(os.homedir(), 'AppData', 'Roaming', 'npm', 'claude.cmd'),
+    path.join(os.homedir(), 'AppData', 'Roaming', 'npm', 'claude'),
+    path.join(os.homedir(), '.claude', 'local', 'claude.exe'),
+    path.join(os.homedir(), '.claude', 'local', 'claude'),
+  ];
+  for (const c of candidates) { if (fs.existsSync(c)) return c; }
+  return 'claude';
+}
+
+function cliModelAlias(model) {
+  const m = String(model || '').toLowerCase();
+  if (m.includes('haiku')) return 'haiku';
+  if (m.includes('opus'))  return 'opus';
+  return 'sonnet';
+}
+
+// Flatten Anthropic Messages API body → single prompt string + temp image paths.
+// Identical to QA Dashboard's _notes_intel_prompt().
+function buildPrompt(body) {
+  const parts     = [];
+  const tempFiles = [];
+  if (body.system) parts.push('SYSTEM INSTRUCTIONS (follow strictly):\n' + body.system);
+  for (const message of body.messages || []) {
+    const content = message.content;
+    if (typeof content === 'string') { parts.push(content); continue; }
+    for (const block of content || []) {
+      if (block.type === 'text') {
+        parts.push(String(block.text || ''));
+      } else if (block.type === 'image') {
+        const source  = block.source || {};
+        const ext     = ({ 'image/png': '.png', 'image/jpeg': '.jpg', 'image/gif': '.gif', 'image/webp': '.webp' })[source.media_type] || '.png';
+        const tmpDir  = path.join(os.tmpdir(), 'notes-intel-attachments');
+        fs.mkdirSync(tmpDir, { recursive: true });
+        const imgPath = path.join(tmpDir, `attachment-${Date.now()}-${Math.random().toString(36).slice(2)}${ext}`);
+        fs.writeFileSync(imgPath, Buffer.from(source.data || '', 'base64'));
+        tempFiles.push(imgPath);
+        // Use forward slashes — Claude CLI handles them on Windows and avoids escape issues
+        const imgPathFwd = imgPath.replace(/\\/g, '/');
+        parts.push(
+          'A screenshot is attached. FIRST use the Read tool to view the image file at this path: ' + imgPathFwd + '\n' +
+          'Everything visible in the image is primary input content. Describe it fully and base your analysis on it.'
+        );
+      }
+    }
+  }
+  return { prompt: parts.filter(Boolean).join('\n\n'), tempFiles };
+}
+
+
+function cleanupTempFiles(files) {
+  for (const f of files) { try { fs.unlinkSync(f); } catch { } }
+}
+
+// ---------------------------------------------------------------------------
+// Local HTTP server
+// ---------------------------------------------------------------------------
+
+function getFreePort() {
+  return new Promise((resolve, reject) => {
+    const srv = net.createServer();
+    srv.unref();
+    srv.on('error', reject);
+    srv.listen(0, '127.0.0.1', () => { const p = srv.address().port; srv.close(() => resolve(p)); });
+  });
+}
+
+function handleClaudeRequest(req, res) {
+  let raw = '';
+  req.on('data', chunk => { raw += chunk; });
+  req.on('end', () => {
+    let body;
+    try { body = JSON.parse(raw); } catch {
+      res.writeHead(400); res.end(JSON.stringify({ error: 'bad_json' })); return;
+    }
+
+    const { prompt, tempFiles } = buildPrompt(body);
+    if (!prompt.trim()) {
+      res.writeHead(400); res.end(JSON.stringify({ error: 'empty_prompt' })); return;
+    }
+
+    const claudePath = resolveClaudeCli();
+    const model      = cliModelAlias(body.model);
+    const args = ['--dangerously-skip-permissions', '--model', model, '-p'];
+
+    // shell:true required on Windows to execute .cmd batch files.
+    // Prepend npm global bin so claude.cmd is found even when Electron
+    // doesn't inherit the user's full terminal PATH.
+    const npmBin = path.join(os.homedir(), 'AppData', 'Roaming', 'npm');
+    const spawnOpts = {
+      env: { ...process.env, PYTHONUTF8: '1', PATH: `${npmBin};${process.env.PATH || ''}` },
+      windowsHide: true,
+      // Only use shell for .cmd files; .exe can be spawned directly (avoids deprecation warning)
+      shell: process.platform === 'win32' && claudePath.endsWith('.cmd'),
+      stdio: ['pipe', 'pipe', 'pipe'],
+    };
+
+    log(`spawn: ${claudePath} ${args.join(' ')} | prompt length=${prompt.length}`);
+
+    if (body.stream) {
+      res.on('error', err => log(`res socket error (stream): ${err.message}`));
+      res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' });
+      const safeWrite = d => { try { res.write(d); } catch(e) { log(`res write error: ${e.message}`); } };
+      safeWrite('data: ' + JSON.stringify({ type: 'message_start', message: { id: 'cli', role: 'assistant', content: [], model } }) + '\n\n');
+      safeWrite('data: ' + JSON.stringify({ type: 'content_block_start', index: 0, content_block: { type: 'text', text: '' } }) + '\n\n');
+
+      const proc = spawn(claudePath, args, spawnOpts);
+      proc.stdin.on('error', err => log(`stdin error (stream): ${err.message}`));
+      try { proc.stdin.write(prompt, 'utf8'); proc.stdin.end(); } catch (e) { log(`stdin write error (stream): ${e.message}`); }
+
+      let stderrBuf = '';
+      proc.stderr.on('data', chunk => { stderrBuf += chunk.toString('utf8'); });
+
+      proc.stdout.on('data', chunk => {
+        const text = chunk.toString('utf8');
+        if (text) safeWrite('data: ' + JSON.stringify({ type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text } }) + '\n\n');
+      });
+
+      proc.on('close', (code, signal) => {
+        log(`stream close: code=${code} signal=${signal} stderr_len=${stderrBuf.length}`);
+        if (stderrBuf) log(`stderr: ${stderrBuf.slice(0, 800)}`);
+        cleanupTempFiles(tempFiles);
+        if (code !== 0) {
+          const errMsg = stderrBuf.trim().slice(0, 300) ||
+            (signal ? `claude killed by signal ${signal}` : `claude exited with code ${code}`);
+          safeWrite('data: ' + JSON.stringify({ type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: '\n\n[Error: ' + errMsg + ']' } }) + '\n\n');
+        }
+        safeWrite('data: ' + JSON.stringify({ type: 'content_block_stop', index: 0 }) + '\n\n');
+        safeWrite('data: ' + JSON.stringify({ type: 'message_stop' }) + '\n\n');
+        safeWrite('data: [DONE]\n\n');
+        try { res.end(); } catch(e) { log(`res.end error: ${e.message}`); }
+      });
+
+      // Do NOT kill on req close — in Electron the req socket closes prematurely
+      // after the body is received even though the client is still reading SSE.
+      // Let Claude finish; writes to a closed socket are silently ignored.
+
+    } else {
+      // Non-streaming: 120-second timeout, capture both stdout and stderr.
+      let output = '';
+      let stderrBuf = '';
+      const proc = spawn(claudePath, args, spawnOpts);
+      proc.stdin.on('error', err => log(`stdin error (non-stream): ${err.message}`));
+      try { proc.stdin.write(prompt, 'utf8'); proc.stdin.end(); } catch (e) { log(`stdin write error (non-stream): ${e.message}`); }
+
+      proc.stdout.on('data', chunk => { output += chunk.toString('utf8'); });
+      proc.stderr.on('data', chunk => { stderrBuf += chunk.toString('utf8'); });
+
+      const timer = setTimeout(() => {
+        log('non-streaming call timed out — killing process');
+        proc.kill();
+      }, 120000);
+
+      proc.on('close', (code, signal) => {
+        clearTimeout(timer);
+        log(`non-stream close: code=${code} signal=${signal} output_len=${output.length} stderr_len=${stderrBuf.length}`);
+        if (stderrBuf) log(`stderr: ${stderrBuf.slice(0, 800)}`);
+        cleanupTempFiles(tempFiles);
+
+        if (!output.trim() && code !== 0) {
+          const errMsg = stderrBuf.trim().slice(0, 200) || `claude exited with code ${code}`;
+          res.writeHead(500); res.end(JSON.stringify({ error: errMsg })); return;
+        }
+
+        // Strip markdown code fences — HTML already does this too, belt-and-braces.
+        const text = output.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          id: 'cli', type: 'message', role: 'assistant', model,
+          content: [{ type: 'text', text }],
+          stop_reason: code === 0 ? 'end_turn' : 'error',
+        }));
+      });
+    }
+  });
+}
+
+const MIME_TYPES = { '.html': 'text/html', '.css': 'text/css', '.js': 'application/javascript', '.png': 'image/png', '.ico': 'image/x-icon' };
+
+async function startServer() {
+  proxyPort = await getFreePort();
+  const appDir = path.join(app.getAppPath(), 'app');
+
+  proxyServer = http.createServer((req, res) => {
+    if (req.method === 'OPTIONS') {
+      res.writeHead(204, { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': '*' });
+      res.end(); return;
+    }
+    if (req.method === 'POST' && req.url === '/api/claude') {
+      handleClaudeRequest(req, res); return;
+    }
+    if (req.url === '/api/quit-and-install') {
+      res.writeHead(200); res.end('ok');
+      setTimeout(() => autoUpdater.quitAndInstall(), 500);
+      return;
+    }
+    const urlPath = (req.url === '/' ? '/index.html' : req.url).split('?')[0];
+    const filePath = path.join(appDir, urlPath);
+    try {
+      const data = fs.readFileSync(filePath);
+      res.writeHead(200, { 'Content-Type': MIME_TYPES[path.extname(filePath)] || 'text/plain' });
+      res.end(data);
+    } catch {
+      res.writeHead(404); res.end('Not found');
+    }
+  });
+
+  await new Promise(resolve => proxyServer.listen(proxyPort, '127.0.0.1', resolve));
+  log(`server started on port ${proxyPort}`);
+}
+
+// ---------------------------------------------------------------------------
+// Window
+// ---------------------------------------------------------------------------
+
+function createWindow() {
+  mainWindow = new BrowserWindow({
+    width: 820,
+    height: 900,
+    minWidth: 680,
+    minHeight: 600,
+    show: false,
+    title: 'Notes Intel',
+    backgroundColor: '#080809',
+    icon: path.join(__dirname, '..', 'electron-resources', 'icon.ico'),
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+      sandbox: true,
+    },
+  });
+
+  mainWindow.once('ready-to-show', () => mainWindow.show());
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => { shell.openExternal(url); return { action: 'deny' }; });
+  mainWindow.loadURL(`http://127.0.0.1:${proxyPort}`);
+}
+
+// ---------------------------------------------------------------------------
+// Lifecycle
+// ---------------------------------------------------------------------------
+
+function setupAutoUpdater() {
+  autoUpdater.logger = { info: msg => log(`updater: ${msg}`), warn: msg => log(`updater warn: ${msg}`), error: msg => log(`updater error: ${msg}`) };
+  autoUpdater.autoDownload = true;
+  autoUpdater.autoInstallOnAppQuit = true;
+
+  autoUpdater.on('update-available', info => {
+    log(`update available: ${info.version}`);
+    if (mainWindow) {
+      mainWindow.webContents.executeJavaScript(
+        `(function(){ var b=document.createElement('div');
+        b.style.cssText='position:fixed;top:12px;right:12px;z-index:99999;background:#0d1f16;border:0.5px solid #5DCAA5;border-radius:8px;padding:10px 16px;font-family:JetBrains Mono,monospace;font-size:11px;color:#5DCAA5;letter-spacing:.04em;';
+        b.textContent='⬇ Update v${info.version} downloading…';
+        document.body.appendChild(b);
+        setTimeout(function(){b.remove();},6000); })()`
+      ).catch(() => {});
+    }
+  });
+
+  autoUpdater.on('update-downloaded', () => {
+    log('update downloaded — will install on quit');
+    if (mainWindow) {
+      mainWindow.webContents.executeJavaScript(
+        `(function(){ var b=document.createElement('div');
+        b.style.cssText='position:fixed;top:12px;right:12px;z-index:99999;background:#0d1f16;border:0.5px solid #5DCAA5;border-radius:8px;padding:10px 16px;font-family:JetBrains Mono,monospace;font-size:11px;color:#5DCAA5;letter-spacing:.04em;cursor:pointer;';
+        b.innerHTML='✓ Update ready — <u>restart to apply</u>';
+        b.onclick=function(){require("electron").ipcRenderer;};
+        document.body.appendChild(b);
+        b.addEventListener("click",function(){ fetch("/api/quit-and-install"); }); })()`
+      ).catch(() => {});
+    }
+  });
+
+  autoUpdater.on('error', err => log(`updater error: ${err && err.message}`));
+  autoUpdater.checkForUpdatesAndNotify().catch(err => log(`update check failed: ${err && err.message}`));
+}
+
+const gotLock = app.requestSingleInstanceLock();
+if (!gotLock) {
+  app.quit();
+} else {
+  app.on('second-instance', () => {
+    if (!mainWindow) return;
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    mainWindow.focus();
+  });
+
+  app.whenReady().then(async () => {
+    app.setAppUserModelId('com.tactilegames.notesintel');
+    await startServer();
+    createWindow();
+    setupAutoUpdater();
+  });
+
+  app.on('window-all-closed', () => app.quit());
+  app.on('before-quit', () => { if (proxyServer) proxyServer.close(); });
+  app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(); });
+}

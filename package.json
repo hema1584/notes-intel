@@ -1,0 +1,56 @@
+{
+  "name": "notes-intel",
+  "version": "4.3.0",
+  "description": "Notes Intel — QA assistant desktop app.",
+  "main": "electron/main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder",
+    "pack": "electron-builder --dir"
+  },
+  "dependencies": {
+    "electron-updater": "latest"
+  },
+  "devDependencies": {
+    "electron": "latest",
+    "electron-builder": "latest"
+  },
+  "build": {
+    "appId": "com.tactilegames.notesintel",
+    "productName": "Notes Intel",
+    "directories": {
+      "output": "dist",
+      "buildResources": "electron-resources"
+    },
+    "files": [
+      "electron/**/*",
+      "app/**/*",
+      "package.json"
+    ],
+    "asar": true,
+    "win": {
+      "signAndEditExecutable": false,
+      "icon": "electron-resources/icon.ico",
+      "target": ["nsis"]
+    },
+    "mac": {
+      "icon": "electron-resources/icon.png",
+      "category": "public.app-category.developer-tools",
+      "identity": null,
+      "target": ["dmg"]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "electron-resources/icon.ico",
+      "uninstallerIcon": "electron-resources/icon.ico"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "hema1584",
+      "repo": "notes-intel"
+    }
+  }
+}
