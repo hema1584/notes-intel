@@ -499,7 +499,7 @@
 <div class="topbar">
   <div class="logo">
     <div class="logo-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 4h10M3 8h7M3 12h5" stroke="#04342C" stroke-width="1.6" stroke-linecap="round"/></svg></div>
-    <div><div class="logo-name">Notes Intel</div><div class="logo-ver">v4.3 · QA intelligence engine</div></div>
+    <div><div class="logo-name">Notes Intel</div><div class="logo-ver">v4.4 · QA intelligence engine</div></div>
   </div>
   <div style="display:flex;align-items:center;gap:6px;flex-wrap:nowrap;">
     <div class="mode-row">
@@ -3841,15 +3841,21 @@ function downloadGistAsHTML(btn) {
     '<div style="margin-top:28px;font-size:9px;color:#1a3a2a;font-family:monospace;">notes intel v4.0</div>\n'+
     '</body>\n</html>';
 
-  var blob = new Blob([html], {type:'text/html'});
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement('a');
   var fn = title.replace(/[^a-z0-9\s-]/gi,'').replace(/\s+/g,'-').toLowerCase() || 'notes-intel-gist';
-  a.href = url; a.download = fn + '-gist.html';
-  document.body.appendChild(a); a.click();
-  document.body.removeChild(a); URL.revokeObjectURL(url);
+  var exportFolder = window._niExportFolder || '';
+  if (exportFolder) {
+    fetch('/api/save-file', { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ folder: exportFolder, filename: fn+'-gist.html', content: html }) }).catch(function(){});
+  } else {
+    var blob = new Blob([html], {type:'text/html'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = fn + '-gist.html';
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+  }
   var lbl = btn.querySelector('span') || btn;
-  var orig = lbl.textContent; lbl.textContent = 'Downloaded ✓';
+  var orig = lbl.textContent; lbl.textContent = exportFolder ? 'Saved ✓' : 'Downloaded ✓';
   setTimeout(function(){ lbl.textContent = orig; }, 1800);
 }
 
@@ -3906,17 +3912,25 @@ function downloadCheckpointCSV(btn) {
   });
 
   var csv = rows.join('\r\n');
-  var blob = new Blob([csv], {type:'text/csv'});
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement('a');
   var date = new Date().toISOString().slice(0,10);
   var slug = feature ? feature.replace(/[^a-z0-9]/gi,'-').toLowerCase() : 'testcases';
-  a.href = url; a.download = 'checkpoint-'+slug+'-'+date+'.csv';
-  document.body.appendChild(a); a.click();
-  document.body.removeChild(a); URL.revokeObjectURL(url);
+  var csvFilename = 'checkpoint-'+slug+'-'+date+'.csv';
+  var exportFolder = window._niExportFolder || '';
+  if (exportFolder) {
+    fetch('/api/save-file', { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ folder: exportFolder, filename: csvFilename, content: csv }) }).catch(function(){});
+  } else {
+    var blob = new Blob([csv], {type:'text/csv'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = csvFilename;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+  }
 
   var orig = btn.innerHTML;
-  btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Downloaded';
+  var doneLabel = exportFolder ? 'Saved' : 'Downloaded';
+  btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg> ' + doneLabel;
   setTimeout(function(){ btn.innerHTML = orig; }, 2000);
 }
 
@@ -5564,6 +5578,17 @@ document.addEventListener('keydown', function(e) {
 });
 
 window.addEventListener('load', loadApiKey);
+
+// Load Electron app settings (provider, folder) on startup — no UI change inside Notes Intel
+window.addEventListener('load', function() {
+  fetch('/api/settings').then(function(r){ return r.json(); }).then(function(s) {
+    if (s.provider && s.provider !== 'claude') {
+      currentProvider = s.provider;
+      if (s.openaiKey) openaiKey = s.openaiKey;
+    }
+    if (s.folderPath) window._niExportFolder = s.folderPath;
+  }).catch(function(){});
+});
 </script>
 
 <div class="key-modal-bg" id="key-modal-bg" style="display:none;" onclick="if(event.target===this)closeKeyModal()">

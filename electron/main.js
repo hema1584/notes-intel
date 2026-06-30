@@ -1,4 +1,4 @@
-const { app, BrowserWindow, shell, dialog } = require('electron');
+const { app, BrowserWindow, shell, dialog, Menu } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const fs   = require('node:fs');
 const http = require('node:http');
@@ -7,9 +7,31 @@ const os   = require('node:os');
 const path = require('node:path');
 const { spawn } = require('node:child_process');
 
-let mainWindow  = null;
-let proxyServer = null;
-let proxyPort   = null;
+let mainWindow     = null;
+let settingsWindow = null;
+let proxyServer    = null;
+let proxyPort      = null;
+
+// ---------------------------------------------------------------------------
+// App settings — stored in userData/settings.json
+// ---------------------------------------------------------------------------
+
+const settingsFile = path.join(
+  process.env.LOCALAPPDATA || (process.env.APPDATA ? path.join(process.env.APPDATA, '..', 'Local') : os.homedir()),
+  'NotesIntel', 'settings.json'
+);
+let appSettings = { provider: 'claude', openaiKey: '', folderPath: '' };
+
+function loadSettings() {
+  try { Object.assign(appSettings, JSON.parse(fs.readFileSync(settingsFile, 'utf8'))); } catch { }
+}
+
+function saveSettings() {
+  try {
+    fs.mkdirSync(path.dirname(settingsFile), { recursive: true });
+    fs.writeFileSync(settingsFile, JSON.stringify(appSettings, null, 2), 'utf8');
+  } catch (e) { log(`saveSettings error: ${e.message}`); }
+}
 
 // ---------------------------------------------------------------------------
 // Logging — written to %LOCALAPPDATA%\NotesIntel\main.log
@@ -223,6 +245,52 @@ async function startServer() {
     if (req.method === 'POST' && req.url === '/api/claude') {
       handleClaudeRequest(req, res); return;
     }
+    if (req.url === '/api/settings' && req.method === 'GET') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(appSettings));
+      return;
+    }
+    if (req.url === '/api/settings' && req.method === 'POST') {
+      let raw = '';
+      req.on('data', c => { raw += c; });
+      req.on('end', () => {
+        try {
+          const patch = JSON.parse(raw);
+          Object.assign(appSettings, patch);
+          saveSettings();
+          log(`settings updated: provider=${appSettings.provider} folder=${appSettings.folderPath}`);
+          res.writeHead(200, { 'Content-Type': 'application/json' }); res.end('{"ok":true}');
+        } catch (e) { res.writeHead(400); res.end('{"error":"bad json"}'); }
+      });
+      return;
+    }
+    if (req.url === '/api/pick-folder') {
+      const parent = settingsWindow && !settingsWindow.isDestroyed() ? settingsWindow : mainWindow;
+      dialog.showOpenDialog(parent, { properties: ['openDirectory'] }).then(result => {
+        if (result.canceled || !result.filePaths.length) {
+          res.writeHead(200, { 'Content-Type': 'application/json' }); res.end('{"cancelled":true}');
+        } else {
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ path: result.filePaths[0] }));
+        }
+      }).catch(err => { log(`pick-folder error: ${err.message}`); res.writeHead(500); res.end('{}'); });
+      return;
+    }
+    if (req.method === 'POST' && req.url === '/api/save-file') {
+      let raw = '';
+      req.on('data', c => { raw += c; });
+      req.on('end', () => {
+        try {
+          const { folder, filename, content } = JSON.parse(raw);
+          const safeName = path.basename(filename).replace(/[/\\:*?"<>|]/g, '_');
+          const dest = path.join(folder, safeName);
+          fs.writeFileSync(dest, content, 'utf8');
+          log(`save-file: ${dest}`);
+          res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ ok: true, path: dest }));
+        } catch (err) { log(`save-file error: ${err.message}`); res.writeHead(500); res.end('{"error":"write failed"}'); }
+      });
+      return;
+    }
     if (req.url === '/api/quit-and-install') {
       res.writeHead(200); res.end('ok');
       setTimeout(() => autoUpdater.quitAndInstall(), 500);
@@ -241,6 +309,50 @@ async function startServer() {
 
   await new Promise(resolve => proxyServer.listen(proxyPort, '127.0.0.1', resolve));
   log(`server started on port ${proxyPort}`);
+}
+
+// ---------------------------------------------------------------------------
+// Settings window
+// ---------------------------------------------------------------------------
+
+function openSettingsWindow() {
+  if (settingsWindow && !settingsWindow.isDestroyed()) { settingsWindow.focus(); return; }
+  settingsWindow = new BrowserWindow({
+    width: 440, height: 400,
+    title: 'Notes Intel — Settings',
+    parent: mainWindow,
+    modal: false,
+    show: false,
+    resizable: false,
+    backgroundColor: '#080809',
+    icon: path.join(__dirname, '..', 'electron-resources', 'icon.ico'),
+    webPreferences: { nodeIntegration: false, contextIsolation: true, sandbox: true },
+  });
+  settingsWindow.setMenuBarVisibility(false);
+  settingsWindow.once('ready-to-show', () => settingsWindow.show());
+  settingsWindow.on('closed', () => { settingsWindow = null; });
+  settingsWindow.loadURL(`http://127.0.0.1:${proxyPort}/settings.html`);
+}
+
+function setupAppMenu() {
+  const menu = Menu.buildFromTemplate([
+    {
+      label: 'Notes Intel',
+      submenu: [
+        { label: 'Settings…', accelerator: 'CmdOrCtrl+,', click: openSettingsWindow },
+        { type: 'separator' },
+        { label: 'Quit Notes Intel', accelerator: 'CmdOrCtrl+Q', click: () => app.quit() },
+      ],
+    },
+    {
+      label: 'Edit',
+      submenu: [
+        { role: 'undo' }, { role: 'redo' }, { type: 'separator' },
+        { role: 'cut' }, { role: 'copy' }, { role: 'paste' }, { role: 'selectAll' },
+      ],
+    },
+  ]);
+  Menu.setApplicationMenu(menu);
 }
 
 // ---------------------------------------------------------------------------
@@ -321,6 +433,8 @@ if (!gotLock) {
 
   app.whenReady().then(async () => {
     app.setAppUserModelId('com.tactilegames.notesintel');
+    loadSettings();
+    setupAppMenu();
     await startServer();
     createWindow();
     setupAutoUpdater();
