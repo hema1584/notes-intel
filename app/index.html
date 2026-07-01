@@ -49,8 +49,8 @@
  .big-input{background:var(--bg2);border:0.5px solid var(--border);border-radius:10px;padding:13px 16px;font-size:15px;font-family:'Sora',sans-serif;color:var(--text);line-height:1.7;min-height:110px;resize:none;outline:none;width:100%;overflow:hidden;transition:border-color .15s;}
  .big-input:focus{border-color:#383844;}
  .big-input::placeholder{color:var(--muted);}
- .attach-strip{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
- .att-btn{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:7px;border:0.5px dashed #383848;font-size:12px;color:#7a7a8a;cursor:pointer;background:transparent;transition:all .15s;font-family:'Sora',sans-serif;}
+ .attach-strip{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+ .att-btn{display:flex;align-items:center;gap:5px;padding:5px 9px;border-radius:7px;border:0.5px dashed #383848;font-size:11.5px;color:#7a7a8a;cursor:pointer;background:transparent;transition:all .15s;font-family:'Sora',sans-serif;}
  .att-btn:hover{border-color:var(--teal);color:var(--teal);}
  .att-sep{width:0.5px;height:14px;background:var(--border);}
  .att-tags{display:flex;gap:5px;flex-wrap:wrap;}
@@ -276,10 +276,14 @@
  .topbar-sep{width:0.5px;height:16px;background:#1c1c24;}
  .info-badge{width:15px;height:15px;border-radius:50%;background:#1a1a24;border:0.5px solid #2e2e3a;color:#444450;font-size:9px;font-family:'JetBrains Mono',monospace;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;position:relative;flex-shrink:0;}
  .info-badge:hover,.info-badge:focus{border-color:#AFA9EC;color:#AFA9EC;outline:none;}
- .info-tooltip{display:none;position:absolute;top:calc(100% + 8px);left:0;background:#1a1a22;border:0.5px solid #2e2e38;border-radius:10px;padding:13px 15px;width:300px;z-index:100;pointer-events:none;text-transform:none;letter-spacing:0;box-shadow:0 8px 24px rgba(0,0,0,.4);}
+ .info-tooltip{display:none;position:absolute;top:calc(100% + 8px);left:0;background:#1a1a22;border:0.5px solid #2e2e38;border-radius:10px;padding:14px 16px;width:340px;z-index:100;pointer-events:none;text-transform:none;letter-spacing:0;box-shadow:0 8px 24px rgba(0,0,0,.4);}
  .info-badge:hover .info-tooltip,.info-badge:focus .info-tooltip{display:block;}
- .info-tooltip-title{font-size:12px;font-weight:600;color:#d0d0dc;margin-bottom:7px;font-family:'Sora',sans-serif;text-transform:none;letter-spacing:0;}
- .info-tooltip-body{font-size:12px;color:#9a9aa8;line-height:1.65;font-family:'Sora',sans-serif;text-transform:none;letter-spacing:0;}
+ .info-tooltip-title{font-size:12px;font-weight:700;color:#d0d0dc;margin-bottom:10px;font-family:'Sora',sans-serif;text-transform:none;letter-spacing:0;}
+ .info-tooltip-body{font-size:11.5px;color:#9a9aa8;line-height:1.6;font-family:'Sora',sans-serif;text-transform:none;letter-spacing:0;}
+ .info-tooltip-body ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px;}
+ .info-tooltip-body li{display:flex;gap:8px;align-items:flex-start;}
+ .info-tooltip-body li .tip-icon{flex-shrink:0;margin-top:1px;opacity:.8;}
+ .info-tooltip-sub{font-size:11px;color:#6a6a78;margin-top:9px;padding-top:9px;border-top:0.5px solid #252530;line-height:1.5;}
  .content-size-bar{display:flex;align-items:center;justify-content:space-between;padding:4px 2px;}
  .content-size-bar span{font-size:10px;font-family:'JetBrains Mono',monospace;}
  #content-size-msg{color:#EF9F27;}
@@ -326,7 +330,11 @@
  .att-btn-jira:hover{border-color:#378ADD;color:#378ADD;}
  .att-btn-pm{border-color:#a888f040;color:#a888f0;}
  .att-btn-pm:hover{border-color:#b89eff;color:#b89eff;}
+ .att-btn-importhtml{border-color:#5dca9a40;color:#5dca9a;}
+ .att-btn-importhtml:hover{border-color:#5DCAA5;color:#5DCAA5;}
  #file-input{display:none;}
+ #full-report-btn{width:100%;padding:12px;background:linear-gradient(135deg,#0e1f1a 0%,#0a1a14 100%);border:1px solid #2a5a45;border-radius:9px;font-size:12px;color:#5DCAA5;font-family:'JetBrains Mono',monospace;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:all .2s;letter-spacing:0.02em;box-shadow:0 0 0 1px #5dca9a18,0 2px 12px #5dca9a10;}
+ #full-report-btn:hover{background:linear-gradient(135deg,#132b22 0%,#0e2219 100%);border-color:#5DCAA5;color:#8de8c8;box-shadow:0 0 0 1px #5dca9a40,0 4px 20px #5dca9a20;}
  .risk-card{background:#0d0d0f;border-top:0.5px solid #252530;}
  .risk-item{border-top:0.5px solid #1e1e28;}
  .risk-item:first-child{border-top:none;}
@@ -492,14 +500,39 @@
  .ev-evidence{font-size:13px;color:#909098;line-height:1.6;font-style:italic;}
  .ev-reason{font-size:12px;color:#606070;line-height:1.5;margin-top:3px;}
  .qi-p-reason{font-size:11px;color:#606070;font-family:'Sora',sans-serif;padding:2px 14px 5px 14px;font-style:italic;line-height:1.4;}
+ .appbar{position:fixed;top:0;left:0;right:0;height:32px;background:#05080c;border-bottom:0.5px solid #141a24;display:flex;align-items:center;padding:0 16px;gap:12px;z-index:9999;-webkit-app-region:drag;}
+ .appbar-name{font-size:11px;font-family:'JetBrains Mono',monospace;color:#3a4a5a;letter-spacing:.06em;flex-shrink:0;}
+ .appbar-sep{width:0.5px;height:14px;background:#1c2430;flex-shrink:0;}
+ .appbar-label{font-size:10px;font-family:'JetBrains Mono',monospace;color:#3a4a5a;letter-spacing:.06em;flex-shrink:0;}
+ .appbar-chips{display:flex;gap:4px;-webkit-app-region:no-drag;}
+ .appbar-chip{font-size:10.5px;padding:2px 10px;border-radius:5px;border:0.5px solid transparent;color:#4a5a6a;font-family:'JetBrains Mono',monospace;cursor:pointer;transition:all .15s;background:transparent;letter-spacing:.02em;}
+ .appbar-chip:hover{color:#8a9aaa;background:#0d1520;}
+ .appbar-chip.on{background:#091812;color:#5DCAA5;border-color:#1a4a3a;font-weight:600;}
+ .appbar-chip.on-openai{background:#080e1a;color:#60a5fa;border-color:#1a3060;font-weight:600;}
+ .appbar-folder{font-size:10px;font-family:'JetBrains Mono',monospace;color:#2a3a4a;letter-spacing:.02em;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;-webkit-app-region:no-drag;}
+ .appbar-folder:hover{color:#5DCAA5;}
 </style>
 </head>
 <body>
 
+<div class="appbar" id="appbar" style="display:none;">
+  <span class="appbar-name">Notes Intel</span>
+  <div class="appbar-sep"></div>
+  <span class="appbar-label">AI</span>
+  <div class="appbar-chips">
+    <button class="appbar-chip on" id="ab-claude" onclick="abSetProvider('claude')">Claude</button>
+    <button class="appbar-chip" id="ab-openai" onclick="abSetProvider('openai')">Codex</button>
+  </div>
+  <div class="appbar-sep"></div>
+  <span class="appbar-folder" id="ab-folder" title="Click to change export folder" onclick="abPickFolder()">no export folder</span>
+</div>
+
+<div style="height:32px;display:none;" id="appbar-spacer"></div>
+
 <div class="topbar">
   <div class="logo">
     <div class="logo-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 4h10M3 8h7M3 12h5" stroke="#04342C" stroke-width="1.6" stroke-linecap="round"/></svg></div>
-    <div><div class="logo-name">Notes Intel</div><div class="logo-ver">v4.4 · QA intelligence engine</div></div>
+    <div><div class="logo-name">Notes Intel</div><div class="logo-ver">v4.5 · QA intelligence engine</div></div>
   </div>
   <div style="display:flex;align-items:center;gap:6px;flex-wrap:nowrap;">
     <div class="mode-row">
@@ -618,8 +651,17 @@
       // your content
       <div class="info-badge" tabindex="0">?
         <div class="info-tooltip">
-          <div class="info-tooltip-title">What goes here?</div>
-          <div class="info-tooltip-body">Paste any raw text — meeting notes, a web article, personal observations, or a Confluence/Notion dump. You can also attach a screenshot 📷 or add a Confluence page 📄 and it will be read automatically. The AI will generate a summary and QA focus points from whatever you provide.</div>
+          <div class="info-tooltip-title">What can I use as input?</div>
+          <div class="info-tooltip-body">
+            <ul>
+              <li><span class="tip-icon">📝</span><span>Meeting notes, transcripts, or personal observations</span></li>
+              <li><span class="tip-icon">🎫</span><span>Jira tickets, PM tool items, or Confluence pages</span></li>
+              <li><span class="tip-icon">💬</span><span>Slack threads or chat exports</span></li>
+              <li><span class="tip-icon">🖼</span><span>Screenshots — UI flows, mockups, error states</span></li>
+              <li><span class="tip-icon">📄</span><span>HTML reports from previous QA sessions</span></li>
+            </ul>
+            <div class="info-tooltip-sub">Mix and match — the more context you provide, the sharper the QA output.</div>
+          </div>
         </div>
       </div>
     </div>
@@ -653,8 +695,13 @@
       </div>
       <div class="att-btn att-btn-cortex" onclick="toggleCortexInput()">
         <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M5 6h6M5 9h4" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
-        Tactile Cortex
+        Cortex
       </div>
+      <div class="att-btn att-btn-importhtml" onclick="document.getElementById('html-import-input').click()">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 2h7l3 3v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.2"/><path d="M10 2v3h3" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M6 8l-2 2 2 2M10 8l2 2-2 2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        import html
+      </div>
+      <input type="file" id="html-import-input" accept=".html,.htm" onchange="handleHtmlImport(this)" style="display:none;"/>
       <div class="att-sep"></div>
       <div class="att-tags" id="att-tags"></div>
       <div id="img-preview-wrap" style="display:none;position:relative;">
@@ -687,7 +734,7 @@
         <button class="link-add-btn" onclick="addCortexRef()" style="background:#0d1e28;color:#38BDF8;">add</button>
         <button class="link-cancel-btn" onclick="toggleCortexInput()">✕</button>
       </div>
-    <div class="input-tip" id="input-tip" style="color:#787880;">💡 Attach tickets, docs, chats, or screenshots individually—or combine them for deeper insights.</div>
+    <div class="input-tip" id="input-tip" style="color:#787880;">💡 Attach tickets, docs, chats, screenshots, or HTML reports individually—or combine them for deeper insights.</div>
     <div class="err-bar" id="err-bar"></div>
     <div class="run-row">
       <div class="shortcut-hint">
@@ -1027,6 +1074,15 @@
     </div>
   </div>
 </div>
+
+<!-- Download full report button — shown after QA is generated -->
+<div id="full-report-bar" style="display:none;width:100%;max-width:720px;margin-top:4px;">
+  <button id="full-report-btn" onclick="downloadFullReport(this)">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2v9M4 8l4 4 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Download full report as HTML
+  </button>
+</div>
+
 </div>
 
 <div id="img-lightbox" onclick="closeImagePreview()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:1000;align-items:center;justify-content:center;cursor:zoom-out;">
@@ -1146,7 +1202,7 @@ function buildGistInstruction(textBase) {
     '     - Anything you cannot tie to a behaviour described in the input.\n' +
     '   Format rule: add "— [angle]" suffix ONLY when the chip alone does not tell you what to check. The angle must be an observable check, never a process word.\n' +
     '   e.g. "Camera permission denied — graceful fallback" (needs angle) vs "QR scan happy path" (self-explanatory)\n' +
-    '   Exception: platform chips like "iOS + Android" never need a suffix — parity is implied.\n' +
+    '   BANNED chips: "iOS + Android", "iOS", "Android", "Kindle", or any bare platform name — these say nothing testable. If platform parity matters, name the behaviour: e.g. "Send flow — iOS + Android parity" or "Card display — Kindle layout".\n' +
     '   GROUPING RULE: if multiple chips share the same subject (e.g. "Haptic feedback — level play", "Haptic feedback — booster", "Haptic feedback — win screen")\n' +
     '   collapse them into ONE chip listing the scenarios: "Haptic feedback — level play, booster, win/fail"\n' +
     '   Never repeat the same subject across multiple chips. Group and compress instead.\n' +
@@ -2397,6 +2453,28 @@ function handleFile(input) {
   input.value = '';
 }
 
+function handleHtmlImport(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var raw = e.target.result;
+    // strip tags, collapse whitespace
+    var txt = raw.replace(/<style[\s\S]*?<\/style>/gi, '')
+                 .replace(/<script[\s\S]*?<\/script>/gi, '')
+                 .replace(/<[^>]+>/g, ' ')
+                 .replace(/&nbsp;/g, ' ')
+                 .replace(/\s{2,}/g, ' ')
+                 .trim();
+    var ta = document.getElementById('main-input');
+    ta.value = (ta.value ? ta.value + '\n\n' : '') + '--- Imported HTML: ' + file.name + ' ---\n' + txt;
+    autoResize(ta);
+    checkContentSize(ta);
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
 function toggleSlackInput() {
   var row = document.getElementById('slack-input-row');
   var inp = document.getElementById('slack-url-input');
@@ -2981,7 +3059,7 @@ async function generateQA(tier) {
     // include edited gist if user has modified it
     var gistBody = document.getElementById('gist-body');
     var currentGist = gistBody ? (gistBody.innerText || gistBody.textContent || '').trim() : '';
-    var gistAddendum = currentGist ? '\n\nEDITED SUMMARY (user has refined this — use it to guide QA focus):\n' + currentGist + '\n' : '';
+    var gistAddendum = currentGist ? '\n\nEDITED SUMMARY (user has refined this, and may have answered any Needs Clarification questions inline — treat the edited content as confirmed and use it to guide QA focus):\n' + currentGist + '\n' : '';
 
     // Slack-sourced points the user explicitly added are MUST-COVER, high priority
     if (window._prioritySlackPoints && window._prioritySlackPoints.length) {
@@ -3101,6 +3179,9 @@ function renderQATier(arr, isEdge) {
     qaData = arr;
   }
   renderQA(qaData);
+  // Show download full report button once QA is ready
+  var bar = document.getElementById('full-report-bar');
+  if (bar) bar.style.display = 'block';
 }
 
 function showQAButton() {
@@ -3934,6 +4015,120 @@ function downloadCheckpointCSV(btn) {
   setTimeout(function(){ btn.innerHTML = orig; }, 2000);
 }
 
+function downloadFullReport(btn) {
+
+  var title = (document.getElementById('title-input') ? document.getElementById('title-input').value.trim() : '') || 'QA Report';
+  var slug = title.replace(/[^a-z0-9\s-]/gi,'').replace(/\s+/g,'-').toLowerCase() || 'qa-report';
+
+  // ── Gist section ──
+  var gistHtml = '';
+  var gistBody = document.getElementById('gist-body');
+  if (gistBody && gistBody.textContent.trim()) {
+    var lines = [];
+    var lead = gistBody.querySelector('.gist-lead');
+    if (lead) lines.push('<p class="lead">'+esc(lead.textContent.trim())+'</p>');
+    gistBody.querySelectorAll('.gist-group').forEach(function(g) {
+      var icon = g.querySelector('.gist-group-icon');
+      var lbl  = g.querySelector('.gist-group-label');
+      if (lbl) lines.push('<div class="sec-hd">'+(icon?esc(icon.textContent.trim())+' ':'')+esc(lbl.textContent.trim())+'</div>');
+      g.querySelectorAll('.gist-point-txt').forEach(function(pt){ lines.push('<div class="pt">– '+esc(pt.textContent.trim())+'</div>'); });
+      var chips = Array.from(g.querySelectorAll('.scope-row .scope-txt')).map(function(c){ return c.textContent.trim(); }).filter(Boolean);
+      if (chips.length) lines.push('<div class="scope-list">'+chips.map(function(c,i){ var n=(i+1)<10?'0'+(i+1):''+(i+1); return '<div class="scope-row"><span class="scope-n">'+n+'</span><span class="scope-txt">'+esc(c)+'</span></div>'; }).join('')+'</div>');
+    });
+    gistHtml = '<section><div class="s-hd teal">● Summary</div>'+lines.join('\n')+'</section>';
+  }
+
+  // ── QA items section ──
+  var qaHtml = '';
+  if (qaData && qaData.length) {
+    var sevColor = { high:'#e06060', med:'#d4a855', low:'#5DCAA5' };
+    var items = qaData.map(function(item, i) {
+      var tc = item.testcase || {};
+      var sev = (item.severity||'').toLowerCase();
+      var col = sevColor[sev] || '#607080';
+      var steps = (tc.steps||[]).map(function(s,n){ return '<li>'+esc(s)+'</li>'; }).join('');
+      var tcBlock = (tc.objective||tc.preconditions||steps||tc.expected) ? (
+        '<div class="tc">'+
+        (tc.objective ? '<div class="tc-row"><span class="tc-lbl">Objective</span><span>'+esc(tc.objective)+'</span></div>' : '')+
+        (tc.preconditions ? '<div class="tc-row"><span class="tc-lbl">Preconditions</span><span>'+esc(tc.preconditions)+'</span></div>' : '')+
+        (steps ? '<div class="tc-row"><span class="tc-lbl">Steps</span><ol>'+steps+'</ol></div>' : '')+
+        (tc.expected ? '<div class="tc-row"><span class="tc-lbl">Expected</span><span>'+esc(tc.expected)+'</span></div>' : '')+
+        '</div>'
+      ) : '';
+      return '<div class="qa-item">'+
+        '<div class="qa-hd">'+
+          '<span class="sev" style="color:'+col+';border-color:'+col+'40;">'+esc(sev||'?')+'</span>'+
+          '<span class="qa-ttl">'+esc(item.title||'')+'</span>'+
+        '</div>'+
+        (item.detail ? '<div class="qa-det">'+esc(item.detail)+'</div>' : '')+
+        tcBlock+
+      '</div>';
+    }).join('');
+    qaHtml = '<section><div class="s-hd blue">● QA Focus ('+qaData.length+' items)</div>'+items+'</section>';
+  }
+
+  // ── Risk section ──
+  var riskHtml = '';
+  if (typeof riskData !== 'undefined' && riskData && riskData.length) {
+    var risks = riskData.map(function(r) {
+      return '<div class="qa-item"><div class="qa-hd"><span class="sev" style="color:#d4a855;border-color:#d4a85540;">risk</span><span class="qa-ttl">'+esc(r.title||r.risk||'')+'</span></div>'+(r.detail||r.description ? '<div class="qa-det">'+esc(r.detail||r.description)+'</div>' : '')+'</div>';
+    }).join('');
+    riskHtml = '<section><div class="s-hd amber">● Risks ('+riskData.length+')</div>'+risks+'</section>';
+  }
+
+  var html = '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8"/>\n<title>'+esc(title)+'</title>\n<style>\n'+
+    '*{box-sizing:border-box;margin:0;padding:0;}'+
+    'body{background:#080f0d;font-family:\'Segoe UI\',system-ui,sans-serif;padding:36px 32px;max-width:740px;margin:0 auto;color:#c0c8d0;}'+
+    'h1{font-size:18px;font-weight:700;color:#e8eef4;margin-bottom:4px;letter-spacing:-.01em;}'+
+    '.meta{font-size:10px;color:#3a5a4a;font-family:monospace;letter-spacing:.08em;text-transform:uppercase;margin-bottom:28px;}'+
+    'section{margin-bottom:24px;}'+
+    '.s-hd{font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-family:monospace;padding:4px 10px;margin-bottom:10px;}'+
+    '.teal{color:#5DCAA5;border-left:3px solid #5DCAA5;}'+
+    '.blue{color:#6090d8;border-left:3px solid #6090d8;}'+
+    '.amber{color:#d4a855;border-left:3px solid #d4a855;}'+
+    '.lead{font-size:14px;font-weight:400;color:#9DCFC0;line-height:1.75;margin-bottom:12px;}'+
+    '.sec-hd{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#5DCAA5;font-family:monospace;border-left:3px solid #5DCAA5;padding:4px 9px;margin:12px 0 6px;}'+
+    '.pt{font-size:14px;color:#88b8ac;line-height:1.7;display:flex;gap:8px;margin:4px 0;}'+
+    '.scope-list{display:flex;flex-direction:column;gap:5px;margin:6px 0;}'+
+    '.scope-row{display:flex;align-items:baseline;gap:10px;}'+
+    '.scope-n{font-size:11px;color:#3d8060;font-family:monospace;min-width:22px;flex-shrink:0;}'+
+    '.scope-txt{font-size:14px;color:#88b8ac;line-height:1.7;}'+
+    '.qa-item{border-top:0.5px solid #131a14;padding:12px 0;}'+
+    '.qa-item:first-child{border-top:none;}'+
+    '.qa-hd{display:flex;align-items:baseline;gap:9px;margin-bottom:5px;}'+
+    '.sev{font-size:10px;font-weight:700;text-transform:uppercase;font-family:monospace;letter-spacing:.06em;padding:2px 8px;border-radius:4px;border:0.5px solid;flex-shrink:0;}'+
+    '.qa-ttl{font-size:15px;font-weight:500;color:#d0dce8;line-height:1.4;}'+
+    '.qa-det{font-size:13px;color:#607070;margin-bottom:6px;line-height:1.6;}'+
+    '.tc{background:#080f0d;border:0.5px solid #131a14;border-radius:7px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;}'+
+    '.tc-row{display:flex;gap:10px;font-size:13px;align-items:baseline;}'+
+    '.tc-lbl{font-family:monospace;font-size:11px;color:#3a6a5a;letter-spacing:.04em;min-width:90px;flex-shrink:0;}'+
+    'ol{padding-left:16px;color:#909098;font-size:13px;line-height:1.7;}'+
+    '.footer{margin-top:36px;font-size:9px;color:#1a3a2a;font-family:monospace;}'+
+  '\n</style>\n</head>\n<body>\n'+
+    '<h1>'+esc(title)+'</h1>\n'+
+    '<div class="meta">● notes intel · '+new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})+'</div>\n'+
+    gistHtml + qaHtml + riskHtml +
+    '<div class="footer">generated by notes intel v4.5</div>\n'+
+  '</body>\n</html>';
+
+  var exportFolder = window._niExportFolder || '';
+  var filename = slug + '-qa-report.html';
+  if (exportFolder) {
+    fetch('/api/save-file', { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ folder: exportFolder, filename: filename, content: html }) }).catch(function(){});
+  } else {
+    var blob = new Blob([html], {type:'text/html'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+  }
+  var orig = btn.innerHTML;
+  btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg> '+(exportFolder?'Saved ✓':'Downloaded ✓');
+  setTimeout(function(){ btn.innerHTML = orig; }, 2000);
+}
+
 async function pushToJira() {
   var rawId = document.getElementById('jira-id').value.trim();
   var keyExtract = rawId.match(/([A-Z][A-Z0-9]{1,9}-\d+)/i);
@@ -3965,7 +4160,7 @@ async function pushToJira() {
   }).join('');
   note.innerHTML = '<div class="push-progress">'+progressHTML+'</div>';
 
-  var created = 0, failed = 0;
+  var created = 0, failed = 0, failedItems = [];
   for (var idx = 0; idx < allPushItems.length; idx++) {
     var tc = allPushItems[idx];
     var dot = document.getElementById('ppi-dot-p'+idx);
@@ -3980,11 +4175,10 @@ async function pushToJira() {
       st.innerHTML = '<a href="'+safeUrl+'" target="_blank" rel="noopener noreferrer" style="color:#378ADD;font-family:JetBrains Mono,monospace;font-size:10px;text-decoration:none;">'+esc(result.key)+' ↗</a>'; }
     } catch(e) {
       failed++;
+      failedItems.push(tc);
       if (dot) { dot.textContent = '✗'; dot.style.color = '#F09595'; dot.style.animation = 'none'; }
       var failMsg = e.message ? esc(e.message.substring(0, 60)) : 'failed';
-      if (st) {
-        st.innerHTML = '<span style="color:#F09595;font-size:10px;">'+failMsg+'</span>';
-      }
+      if (st) { st.innerHTML = '<span style="color:#F09595;font-size:10px;">'+failMsg+'</span>'; }
     }
   }
 
@@ -3993,24 +4187,46 @@ async function pushToJira() {
   '</div>';
   note.innerHTML += summary;
   btn.disabled = false;
+
   if (failed === 0) {
     // All succeeded — show Open Jira button
     var jiraUrl = 'https://tactileentertainment.atlassian.net/browse/' + parentKey;
     btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Open Jira ↗';
-    btn.style.background = '#0F6E56';
-    btn.style.color = '#9FE1CB';
+    btn.style.background = '#0F6E56'; btn.style.color = '#9FE1CB';
     btn.onclick = function() { window.open(jiraUrl, '_blank', 'noopener,noreferrer'); };
   } else if (created === 0) {
-    // All failed — retry
+    // All failed — retry all
     btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2v9M4 8l4 4 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg> Retry';
     btn.style.background = ''; btn.style.color = '';
     btn.onclick = pushToJira;
   } else {
-    // Partial — show Open Jira
+    // Partial — show Open Jira + Retry failed button
     var jiraUrl2 = 'https://tactileentertainment.atlassian.net/browse/' + parentKey;
     btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Open Jira ↗';
     btn.style.background = '#633806'; btn.style.color = '#9FE1CB';
     btn.onclick = function() { window.open(jiraUrl2, '_blank', 'noopener,noreferrer'); };
+    // Insert retry-failed button next to push button
+    var retryBtn = document.getElementById('push-retry-failed-btn');
+    if (!retryBtn) {
+      retryBtn = document.createElement('button');
+      retryBtn.id = 'push-retry-failed-btn';
+      retryBtn.style.cssText = 'margin-left:8px;padding:7px 14px;background:transparent;border:0.5px solid #5a3010;border-radius:8px;font-size:11px;color:#EF9F27;cursor:pointer;font-family:JetBrains Mono,monospace;';
+      btn.parentNode.insertBefore(retryBtn, btn.nextSibling);
+    }
+    var _failedItems = failedItems.slice();
+    retryBtn.textContent = '↺ Retry failed (' + failed + ')';
+    retryBtn.onclick = async function() {
+      retryBtn.disabled = true; retryBtn.textContent = 'retrying…';
+      var rCreated = 0, rFailed = 0;
+      for (var ri = 0; ri < _failedItems.length; ri++) {
+        try { await createSubtaskViaMCP(_failedItems[ri], parentKey); rCreated++; }
+        catch(re) { rFailed++; }
+      }
+      if (rFailed === 0) { retryBtn.remove(); }
+      else { retryBtn.disabled = false; retryBtn.textContent = '↺ Retry failed (' + rFailed + ')'; }
+      var s2 = note.querySelector('div[style*="margin-top:8px"]');
+      if (s2) s2.textContent = (created + rCreated) + ' subtasks created on ' + parentKey + (rFailed > 0 ? ' · ' + rFailed + ' failed' : '');
+    };
   }
 }
 
@@ -4550,35 +4766,79 @@ function saveGistEdit() {
   var body = document.getElementById('gist-body');
   var editor = document.getElementById('gist-editor');
   var btn = document.getElementById('gist-edit-btn');
-  // Render edited text — detect section headers (ALL CAPS lines) and bullet points
+
   var lines = area.value.split('\n');
-  var html = '';
+  var leadHtml = '';
+  var groupsHtml = '';
   var firstLine = true;
-  var currentPoints = [];
-  function flushPoints() {
-    if (currentPoints.length) {
-      html += '<ul class="gist-ul">'+currentPoints.map(function(p){
-        return '<li class="gist-li">'+esc(p)+'</li>';
-      }).join('')+'</ul>';
-      currentPoints = [];
+  var currentGroup = null; // { icon, label, points[], isChips }
+
+  function flushGroup() {
+    if (!currentGroup || !currentGroup.points.length) { currentGroup = null; return; }
+    var g = currentGroup;
+    var inner = '';
+    if (g.isChips) {
+      inner = '<div class="scope-list">' + g.points.map(function(pt, idx) {
+        var n = idx < 9 ? '0'+(idx+1) : ''+(idx+1);
+        return '<div class="scope-row"><span class="scope-n">'+n+'</span><span class="scope-txt">'+esc(pt)+'</span></div>';
+      }).join('') + '</div>';
+    } else {
+      inner = '<div class="gist-group-items">' + g.points.map(function(pt) {
+        return '<div class="gist-point"><div class="gist-point-dot"></div><div class="gist-point-txt">'+esc(pt)+'</div></div>';
+      }).join('') + '</div>';
     }
+    groupsHtml +=
+      '<div class="gist-group">' +
+        '<div class="gist-group-hd">' +
+          '<span class="gist-group-icon">'+esc(g.icon)+'</span>' +
+          '<span class="gist-group-label">'+esc(g.label)+'</span>' +
+          (!g.isChips ? '<span class="gist-group-count">'+g.points.length+'</span>' : '') +
+        '</div>' +
+        inner +
+      '</div>';
+    currentGroup = null;
   }
+
+  function isHeader(t) {
+    if (t.startsWith('-') || t.startsWith('·') || t.startsWith('•')) return false;
+    // emoji-prefixed line, or ALL CAPS label (allow spaces, digits, punctuation)
+    var stripped = t.replace(/^[\s\S]{1,4}\s/, ''); // strip leading emoji + space
+    return (stripped === stripped.toUpperCase() && /[A-Z]/.test(stripped) && t.length < 60);
+  }
+
+  function parseHeader(t) {
+    var m = t.match(/^([\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\u{1F300}-\u{1F9FF}·•▸→★⚙📋🔧💡⚠🎯🔍]+)\s+(.+)$/u);
+    if (m) return { icon: m[1], label: m[2] };
+    return { icon: '·', label: t };
+  }
+
   lines.forEach(function(l) {
     var t = l.trim();
     if (!t) return;
     if (firstLine) {
-      html += '<div class="gist-lead">'+esc(t)+'</div>';
+      leadHtml = '<div class="gist-lead">'+esc(t)+'</div>';
       firstLine = false;
-    } else if (/^[A-Z0-9 ⚙📋🔧💡⚠🎯🔍]+$/.test(t.replace(/^[^a-zA-Z]+/, '')) && t.length < 50 && !t.startsWith('-')) {
-      // Looks like a section header — render as subtle subheading
-      flushPoints();
-      html += '<div style="font-size:9px;font-family:\'JetBrains Mono\',monospace;color:#2a6a54;letter-spacing:.1em;text-transform:uppercase;margin:10px 0 5px;padding-left:2px;">'+esc(t)+'</div>';
-    } else {
-      currentPoints.push(t.replace(/^[-•*]\s*/, '').trim());
+      return;
     }
+    if (isHeader(t)) {
+      flushGroup();
+      var h = parseHeader(t);
+      currentGroup = { icon: h.icon, label: h.label, points: [], isChips: false };
+      return;
+    }
+    if (t.startsWith('· ') || t.startsWith('• ')) {
+      if (!currentGroup) currentGroup = { icon: '·', label: '', points: [], isChips: true };
+      currentGroup.isChips = true;
+      currentGroup.points.push(t.slice(2).trim());
+      return;
+    }
+    var pt = t.replace(/^[-*]\s*/, '').trim();
+    if (!currentGroup) currentGroup = { icon: '·', label: '', points: [], isChips: false };
+    currentGroup.points.push(pt);
   });
-  flushPoints();
-  body.innerHTML = html;
+  flushGroup();
+
+  body.innerHTML = leadHtml + (groupsHtml ? '<div class="gist-groups">'+groupsHtml+'</div>' : '');
   body.style.display = 'block';
   editor.style.display = 'none';
   btn.classList.remove('active');
@@ -4599,17 +4859,24 @@ function renderGist(text) {
   var summary = '';
 
   // Try parse structured JSON first
+  var _cj = function(s) {
+    return s.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
+            .replace(/[\u2018\u2019]/g, "'")
+            .replace(/[\u201C\u201D]/g, '"');
+  };
   try {
     var clean = text.replace(/```json|```/g, '').trim();
-    var s = clean.indexOf('{'), e = clean.lastIndexOf('}');
-    if (s > -1 && e > -1) {
-      var jsonStr = clean.slice(s, e+1);
-      // Clean common streaming artefacts that break JSON.parse
-      jsonStr = jsonStr
-        .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')  // control chars
-        .replace(/[\u2018\u2019]/g, "'")                            // smart single quotes
-        .replace(/[\u201C\u201D]/g, '"');                           // smart double quotes
-      parsed = JSON.parse(jsonStr);
+    // Strategy 1: parse full clean string (handles both object and array)
+    try { var raw = JSON.parse(_cj(clean)); parsed = Array.isArray(raw) ? raw[0] : raw; } catch(e1) { parsed = null; }
+    // Strategy 2: extract {...} slice
+    if (!parsed) {
+      var s = clean.indexOf('{'), e = clean.lastIndexOf('}');
+      if (s > -1 && e > s) { try { parsed = JSON.parse(_cj(clean.slice(s, e+1))); } catch(e2) {} }
+    }
+    // Strategy 3: extract [...] slice and use first element
+    if (!parsed) {
+      var sa = clean.indexOf('['), ea = clean.lastIndexOf(']');
+      if (sa > -1 && ea > sa) { try { var arr = JSON.parse(_cj(clean.slice(sa, ea+1))); parsed = Array.isArray(arr) ? arr[0] : arr; } catch(e3) {} }
     }
   } catch(pe) { parsed = null; }
   window._gistParsed = parsed;
@@ -4671,6 +4938,7 @@ function renderGist(text) {
   }
 
   document.getElementById('gist-body').innerHTML = html;
+  setAnalysisStatus(''); // safety clear — banner must go once gist is rendered
 
   // Reveal the on-demand Slack discussion check as soon as a gist exists, if channels are configured.
   var sdWrap = document.getElementById('slack-disc-wrap');
@@ -5579,14 +5847,45 @@ document.addEventListener('keydown', function(e) {
 
 window.addEventListener('load', loadApiKey);
 
-// Load Electron app settings (provider, folder) on startup — no UI change inside Notes Intel
-window.addEventListener('load', function() {
-  fetch('/api/settings').then(function(r){ return r.json(); }).then(function(s) {
-    if (s.provider && s.provider !== 'claude') {
-      currentProvider = s.provider;
-      if (s.openaiKey) openaiKey = s.openaiKey;
+// App bar — shown only in Electron (127.0.0.1), wired to /api/settings
+function abSetProvider(p) {
+  currentProvider = p;
+  if (p === 'openai' && window._niOpenaiKey) openaiKey = window._niOpenaiKey;
+  document.getElementById('ab-claude').className = 'appbar-chip' + (p === 'claude' ? ' on' : '');
+  document.getElementById('ab-openai').className = 'appbar-chip' + (p === 'openai' ? ' on-openai' : '');
+  fetch('/api/settings', { method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ provider: p }) }).catch(function(){});
+}
+
+function setFolderLabel(p) {
+  var fl = document.getElementById('ab-folder');
+  if (!fl || !p) return;
+  fl.textContent = p.split(/[\\/]/).pop() || p;
+  fl.title = p;
+}
+
+function abPickFolder() {
+  fetch('/api/pick-folder').then(function(r){ return r.json(); }).then(function(d) {
+    if (d.path) {
+      window._niExportFolder = d.path;
+      setFolderLabel(d.path);
+      fetch('/api/settings', { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ folderPath: d.path }) }).catch(function(){});
     }
-    if (s.folderPath) window._niExportFolder = s.folderPath;
+  }).catch(function(){});
+}
+
+window.addEventListener('load', function() {
+  if (window.location.hostname !== '127.0.0.1') return;
+  fetch('/api/settings').then(function(r){ return r.json(); }).then(function(s) {
+    if (s.openaiKey) { openaiKey = s.openaiKey; window._niOpenaiKey = s.openaiKey; }
+    if (s.folderPath) { window._niExportFolder = s.folderPath; }
+    var bar = document.getElementById('appbar');
+    var spacer = document.getElementById('appbar-spacer');
+    if (bar) bar.style.display = 'flex';
+    if (spacer) spacer.style.display = 'block';
+    abSetProvider(s.provider || 'claude');
+    setFolderLabel(s.folderPath);
   }).catch(function(){});
 });
 </script>

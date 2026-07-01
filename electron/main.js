@@ -205,7 +205,7 @@ function handleClaudeRequest(req, res) {
       const timer = setTimeout(() => {
         log('non-streaming call timed out — killing process');
         proc.kill();
-      }, 120000);
+      }, 300000); // 5 min — Sonnet JSON calls can take 2-3 min on large prompts
 
       proc.on('close', (code, signal) => {
         clearTimeout(timer);
@@ -213,9 +213,10 @@ function handleClaudeRequest(req, res) {
         if (stderrBuf) log(`stderr: ${stderrBuf.slice(0, 800)}`);
         cleanupTempFiles(tempFiles);
 
-        if (!output.trim() && code !== 0) {
-          const errMsg = stderrBuf.trim().slice(0, 200) || `claude exited with code ${code}`;
-          res.writeHead(500); res.end(JSON.stringify({ error: errMsg })); return;
+        if (!output.trim() && (code !== 0 || code === null)) {
+          const detail = stderrBuf.trim().slice(0, 200) ||
+            (signal ? `claude killed by signal ${signal} — try again or reduce input size` : `claude exited with code ${code}`);
+          res.writeHead(500); res.end(JSON.stringify({ error: detail })); return;
         }
 
         // Strip markdown code fences — HTML already does this too, belt-and-braces.
@@ -256,7 +257,8 @@ async function startServer() {
       req.on('end', () => {
         try {
           const patch = JSON.parse(raw);
-          Object.assign(appSettings, patch);
+          const allowed = ['provider', 'openaiKey', 'folderPath'];
+          allowed.forEach(k => { if (k in patch) appSettings[k] = patch[k]; });
           saveSettings();
           log(`settings updated: provider=${appSettings.provider} folder=${appSettings.folderPath}`);
           res.writeHead(200, { 'Content-Type': 'application/json' }); res.end('{"ok":true}');
@@ -282,11 +284,18 @@ async function startServer() {
       req.on('end', () => {
         try {
           const { folder, filename, content } = JSON.parse(raw);
+          const allowed = appSettings.folderPath ? path.resolve(appSettings.folderPath) : null;
+          const resolved = path.resolve(folder);
+          if (!allowed || (!resolved.startsWith(allowed + path.sep) && resolved !== allowed)) {
+            res.writeHead(403); res.end('{"error":"forbidden path"}'); return;
+          }
           const safeName = path.basename(filename).replace(/[/\\:*?"<>|]/g, '_');
-          const dest = path.join(folder, safeName);
-          fs.writeFileSync(dest, content, 'utf8');
-          log(`save-file: ${dest}`);
-          res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ ok: true, path: dest }));
+          const dest = path.join(resolved, safeName);
+          fs.promises.writeFile(dest, content, 'utf8').then(() => {
+            log(`save-file: ${dest}`);
+            res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ ok: true, path: dest }));
+          }).catch(err => { log(`save-file error: ${err.message}`); res.writeHead(500); res.end('{"error":"write failed"}'); });
+          return;
         } catch (err) { log(`save-file error: ${err.message}`); res.writeHead(500); res.end('{"error":"write failed"}'); }
       });
       return;
