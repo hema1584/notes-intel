@@ -5,7 +5,7 @@ const http = require('node:http');
 const net  = require('node:net');
 const os   = require('node:os');
 const path = require('node:path');
-const { spawn } = require('node:child_process');
+const { spawn, execFile } = require('node:child_process');
 
 let mainWindow     = null;
 let settingsWindow = null;
@@ -124,6 +124,63 @@ function getFreePort() {
 // In-memory results for async jobs (code cross-check) — polled via /api/job/<id>
 const claudeJobs = {};
 
+// Run an svn command, resolve with stdout. Rejects on non-zero exit.
+function svn(args, timeoutMs) {
+  return new Promise((resolve, reject) => {
+    execFile('svn', args, { maxBuffer: 32 * 1024 * 1024, timeout: timeoutMs || 60000, windowsHide: true },
+      (err, stdout, stderr) => {
+        if (err) { reject(new Error((stderr || err.message || '').slice(0, 300))); return; }
+        resolve(stdout || '');
+      });
+  });
+}
+
+// Fast code-check: fetch the full text of every file changed in a revision.
+// One `svn diff --summarize` + one `svn cat` per changed file — no agentic crawl.
+async function fetchSvnChangedFiles(baseUrl, rev) {
+  const SKIP_EXT = /\.(meta|png|jpg|jpeg|gif|tga|psd|fbx|anim|controller|prefab|unity|asset|dll|so|a|mat|wav|mp3|ogg|ttf|otf|bytes)$/i;
+  const MAX_FILES = 12;
+  const MAX_FILE_BYTES = 55000;
+  const peg = rev ? '@' + rev : '';
+  const revArg = rev ? ['-c', rev] : ['-c', 'HEAD'];
+  // --summarize gives one line per changed path: "M       <url>"
+  const summary = await svn(['diff', '--summarize'].concat(revArg).concat([baseUrl]), 90000);
+  const lines = summary.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const all = [];
+  const skipped = [];
+  for (const line of lines) {
+    const m = line.match(/^([AMDR!~ ]+)\s+(\S.*)$/);
+    if (!m) continue;
+    const status = m[1].trim();
+    const url = m[2].trim();
+    if (status === 'D') { skipped.push({ url, why: 'deleted' }); continue; }
+    if (SKIP_EXT.test(url)) { skipped.push({ url, why: 'asset/binary' }); continue; }
+    all.push({ status, url });
+  }
+  const picked = all.slice(0, MAX_FILES);
+  const files = [];
+  for (const f of picked) {
+    try {
+      let content = await svn(['cat', f.url + peg], 60000);
+      let truncated = false;
+      if (content.length > MAX_FILE_BYTES) { content = content.slice(0, MAX_FILE_BYTES); truncated = true; }
+      files.push({ path: f.url.replace(baseUrl, '').replace(/^\//, ''), status: f.status, content, truncated });
+    } catch (e) {
+      files.push({ path: f.url.replace(baseUrl, '').replace(/^\//, ''), status: f.status, content: '', error: e.message });
+    }
+  }
+  let logMsg = '';
+  try { logMsg = await svn(['log'].concat(revArg).concat([baseUrl]), 30000); } catch (e) {}
+  return {
+    files,
+    commitLog: logMsg.slice(0, 2000),
+    changedCount: all.length,
+    includedCount: files.length,
+    droppedForCap: Math.max(0, all.length - picked.length),
+    skipped: skipped.slice(0, 30)
+  };
+}
+
 function handleClaudeRequest(req, res) {
   let raw = '';
   req.on('data', chunk => { raw += chunk; });
@@ -146,10 +203,14 @@ function handleClaudeRequest(req, res) {
     const repoVal = (appSettings.repoPath || '').trim();
     const isRemoteRepo = /^(svn(\+\w+)?|https?):\/\//i.test(repoVal);
     const useRepo = body.useRepo === true && repoVal && (isRemoteRepo || fs.existsSync(repoVal));
-    // For code cross-check use JSON output format so we capture token usage + cost per run.
+    // JSON output format lets us capture token usage + cost. Used for code cross-check
+    // (useRepo agentic mode) and any call that opts in with body.meter (e.g. fast mode).
+    const jsonOut = useRepo || body.meter === true;
     const args = useRepo
       ? ['--allowedTools', 'Read Grep Glob Bash(svn:*) Bash(git:*)', '--output-format', 'json', '--model', model, '-p']
-      : ['--dangerously-skip-permissions', '--model', model, '-p'];
+      : jsonOut
+        ? ['--dangerously-skip-permissions', '--output-format', 'json', '--model', model, '-p']
+        : ['--dangerously-skip-permissions', '--model', model, '-p'];
 
     // shell:true required on Windows to execute .cmd batch files.
     // Prepend npm global bin so claude.cmd is found even when Electron
@@ -282,8 +343,8 @@ function handleClaudeRequest(req, res) {
         // Strip markdown code fences — HTML already does this too, belt-and-braces.
         let text = output.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
         let usage = null;
-        // Code cross-check uses --output-format json: unwrap .result and capture token usage.
-        if (useRepo) {
+        // JSON output format: unwrap .result and capture token usage (code-check + metered fast mode).
+        if (jsonOut) {
           try {
             const wrap = JSON.parse(output);
             if (typeof wrap.result === 'string') text = wrap.result.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
@@ -327,6 +388,26 @@ async function startServer() {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(j || { status: 'unknown' }));
       if (j && j.status !== 'running') delete claudeJobs[jid];
+      return;
+    }
+    if (req.url === '/api/svn-changes' && req.method === 'POST') {
+      let raw = '';
+      req.on('data', c => { raw += c; });
+      req.on('end', async () => {
+        let b; try { b = JSON.parse(raw); } catch { res.writeHead(400); res.end('{"error":"bad json"}'); return; }
+        const url = (b.url || '').replace(/@\d+$/, '').trim();
+        const rev = (b.rev || '').toString().replace(/^r/i, '').trim();
+        if (!url) { res.writeHead(400); res.end('{"error":"missing url"}'); return; }
+        log(`svn-changes: url=${url} rev=${rev || 'HEAD'}`);
+        try {
+          const result = await fetchSvnChangedFiles(url, rev);
+          log(`svn-changes: ${result.includedCount}/${result.changedCount} files fetched, ${result.droppedForCap} over cap`);
+          res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(JSON.stringify(result));
+        } catch (e) {
+          log(`svn-changes error: ${e.message}`);
+          res.writeHead(500); res.end(JSON.stringify({ error: e.message.slice(0, 300) }));
+        }
+      });
       return;
     }
     if (req.url === '/api/settings' && req.method === 'GET') {

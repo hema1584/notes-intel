@@ -803,7 +803,11 @@
         <input id="cc-svn-rev" placeholder="revision (optional)" spellcheck="false" style="width:170px;background:#111116;border:0.5px solid #252530;border-radius:7px;padding:9px 12px;font-size:12.5px;font-family:'JetBrains Mono',monospace;color:#a0b0c0;outline:none;"/>
         <input id="cc-review-link" placeholder="code review link (optional)" spellcheck="false" style="flex:1;background:#111116;border:0.5px solid #252530;border-radius:7px;padding:9px 12px;font-size:12.5px;font-family:'JetBrains Mono',monospace;color:#a0b0c0;outline:none;"/>
       </div>
-      <div style="display:flex;gap:8px;margin-top:10px;align-items:center;">
+      <label style="display:flex;align-items:flex-start;gap:8px;margin-top:11px;cursor:pointer;">
+        <input type="checkbox" id="cc-deep-mode" style="accent-color:#EF9F27;margin-top:2px;"/>
+        <span style="font-size:11.5px;color:#8a8a96;font-family:'Sora',sans-serif;line-height:1.5;">Deep check — read the whole module, not just changed files. Slower and costs more; use when a bug may come from code this change <em>touches but doesn't modify</em>.</span>
+      </label>
+      <div style="display:flex;gap:8px;margin-top:11px;align-items:center;">
         <button onclick="runCodeCheckGo()" style="display:flex;align-items:center;gap:7px;padding:8px 16px;background:#17100a;border:0.5px solid #B45517;border-radius:8px;font-size:12px;color:#EF9F27;cursor:pointer;font-family:'JetBrains Mono',monospace;">Run check →</button>
         <button onclick="document.getElementById('cc-setup').style.display='none'" style="padding:8px 14px;background:transparent;border:0.5px solid #252530;border-radius:8px;font-size:11.5px;color:#5a5a66;cursor:pointer;font-family:'JetBrains Mono',monospace;">cancel</button>
       </div>
@@ -2412,10 +2416,20 @@ function clearAll() {
   window._niSessId = null; // next analysis becomes a new history entry
   try { renderHistoryList(); } catch(e) {}
   window._codeCheckData = null;
+  window._ccUsage = null;
+  window._ccFilesBlock = '';
+  window._ccChecked = {};
+  window._ccReviewLink = '';
   var ccSec = document.getElementById('codecheck-section');
   if (ccSec) ccSec.style.display = 'none';
   var ccBody = document.getElementById('codecheck-body');
   if (ccBody) ccBody.innerHTML = '';
+  // Reset the code cross-check setup panel + its fields (revision/link are per-ticket)
+  var ccSetup = document.getElementById('cc-setup');
+  if (ccSetup) ccSetup.style.display = 'none';
+  ['cc-svn-url', 'cc-svn-rev', 'cc-review-link'].forEach(function (id) { var el = document.getElementById(id); if (el) el.value = ''; });
+  var ccDeep = document.getElementById('cc-deep-mode');
+  if (ccDeep) ccDeep.checked = false;
   // Clear inputs
   var mainInput = document.getElementById('main-input');
   mainInput.value = '';
@@ -3292,7 +3306,17 @@ function renderQATier(arr, isEdge) {
 function buildCodeCheckInstruction(requirements, repoUrl) {
   var isRemote = /^(svn(\+\w+)?|https?):\/\//i.test(repoUrl || '');
   var access, method;
-  if (isRemote) {
+  if (window._ccFilesBlock) {
+    // Fast mode — the changed files are provided inline; no repo access, no exploration.
+    access = 'You are reviewing a code change. The COMPLETE current text of every file this change touched is provided below — you do NOT need to fetch anything, and there is no other code available to you.\n';
+    method = 'METHOD:\n' +
+      '1. Read the changed files below in full. They ARE the change under review.\n' +
+      '2. Compare what they do against the REQUIREMENTS. Note every mismatch, missing behaviour, or extra behaviour.\n' +
+      '3. Hunt bugs IN this code: null guards, off-by-one, silent early returns, swallowed errors, wrong event/lifecycle timing, race conditions.\n' +
+      '4. For each acceptance criterion: is it implemented in these files? Cite file:line.\n' +
+      '5. If judging something needs code that is NOT shown here (a base class, a caller in another file), do NOT guess — note it in gaps as "not verifiable from the changed files".\n\n' +
+      '--- CHANGED FILES ---\n' + window._ccFilesBlock + '\n--- END CHANGED FILES ---\n';
+  } else if (isRemote) {
     var m = (repoUrl || '').match(/^(.*?)@(\d+)$/);
     var baseUrl = m ? m[1] : repoUrl;
     var rev = m ? m[2] : '';
@@ -3341,7 +3365,7 @@ function buildCodeCheckInstruction(requirements, repoUrl) {
     '- This is static analysis: flag "verify on device" where runtime behaviour matters.\n\n' +
     'BREVITY — this is a scan-first report, not documentation. Respect every word limit below strictly. One idea per field. No sub-clauses chained with semicolons or em-dashes. Never repeat the same fact in two sections — evidence lives ONCE, in the most specific section. File paths appear ONLY in file/rootCause/note fields, never in verdict, bullets, or checklist.\n\n' +
     'OUTPUT — return ONLY this JSON object, no markdown fences, no prose:\n' +
-    '{"summary":{"match":"yes|partial|no — does the implementation match the ticket","verdict":"max 15 words in PLAIN QA LANGUAGE — no class names, no code jargon. State whether the build does what the ticket promises and whether testing can proceed. e.g. Partial match — safe to test, but popup closing behaves differently than the ticket describes","subline":"max 12 words — the FIRST thing QA should test and why, in device actions. e.g. Start by reopening popups quickly — most likely place to break","forDev":["max 10 words each, max 3 bullets, no file paths"],"forQA":["max 10 words each, max 3 bullets, no file paths"]},' +
+    '{"summary":{"match":"yes|partial|no — does the implementation match the ticket","verdict":"max 15 words in PLAIN QA LANGUAGE — no class names, no code jargon. State whether the build does what the ticket promises and whether testing can proceed. e.g. Partial match — safe to test, but popup closing behaves differently than the ticket describes","subline":"max 12 words — the FIRST thing QA should test and why, in device actions. e.g. Start by reopening popups quickly — most likely place to break","forQA":["max 10 words each, max 3 bullets, no file paths — what to test and why"],"forDev":["max 12 words each, max 3 bullets, no file paths — phrase as SUGGESTIONS a QA peer would raise, never bare orders. Use \\"Consider…\\", \\"Worth confirming…\\", \\"Might be safer to…\\" — NOT \\"Add X\\" / \\"Fix Y\\""]},' +
     '"discrepancies":[{"ticketSays":"max 12 words","codeDoes":"max 12 words","file":"file:line only","question":"one polite self-contained sentence, max 35 words, citing file:line — pasteable to Jira"}],' +
     '"findings":[{"title":"max 60 chars","severity":"high|med|low","repro":["max 3 steps, max 10 words each"],"observed":"max 20 words","rootCause":"file:line + max 25 words","proposedFix":"max 15 words"}],' +
     '"acStatus":[{"ac":"max 12 words","status":"implemented|partial|missing","note":"file:line or gap, max 15 words"}],' +
@@ -3371,6 +3395,7 @@ async function runCodeCheckGo() {
   var repoUrl = urlEl ? urlEl.value.trim() : '';
   var rev = revEl ? revEl.value.trim().replace(/^r/i, '') : '';
   var reviewLink = linkEl ? linkEl.value.trim() : '';
+  var deepMode = !!(document.getElementById('cc-deep-mode') && document.getElementById('cc-deep-mode').checked);
   if (!repoUrl) { showErr('Enter the SVN branch URL (or a local checkout folder) for this ticket.'); return; }
   var repoVal = rev ? repoUrl.replace(/@\d+$/, '') + '@' + rev : repoUrl;
   window._niRepoPath = repoVal;
@@ -3433,38 +3458,73 @@ async function runCodeCheckGo() {
       setAnalysisStatus('cross-checking code against requirements — this can take several minutes…');
     }
 
-    var r = await fetch(getApiUrl(), {
-      method: 'POST',
-      headers: getApiHeaders(),
-      body: JSON.stringify(Object.assign(wrapBody({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 8000,
-        temperature: 0,
-        system: 'You are a meticulous static-analysis QA reviewer. You only report what you verified by reading actual files. Output raw JSON only.',
-        messages: [{ role: 'user', content: buildCodeCheckInstruction(requirements, window._niRepoPath) }]
-      }), { useRepo: true, asyncJob: true }))
-    });
-    if (!r.ok) { var et = await r.text(); throw new Error('API error ' + r.status + ': ' + et.substring(0, 100)); }
-    var jd = await r.json();
-    var d = jd;
-    if (jd.jobId) {
-      // Poll the background job — survives dropped sockets, sleep, and long runs
-      var t0 = Date.now();
-      d = null;
-      while (Date.now() - t0 < 20 * 60 * 1000) {
-        await new Promise(function (rs) { setTimeout(rs, 5000); });
-        var mins = Math.floor((Date.now() - t0) / 60000);
-        setAnalysisStatus('cross-checking code against requirements — this can take several minutes' + (mins ? ' · ' + mins + ' min elapsed' : '') + '…');
-        var pr = null;
-        try { pr = await fetch('/api/job/' + jd.jobId); } catch (pe) { continue; }
-        if (!pr || !pr.ok) continue;
-        var js = await pr.json();
-        if (js.status === 'running') continue;
-        if (js.status === 'error') throw new Error(js.error || 'code check failed');
-        if (js.status === 'done') { d = js.payload; break; }
-        throw new Error('job lost — was the app restarted mid-analysis?');
+    window._ccFilesBlock = '';
+    var d;
+
+    if (!deepMode) {
+      // ── FAST MODE — app fetches the changed files, one non-agentic reasoning call ──
+      setAnalysisStatus('fetching changed files from svn…');
+      var scr = await fetch('/api/svn-changes', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: repoUrl, rev: rev })
+      });
+      var sc = await scr.json();
+      if (!scr.ok) throw new Error(sc.error || 'could not read svn changes');
+      if (!sc.files || !sc.files.length) throw new Error('No source files changed' + (rev ? ' in revision ' + rev : '') + '. Check the URL/revision, or enable Deep check.');
+      var block = sc.files.map(function (f) {
+        return '### FILE: ' + f.path + ' (' + (f.status || '?') + ')' + (f.truncated ? ' [truncated]' : '') + (f.error ? ' [could not read: ' + f.error + ']' : '') + '\n' + (f.content || '');
+      }).join('\n\n');
+      window._ccFilesBlock = block;
+      var note = sc.includedCount + ' changed file' + (sc.includedCount === 1 ? '' : 's');
+      if (sc.droppedForCap) note += ' (' + sc.droppedForCap + ' more over the cap — enable Deep check for full coverage)';
+      if (sc.commitLog) requirements += '\nCOMMIT MESSAGE(S) for this change:\n' + sc.commitLog + '\n';
+      setAnalysisStatus('reviewing ' + note + ' against requirements…');
+      var rFast = await fetch(getApiUrl(), {
+        method: 'POST', headers: getApiHeaders(),
+        body: JSON.stringify(Object.assign(wrapBody({
+          model: 'claude-sonnet-4-6', max_tokens: 8000, temperature: 0,
+          system: 'You are a meticulous static-analysis QA reviewer. You only report what the provided files actually show. Output raw JSON only.',
+          messages: [{ role: 'user', content: buildCodeCheckInstruction(requirements, repoUrl) }]
+        }), { meter: true }))
+      });
+      if (!rFast.ok) { var etf = await rFast.text(); throw new Error('API error ' + rFast.status + ': ' + etf.substring(0, 100)); }
+      d = await rFast.json();
+      window._ccFilesBlock = '';
+    } else {
+      // ── DEEP MODE — agentic crawl of the whole module (slower, costs more) ──
+      var r = await fetch(getApiUrl(), {
+        method: 'POST',
+        headers: getApiHeaders(),
+        body: JSON.stringify(Object.assign(wrapBody({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 8000,
+          temperature: 0,
+          system: 'You are a meticulous static-analysis QA reviewer. You only report what you verified by reading actual files. Output raw JSON only.',
+          messages: [{ role: 'user', content: buildCodeCheckInstruction(requirements, window._niRepoPath) }]
+        }), { useRepo: true, asyncJob: true }))
+      });
+      if (!r.ok) { var et = await r.text(); throw new Error('API error ' + r.status + ': ' + et.substring(0, 100)); }
+      var jd = await r.json();
+      d = jd;
+      if (jd.jobId) {
+        // Poll the background job — survives dropped sockets, sleep, and long runs
+        var t0 = Date.now();
+        d = null;
+        while (Date.now() - t0 < 20 * 60 * 1000) {
+          await new Promise(function (rs) { setTimeout(rs, 5000); });
+          var mins = Math.floor((Date.now() - t0) / 60000);
+          setAnalysisStatus('deep cross-check — reading the module, this can take several minutes' + (mins ? ' · ' + mins + ' min elapsed' : '') + '…');
+          var pr = null;
+          try { pr = await fetch('/api/job/' + jd.jobId); } catch (pe) { continue; }
+          if (!pr || !pr.ok) continue;
+          var js = await pr.json();
+          if (js.status === 'running') continue;
+          if (js.status === 'error') throw new Error(js.error || 'code check failed');
+          if (js.status === 'done') { d = js.payload; break; }
+          throw new Error('job lost — was the app restarted mid-analysis?');
+        }
+        if (!d) throw new Error('deep check exceeded 20 minutes — add a revision number or use fast mode');
       }
-      if (!d) throw new Error('code check exceeded 20 minutes — narrow the input or add a revision number');
     }
     var raw = extractText(d);
     var clean = raw.replace(/```json|```/g, '').trim();
@@ -3489,11 +3549,28 @@ async function runCodeCheckGo() {
 
 var CC_TABS = [
   { k: 'disc', icon: '⚑', lbl: 'Flags', col: '#EF9F27' },
-  { k: 'find', icon: '🛠', lbl: 'Findings', col: '#6090d8' },
   { k: 'ac', icon: '✅', lbl: 'Criteria', col: '#5DCAA5' },
+  { k: 'find', icon: '🛠', lbl: 'Findings', col: '#6090d8' },
   { k: 'checks', icon: '🧪', lbl: 'Checklist', col: '#5DCAA5' },
   { k: 'bugs', icon: '🎯', lbl: 'Bug sources', col: '#e06060' }
 ];
+
+function ccLegendHtml() {
+  var rows = [
+    ['✅', 'Criteria', '#5DCAA5', 'Is each acceptance criterion in the ticket actually implemented in the code?'],
+    ['🛠', 'Findings', '#6090d8', 'Bugs in the code itself — crashes, missing guards, races. Real regardless of the ticket.'],
+    ['⚑', 'Flags', '#EF9F27', 'Where the code does something different from what the ticket says. Raise these with the programmer.'],
+    ['🧪', 'Checklist', '#5DCAA5', 'What to test on device, by priority. Tick as you go, or convert to QA Focus.'],
+    ['🎯', 'Bug sources', '#e06060', 'Where this change is most likely to break, and what the player would see.']
+  ];
+  var inner = rows.map(function (r) {
+    return '<div style="display:flex;gap:9px;margin:6px 0;align-items:baseline;">' +
+      '<span style="flex-shrink:0;color:' + r[2] + ';font-size:12px;font-family:JetBrains Mono,monospace;min-width:82px;">' + r[0] + ' ' + r[1] + '</span>' +
+      '<span style="font-size:12.5px;color:#8a97a2;line-height:1.6;font-family:Sora,sans-serif;">' + r[3] + '</span></div>';
+  }).join('');
+  return '<details style="margin-bottom:12px;"><summary style="cursor:pointer;font-size:11.5px;color:#6a7a86;font-family:JetBrains Mono,monospace;">ⓘ what do these tabs mean?</summary>' +
+    '<div style="margin-top:8px;padding:11px 14px;background:#0c0c10;border:0.5px solid #1e1e28;border-radius:8px;">' + inner + '</div></details>';
+}
 
 function ccTab(key) {
   CC_TABS.forEach(function (t) {
@@ -3506,7 +3583,10 @@ function ccTab(key) {
       b.style.background = on ? t.col + '1e' : 'transparent';
       b.style.borderColor = on ? t.col + '70' : '#2a2a34';
       var badge = b.querySelector('.cc-tab-n');
-      if (badge) { badge.style.background = on ? t.col + '33' : '#1e1e28'; badge.style.color = on ? t.col : '#7a7a86'; }
+      if (badge) {
+        if (t.k === 'find' && window._ccHighN) { badge.style.background = '#e0606022'; badge.style.color = '#e06060'; }
+        else { badge.style.background = on ? t.col + '33' : '#1e1e28'; badge.style.color = on ? t.col : '#7a7a86'; }
+      }
     }
   });
 }
@@ -3646,6 +3726,7 @@ function renderCodeCheck(d) {
   var panes = {}, tabMetas = {};
   window._ccChecked = {};
   window._ccTotal = checkN;
+  window._ccHighN = highN;
 
   // ── Verdict banner — match status drives colour and label ──
   var sum = (d.summary && typeof d.summary === 'object') ? d.summary : { verdict: d.summary || '' };
@@ -3664,21 +3745,8 @@ function renderCodeCheck(d) {
     (sum.subline ? '<div style="font-size:13px;color:' + matchCfg.sub + ';margin-top:5px;line-height:1.55;font-family:Sora,sans-serif;">▸ ' + esc(sum.subline) + '</div>' : '') +
     '</div></div>';
 
-  // ── Stat strip ──
-  var tile = function (num, unit, lbl, col) {
-    return '<div style="background:#151517;border-radius:8px;padding:10px 11px;text-align:center;">' +
-      '<div style="font-size:20px;color:' + col + ';font-family:JetBrains Mono,monospace;">' + num + (unit ? '<span style="font-size:11.5px;opacity:.6;"> ' + unit + '</span>' : '') + '</div>' +
-      '<div style="font-size:10px;color:#6a6a76;text-transform:uppercase;letter-spacing:.06em;margin-top:3px;font-family:JetBrains Mono,monospace;">' + lbl + '</div></div>';
-  };
-  html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;">' +
-    tile(disc.length, '', 'flags', disc.length ? '#EF9F27' : '#3a4a3a') +
-    tile(highN, 'high', 'findings', highN ? '#e06060' : '#3a4a3a') +
-    tile(acs.length ? acDone + '<span style="font-size:11px;opacity:.6;">/' + acs.length + '</span>' : '—', '', 'AC done', '#5DCAA5') +
-    tile(checkN, '', 'checks', '#7F77DD') +
-    '</div>';
-
-  // ── For dev / For QA quick bullets (always visible, short) ──
-  [{ key: 'forDev', label: '🛠 For the developer', col: '#6090d8' }, { key: 'forQA', label: '🧪 For QA', col: '#5DCAA5' }].forEach(function (g) {
+  // ── QA first, then developer suggestions (counts live in the tab pills below — no separate stat strip) ──
+  [{ key: 'forQA', label: '🧪 For QA', col: '#5DCAA5' }, { key: 'forDev', label: '🛠 Suggestions for the developer', col: '#6090d8' }].forEach(function (g) {
     var pts = sum[g.key];
     if (!pts || !pts.length) return;
     html += '<div style="font-size:11px;font-family:JetBrains Mono,monospace;color:' + g.col + ';letter-spacing:.06em;text-transform:uppercase;margin:10px 0 4px;">' + g.label + '</div>';
@@ -3785,18 +3853,22 @@ function renderCodeCheck(d) {
     panes.bugs = bb; tabMetas.bugs = bugs.length;
   }
 
-  // ── Tab bar + panes ──
+  // ── Tab bar + panes — single line, counts double as the at-a-glance stats ──
   var avail = CC_TABS.filter(function (t) { return panes[t.k]; });
   if (avail.length) {
     var active = avail[0].k;
-    html += '<div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;">';
+    html += '<div style="display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;margin-bottom:14px;padding-bottom:2px;">';
     avail.forEach(function (t) {
       var on = t.k === active;
-      html += '<button id="cc-tab-' + t.k + '" onclick="ccTab(\'' + t.k + '\')" style="display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-family:Sora,sans-serif;color:' + (on ? t.col : '#8a97a2') + ';background:' + (on ? t.col + '1e' : 'transparent') + ';border:0.5px solid ' + (on ? t.col + '70' : '#2a2a34') + ';border-radius:8px;padding:8px 14px;cursor:pointer;white-space:nowrap;transition:all .12s;">' +
-        '<span style="font-size:13px;">' + t.icon + '</span>' + t.lbl +
-        '<span class="cc-tab-n" style="font-size:11px;font-family:JetBrains Mono,monospace;background:' + (on ? t.col + '33' : '#1e1e28') + ';color:' + (on ? t.col : '#7a7a86') + ';border-radius:10px;padding:1px 8px;">' + tabMetas[t.k] + '</span></button>';
+      // Findings badge turns red when there are high-severity findings — keeps the urgency the old stat strip carried
+      var badgeCol = (t.k === 'find' && highN) ? '#e06060' : (on ? t.col : '#7a7a86');
+      var badgeBg = (t.k === 'find' && highN) ? '#e0606022' : (on ? t.col + '33' : '#1e1e28');
+      html += '<button id="cc-tab-' + t.k + '" onclick="ccTab(\'' + t.k + '\')" style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-family:Sora,sans-serif;color:' + (on ? t.col : '#8a97a2') + ';background:' + (on ? t.col + '1e' : 'transparent') + ';border:0.5px solid ' + (on ? t.col + '70' : '#2a2a34') + ';border-radius:8px;padding:7px 11px;cursor:pointer;white-space:nowrap;transition:all .12s;flex-shrink:0;">' +
+        '<span style="font-size:12px;">' + t.icon + '</span>' + t.lbl +
+        '<span class="cc-tab-n" style="font-size:11px;font-family:JetBrains Mono,monospace;background:' + badgeBg + ';color:' + badgeCol + ';border-radius:10px;padding:1px 7px;">' + tabMetas[t.k] + '</span></button>';
     });
     html += '</div>';
+    html += ccLegendHtml();
     avail.forEach(function (t) {
       html += '<div id="cc-pane-' + t.k + '" style="' + (t.k === active ? '' : 'display:none;') + '">' + panes[t.k] + '</div>';
     });
@@ -3815,10 +3887,28 @@ function renderCodeCheck(d) {
   ccProgress();
 }
 
+// Build a searchable title/filename for code-check exports: ticket key + feature.
+function ccTitleBase() {
+  var jira = '';
+  try { jira = attachedLinks.filter(function (l) { return l.jiraTicketKey; }).map(function (l) { return l.jiraTicketKey; })[0] || ''; } catch (e) {}
+  if (!jira) { var m = (window._niRepoPath || '').match(/([A-Za-z]{2,}-\d+)/); if (m) jira = m[1].toUpperCase(); }
+  var feat = (window._gistParsed && window._gistParsed.title) ? window._gistParsed.title : '';
+  var ti = document.getElementById('title-input'); var tv = ti ? ti.value.trim() : '';
+  if (!feat && tv && tv.toLowerCase() !== 'code cross-check') feat = tv;
+  var parts = [];
+  if (jira) parts.push(jira);
+  if (feat) parts.push(feat);
+  return parts.length ? parts.join(' — ') : 'Code Cross-Check';
+}
+function ccFileName(ext) {
+  var s = ccTitleBase().replace(/[^a-z0-9\s-]/gi, '').replace(/\s+/g, '-').replace(/-+/g, '-').toLowerCase();
+  return (s || 'code-check') + '-code-check.' + ext;
+}
+
 function downloadCodeCheckMD(btn) {
   var d = window._codeCheckData;
   if (!d) return;
-  var title = (document.getElementById('title-input') ? document.getElementById('title-input').value.trim() : '') || 'Code Cross-Check';
+  var title = ccTitleBase();
   var md = '# Code Cross-Check — ' + title + '\n\n**Method**: Static analysis (no runtime) — verify on device\n\n## Summary\n\n';
   if (d.summary && typeof d.summary === 'object') {
     if (d.summary.verdict) md += '**Verdict**: ' + d.summary.verdict + '\n';
@@ -3867,7 +3957,7 @@ function downloadCodeCheckMD(btn) {
   var blob = new Blob([md], { type: 'text/markdown' });
   var url = URL.createObjectURL(blob);
   var a = document.createElement('a');
-  a.href = url; a.download = title.replace(/[^a-z0-9\s-]/gi, '').replace(/\s+/g, '-').toLowerCase() + '-code-check.md';
+  a.href = url; a.download = ccFileName('md');
   document.body.appendChild(a); a.click();
   document.body.removeChild(a); URL.revokeObjectURL(url);
 }
@@ -3875,7 +3965,7 @@ function downloadCodeCheckMD(btn) {
 function downloadCodeCheckHTML(btn) {
   var d = window._codeCheckData;
   if (!d) return;
-  var title = (document.getElementById('title-input') ? document.getElementById('title-input').value.trim() : '') || 'Code Cross-Check';
+  var title = ccTitleBase();
   var sum = (d.summary && typeof d.summary === 'object') ? d.summary : { verdict: d.summary || '' };
   var sevCol = { high: '#e06060', med: '#d4a855', low: '#5DCAA5' };
   var h = '';
@@ -3895,18 +3985,11 @@ function downloadCodeCheckHTML(btn) {
     '<div><span style="font-size:10px;font-family:monospace;letter-spacing:.08em;color:' + xCfg.col + ';border:0.5px solid ' + xCfg.col + '50;border-radius:4px;padding:2px 8px;margin-right:8px;">' + xCfg.chip + '</span>' +
     '<span style="font-size:14.5px;color:' + xCfg.txt + ';line-height:1.55;">' + esc(sum.verdict) + '</span></div>' +
     (sum.subline ? '<div style="font-size:13px;color:' + xCfg.sub + ';margin-top:5px;">▸ ' + esc(sum.subline) + '</div>' : '') + '</div></div>';
-  var xTile = function (num, lbl, col) { return '<div style="background:#151517;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:20px;color:' + col + ';font-family:monospace;">' + num + '</div><div style="font-size:10px;color:#6a6a76;text-transform:uppercase;letter-spacing:.06em;margin-top:3px;font-family:monospace;">' + lbl + '</div></div>'; };
-  h += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;">' +
-    xTile(xDisc.length, 'flags', xDisc.length ? '#EF9F27' : '#3a4a3a') +
-    xTile(xHighN, 'high findings', xHighN ? '#e06060' : '#3a4a3a') +
-    xTile(xAcs.length ? xAcDone + '/' + xAcs.length : '—', 'AC done', '#5DCAA5') +
-    xTile(xCheckN, 'checks', '#7F77DD') + '</div>';
-
-  [{ key: 'forDev', label: '🛠 For the developer' }, { key: 'forQA', label: '🧪 For QA' }].forEach(function (g) {
+  [{ key: 'forQA', label: '🧪 For QA', col: '#5DCAA5' }, { key: 'forDev', label: '🛠 Suggestions for the developer', col: '#6090d8' }].forEach(function (g) {
     var pts = sum[g.key];
     if (!pts || !pts.length) return;
-    h += '<div style="font-size:11px;font-family:monospace;color:#5DCAA5;letter-spacing:.08em;text-transform:uppercase;margin:12px 0 5px;">' + g.label + '</div>';
-    pts.forEach(function (p) { h += '<div style="display:flex;gap:9px;margin:5px 0;"><span style="color:#3d8060;">–</span><span style="font-size:14px;color:#88b8ac;line-height:1.7;">' + esc(p) + '</span></div>'; });
+    h += '<div style="font-size:11px;font-family:monospace;color:' + g.col + ';letter-spacing:.08em;text-transform:uppercase;margin:12px 0 5px;">' + g.label + '</div>';
+    pts.forEach(function (p) { h += '<div style="display:flex;gap:9px;margin:5px 0;"><span style="color:' + g.col + '99;">–</span><span style="font-size:14px;color:#b0c0cc;line-height:1.7;">' + esc(p) + '</span></div>'; });
   });
 
   if (d.discrepancies && d.discrepancies.length) {
@@ -3985,26 +4068,30 @@ function downloadCodeCheckHTML(btn) {
   for (var xi = 1; xi < xparts.length; xi += 2) { xpanes[xparts[xi]] = (xpanes[xparts[xi]] || '') + xparts[xi + 1]; }
   var xtabs = [
     ['disc', '⚑ Flags', '#EF9F27', xDisc.length],
-    ['find', '🛠 Findings', '#6090d8', xFind.length],
     ['ac', '✅ Criteria', '#5DCAA5', xAcs.length ? xAcDone + '/' + xAcs.length : (d.gaps || []).length],
+    ['find', '🛠 Findings', '#6090d8', xFind.length],
     ['checks', '🧪 Checklist', '#5DCAA5', xCheckN],
     ['bugs', '🎯 Bug sources', '#e06060', (d.bugSources || []).length]
   ].filter(function (t) { return xpanes[t[0]]; });
   var xbody = xhead;
   if (xtabs.length) {
-    xbody += '<div style="display:flex;gap:7px;flex-wrap:wrap;margin:6px 0 14px;">';
+    xbody += '<div style="display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;margin:6px 0 14px;padding-bottom:2px;">';
     xtabs.forEach(function (t, i) {
       var on = i === 0;
-      xbody += '<button class="xtab" data-k="' + t[0] + '" data-c="' + t[2] + '" data-n="' + t[3] + '" style="display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-family:\'Sora\',sans-serif;color:' + (on ? t[2] : '#8a97a2') + ';background:' + (on ? t[2] + '1e' : 'transparent') + ';border:0.5px solid ' + (on ? t[2] + '70' : '#2a2a34') + ';border-radius:8px;padding:8px 14px;cursor:pointer;white-space:nowrap;">' + t[1] +
-        '<span class="xtab-n" style="font-size:11px;font-family:monospace;background:' + (on ? t[2] + '33' : '#1e1e28') + ';color:' + (on ? t[2] : '#7a7a86') + ';border-radius:10px;padding:1px 8px;">' + t[3] + '</span></button>';
+      var fr = (t[0] === 'find' && xHighN);
+      var bBg = fr ? '#e0606022' : (on ? t[2] + '33' : '#1e1e28');
+      var bCol = fr ? '#e06060' : (on ? t[2] : '#7a7a86');
+      xbody += '<button class="xtab" data-k="' + t[0] + '" data-c="' + t[2] + '" data-n="' + t[3] + '"' + (fr ? ' data-hi="1"' : '') + ' style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-family:\'Sora\',sans-serif;color:' + (on ? t[2] : '#8a97a2') + ';background:' + (on ? t[2] + '1e' : 'transparent') + ';border:0.5px solid ' + (on ? t[2] + '70' : '#2a2a34') + ';border-radius:8px;padding:7px 11px;cursor:pointer;white-space:nowrap;flex-shrink:0;">' + t[1] +
+        '<span class="xtab-n" style="font-size:11px;font-family:monospace;background:' + bBg + ';color:' + bCol + ';border-radius:10px;padding:1px 7px;">' + t[3] + '</span></button>';
     });
     xbody += '</div>';
+    xbody += ccLegendHtml();
     xtabs.forEach(function (t, i) { xbody += '<div class="xpane" id="xp-' + t[0] + '" style="' + (i ? 'display:none;' : '') + '">' + xpanes[t[0]] + '</div>'; });
   }
   var xscript = '<script>' +
     'document.querySelectorAll(".xtab").forEach(function(tb){tb.addEventListener("click",function(){' +
-    'document.querySelectorAll(".xtab").forEach(function(o){o.style.color="#8a97a2";o.style.background="transparent";o.style.borderColor="#2a2a34";var n=o.querySelector(".xtab-n");if(n){n.style.background="#1e1e28";n.style.color="#7a7a86";}});' +
-    'var c=tb.dataset.c;tb.style.color=c;tb.style.background=c+"1e";tb.style.borderColor=c+"70";var bn=tb.querySelector(".xtab-n");if(bn){bn.style.background=c+"33";bn.style.color=c;}' +
+    'document.querySelectorAll(".xtab").forEach(function(o){o.style.color="#8a97a2";o.style.background="transparent";o.style.borderColor="#2a2a34";var n=o.querySelector(".xtab-n");if(n){if(o.dataset.hi){n.style.background="#e0606022";n.style.color="#e06060";}else{n.style.background="#1e1e28";n.style.color="#7a7a86";}}});' +
+    'var c=tb.dataset.c;tb.style.color=c;tb.style.background=c+"1e";tb.style.borderColor=c+"70";var bn=tb.querySelector(".xtab-n");if(bn){if(tb.dataset.hi){bn.style.background="#e0606022";bn.style.color="#e06060";}else{bn.style.background=c+"33";bn.style.color=c;}}' +
     'document.querySelectorAll(".xpane").forEach(function(p){p.style.display="none";});' +
     'var p=document.getElementById("xp-"+tb.dataset.k);if(p)p.style.display="block";});});' +
     'function xprog(cb){var l=cb.parentNode.querySelector(".xtxt");if(l){l.style.textDecoration=cb.checked?"line-through":"none";l.style.color=cb.checked?"#5a6a5a":"#b0c0cc";}' +
@@ -4024,7 +4111,7 @@ function downloadCodeCheckHTML(btn) {
   var blob2 = new Blob([doc], { type: 'text/html' });
   var url2 = URL.createObjectURL(blob2);
   var a2 = document.createElement('a');
-  a2.href = url2; a2.download = title.replace(/[^a-z0-9\s-]/gi, '').replace(/\s+/g, '-').toLowerCase() + '-code-check.html';
+  a2.href = url2; a2.download = ccFileName('html');
   document.body.appendChild(a2); a2.click();
   document.body.removeChild(a2); URL.revokeObjectURL(url2);
 }
