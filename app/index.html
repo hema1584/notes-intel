@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net; connect-src 'self' https://api.anthropic.com https://api.openai.com https://checkpoint-qa.tactilews.com https://checkpoint.tactilews.com https://mcp.atlassian.com https://mcp.slack.com https://cortex.tactilews.com https://pm.tactilews.com; frame-ancestors 'self';">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Notes Intel v4.3</title>
+<title>Notes Intel</title>
 <style>@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Sora:wght@400;500&display=swap');
  *{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -29,7 +29,7 @@
  body{font-family:'Sora',sans-serif;color:var(--text);display:flex;flex-direction:column;align-items:center;padding:24px 16px 60px;overflow-y:auto;}
  .topbar{width:100%;max-width:720px;display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
  .logo{display:flex;align-items:center;gap:10px;}
- .logo-icon{width:30px;height:30px;background:var(--teal);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+ .logo-icon{width:30px;height:30px;background:#08080c;border:0.5px solid #26263a;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
  .logo-name{font-size:15px;font-weight:500;color:#e8e8f0;}
  .logo-ver{font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:1px;}
  .mode-row{display:flex;gap:1px;background:#111116;border-radius:8px;padding:3px;border:0.5px solid #1c1c24;}
@@ -500,17 +500,41 @@
  .ev-evidence{font-size:13px;color:#909098;line-height:1.6;font-style:italic;}
  .ev-reason{font-size:12px;color:#606070;line-height:1.5;margin-top:3px;}
  .qi-p-reason{font-size:11px;color:#606070;font-family:'Sora',sans-serif;padding:2px 14px 5px 14px;font-style:italic;line-height:1.4;}
- .appbar{position:fixed;top:0;left:0;right:0;height:32px;background:#05080c;border-bottom:0.5px solid #141a24;display:flex;align-items:center;padding:0 16px;gap:12px;z-index:9999;-webkit-app-region:drag;}
- .appbar-name{font-size:11px;font-family:'JetBrains Mono',monospace;color:#3a4a5a;letter-spacing:.06em;flex-shrink:0;}
- .appbar-sep{width:0.5px;height:14px;background:#1c2430;flex-shrink:0;}
- .appbar-label{font-size:10px;font-family:'JetBrains Mono',monospace;color:#3a4a5a;letter-spacing:.06em;flex-shrink:0;}
- .appbar-chips{display:flex;gap:4px;-webkit-app-region:no-drag;}
- .appbar-chip{font-size:10.5px;padding:2px 10px;border-radius:5px;border:0.5px solid transparent;color:#4a5a6a;font-family:'JetBrains Mono',monospace;cursor:pointer;transition:all .15s;background:transparent;letter-spacing:.02em;}
- .appbar-chip:hover{color:#8a9aaa;background:#0d1520;}
- .appbar-chip.on{background:#091812;color:#5DCAA5;border-color:#1a4a3a;font-weight:600;}
- .appbar-chip.on-openai{background:#080e1a;color:#60a5fa;border-color:#1a3060;font-weight:600;}
- .appbar-folder{font-size:10px;font-family:'JetBrains Mono',monospace;color:#2a3a4a;letter-spacing:.02em;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;-webkit-app-region:no-drag;}
- .appbar-folder:hover{color:#5DCAA5;}
+ .appbar{position:fixed;top:0;left:0;right:0;height:36px;background:#05080c;border-bottom:0.5px solid #141a24;display:flex;align-items:center;padding:0 16px;gap:12px;z-index:9999;-webkit-app-region:drag;}
+ .appbar-name{font-size:12.5px;font-family:'JetBrains Mono',monospace;color:#5a6a7a;letter-spacing:.06em;flex-shrink:0;}
+ .appbar-sep{width:0.5px;height:16px;background:#1c2430;flex-shrink:0;}
+ .appbar-label{font-size:11.5px;font-family:'JetBrains Mono',monospace;color:#5a6a7a;letter-spacing:.06em;flex-shrink:0;}
+ .appbar-field{display:flex;align-items:center;background:#0a0f16;border:0.5px solid #1c2430;border-radius:6px;height:25px;overflow:hidden;-webkit-app-region:no-drag;}
+ .appbar-input{background:transparent;border:none;outline:none;height:100%;padding:0 9px;font-size:12px;font-family:'JetBrains Mono',monospace;color:#8a9aaa;letter-spacing:.02em;min-width:0;}
+ .appbar-input::placeholder{color:#3a4a5a;}
+ .appbar-folder-btn{display:flex;align-items:center;justify-content:center;width:26px;height:100%;border-left:0.5px solid #1c2430;background:transparent;border-top:none;border-right:none;border-bottom:none;color:#4a5a6a;cursor:pointer;flex-shrink:0;}
+ .appbar-folder-btn:hover{color:#5DCAA5;background:#0d1520;}
+ .appbar-select{background:#0a0f16;border:0.5px solid #1c2430;border-radius:6px;height:25px;padding:0 7px;font-size:12px;font-family:'JetBrains Mono',monospace;color:#8a9aaa;outline:none;cursor:pointer;-webkit-app-region:no-drag;}
+ .appbar-select:hover{border-color:#2a3a4a;}
+ /* History sidebar */
+ #hist-sidebar{position:fixed;top:36px;left:0;bottom:0;width:280px;background:#0a0a0d;border-right:0.5px solid #1e1e28;z-index:9998;transform:translateX(-100%);transition:transform .22s ease;display:flex;flex-direction:column;box-shadow:4px 0 24px #00000060;}
+ #hist-sidebar.open{transform:translateX(0);}
+ .hist-hd{padding:14px 12px 10px;}
+ #hist-search{width:100%;background:#111116;border:0.5px solid #252530;border-radius:7px;padding:8px 11px;font-size:13px;font-family:'Sora',sans-serif;color:#a0a0b4;outline:none;}
+ #hist-search::placeholder{color:#4e4e5a;}
+ #hist-search:focus{border-color:#383848;}
+ .hist-sec{font-size:10.5px;font-family:'JetBrains Mono',monospace;color:#5e6e7e;letter-spacing:.12em;text-transform:uppercase;padding:12px 14px 5px;}
+ .hist-scroll{flex:1;overflow-y:auto;padding-bottom:12px;}
+ .hist-row{padding:9px 12px;cursor:pointer;border-left:2px solid transparent;display:flex;align-items:flex-start;gap:6px;}
+ .hist-row:hover{background:#101016;}
+ .hist-row.active{background:#0e1512;border-left-color:#5DCAA5;}
+ .hist-row-main{flex:1;min-width:0;}
+ .hist-row-ttl{font-size:13.5px;color:#b0c0cc;line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;}
+ .hist-row-sub{font-size:11px;font-family:'JetBrains Mono',monospace;color:#5e6e7e;margin-top:3px;}
+ .hist-x{flex-shrink:0;background:none;border:none;color:#3e3e4a;cursor:pointer;font-size:14px;padding:0 3px;line-height:1;visibility:hidden;}
+ .hist-row:hover .hist-x{visibility:visible;}
+ .hist-x:hover{color:#F09595;}
+ .hist-pin{flex-shrink:0;background:none;border:none;color:#3e3e4a;cursor:pointer;font-size:12px;padding:0 3px;line-height:1.4;visibility:hidden;}
+ .hist-row:hover .hist-pin{visibility:visible;}
+ .hist-pin.pinned{visibility:visible;color:#EF9F27;}
+ .hist-empty{padding:10px 14px;font-size:12.5px;color:#4e4e5a;font-family:'JetBrains Mono',monospace;}
+ .hist-toggle-btn{display:flex;align-items:center;justify-content:center;width:26px;height:26px;background:transparent;border:0.5px solid #252530;border-radius:7px;color:#5a6a7a;cursor:pointer;flex-shrink:0;margin-right:10px;}
+ .hist-toggle-btn:hover{border-color:#5DCAA5;color:#5DCAA5;}
 </style>
 </head>
 <body>
@@ -518,21 +542,57 @@
 <div class="appbar" id="appbar" style="display:none;">
   <span class="appbar-name">Notes Intel</span>
   <div class="appbar-sep"></div>
-  <span class="appbar-label">AI</span>
-  <div class="appbar-chips">
-    <button class="appbar-chip on" id="ab-claude" onclick="abSetProvider('claude')">Claude</button>
-    <button class="appbar-chip" id="ab-openai" onclick="abSetProvider('openai')">Codex</button>
+  <span class="appbar-label">Repo</span>
+  <div class="appbar-field" style="flex:1;max-width:340px;">
+    <input class="appbar-input" id="ab-repo" style="flex:1;" placeholder="svn branch URL (@rev ok) or local folder" title="SVN branch URL (append @REVISION optionally) or local checkout folder — used by Code Cross-Check" onchange="abSaveRepo(this.value)" spellcheck="false"/>
+    <button class="appbar-folder-btn" onclick="abPickRepo()" title="Choose repo folder">
+      <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M1.5 4.5A1.5 1.5 0 0 1 3 3h3l1.5 2h5A1.5 1.5 0 0 1 14 6.5v5A1.5 1.5 0 0 1 12.5 13h-9A1.5 1.5 0 0 1 2 11.5l-.5-7z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>
+    </button>
   </div>
   <div class="appbar-sep"></div>
-  <span class="appbar-folder" id="ab-folder" title="Click to change export folder" onclick="abPickFolder()">no export folder</span>
+  <span class="appbar-label">Export</span>
+  <div class="appbar-field" style="flex:1;max-width:380px;">
+    <input class="appbar-input" id="ab-folder" style="flex:1;" readonly placeholder="no export folder" title="Export folder for saved reports" onclick="abPickFolder()"/>
+    <button class="appbar-folder-btn" onclick="abPickFolder()" title="Choose export folder">
+      <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M1.5 4.5A1.5 1.5 0 0 1 3 3h3l1.5 2h5A1.5 1.5 0 0 1 14 6.5v5A1.5 1.5 0 0 1 12.5 13h-9A1.5 1.5 0 0 1 2 11.5l-.5-7z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+  <div class="appbar-sep"></div>
+  <span class="appbar-label">AI</span>
+  <select class="appbar-select" id="ab-provider" onchange="abSetProvider(this.value)">
+    <option value="claude">Claude</option>
+    <option value="openai">Codex</option>
+  </select>
+  <div class="appbar-sep"></div>
+  <span class="appbar-label">Jira</span>
+  <div class="appbar-field" style="flex:1;max-width:280px;">
+    <input class="appbar-input" id="ab-jira" style="flex:1;" placeholder="https://…atlassian.net" title="Jira base URL" onchange="abSaveJira(this.value)" spellcheck="false"/>
+  </div>
 </div>
 
-<div style="height:32px;display:none;" id="appbar-spacer"></div>
+<div style="height:36px;display:none;" id="appbar-spacer"></div>
+
+<div id="hist-sidebar">
+  <div class="hist-hd">
+    <input id="hist-search" placeholder="Search analyses…" oninput="renderHistoryList(this.value)" spellcheck="false"/>
+  </div>
+  <div class="hist-scroll">
+    <div class="hist-sec" id="hist-pinned-lbl" style="display:none;">Pinned</div>
+    <div id="hist-pinned"></div>
+    <div class="hist-sec">Recent</div>
+    <div id="hist-recent"></div>
+  </div>
+</div>
 
 <div class="topbar">
+  <div style="display:flex;align-items:center;">
+  <button class="hist-toggle-btn" onclick="historyToggle()" title="Analysis history">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+  </button>
   <div class="logo">
-    <div class="logo-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 4h10M3 8h7M3 12h5" stroke="#04342C" stroke-width="1.6" stroke-linecap="round"/></svg></div>
-    <div><div class="logo-name">Notes Intel</div><div class="logo-ver">v4.5 · QA intelligence engine</div></div>
+    <div class="logo-icon"><svg width="19" height="19" viewBox="0 0 20 20" fill="none"><ellipse cx="10" cy="10" rx="8" ry="3.4" stroke="#5DCAA5" stroke-width="1.1"/><ellipse cx="10" cy="10" rx="8" ry="3.4" transform="rotate(60 10 10)" stroke="#7F77DD" stroke-width="1.1"/><ellipse cx="10" cy="10" rx="8" ry="3.4" transform="rotate(-60 10 10)" stroke="#EF9F27" stroke-width="1.1"/><path d="M8.2 10l1.3 1.3 2.3-2.6" stroke="#5DCAA5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div><div class="logo-name">Notes Intel</div><div class="logo-ver" id="logo-ver">QA intelligence engine</div></div>
+  </div>
   </div>
   <div style="display:flex;align-items:center;gap:6px;flex-wrap:nowrap;">
     <div class="mode-row">
@@ -736,11 +796,27 @@
       </div>
     <div class="input-tip" id="input-tip" style="color:#787880;">💡 Attach tickets, docs, chats, screenshots, or HTML reports individually—or combine them for deeper insights.</div>
     <div class="err-bar" id="err-bar"></div>
+    <div id="cc-setup" style="display:none;margin:10px 0;padding:13px 15px;background:#0d0b06;border:0.5px solid #B4551730;border-radius:9px;">
+      <div style="font-size:11px;font-family:'JetBrains Mono',monospace;color:#EF9F27;letter-spacing:.06em;text-transform:uppercase;margin-bottom:9px;">&lt;&gt; Code cross-check setup</div>
+      <input id="cc-svn-url" placeholder="SVN branch URL or local checkout folder (required)" spellcheck="false" style="width:100%;background:#111116;border:0.5px solid #252530;border-radius:7px;padding:9px 12px;font-size:12.5px;font-family:'JetBrains Mono',monospace;color:#a0b0c0;outline:none;"/>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <input id="cc-svn-rev" placeholder="revision (optional)" spellcheck="false" style="width:170px;background:#111116;border:0.5px solid #252530;border-radius:7px;padding:9px 12px;font-size:12.5px;font-family:'JetBrains Mono',monospace;color:#a0b0c0;outline:none;"/>
+        <input id="cc-review-link" placeholder="code review link (optional)" spellcheck="false" style="flex:1;background:#111116;border:0.5px solid #252530;border-radius:7px;padding:9px 12px;font-size:12.5px;font-family:'JetBrains Mono',monospace;color:#a0b0c0;outline:none;"/>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;align-items:center;">
+        <button onclick="runCodeCheckGo()" style="display:flex;align-items:center;gap:7px;padding:8px 16px;background:#17100a;border:0.5px solid #B45517;border-radius:8px;font-size:12px;color:#EF9F27;cursor:pointer;font-family:'JetBrains Mono',monospace;">Run check →</button>
+        <button onclick="document.getElementById('cc-setup').style.display='none'" style="padding:8px 14px;background:transparent;border:0.5px solid #252530;border-radius:8px;font-size:11.5px;color:#5a5a66;cursor:pointer;font-family:'JetBrains Mono',monospace;">cancel</button>
+      </div>
+    </div>
     <div class="run-row">
       <div class="shortcut-hint">
         <span class="kbd">⌘</span><span style="color:#2e2e38">+</span><span class="kbd">↵</span>
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
+        <button id="code-check-btn" onclick="runCodeCheck()" class="review-launch-btn" style="padding:8px 16px;font-size:12px;border-color:#B4551730;color:#EF9F27;">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M5 4L1.5 8 5 12M11 4l3.5 4L11 12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Code Cross-Check
+        </button>
         <button id="deep-analysis-btn" onclick="runDeepAnalysis()" class="review-launch-btn" style="padding:8px 16px;font-size:12px;">
           <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 1a7 7 0 1 1 0 14A7 7 0 0 1 8 1z" stroke="currentColor" stroke-width="1.2"/><path d="M5.5 8h5M8 5.5v5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
           Deep Analysis
@@ -849,6 +925,25 @@
       </div>
     </div>
   </div>
+  </div>
+
+  <div id="codecheck-section" style="display:none;width:100%;">
+    <div class="out-card" style="background:#0d0d0f;border-top:0.5px solid #252530;">
+      <div class="card-top">
+        <div class="card-head"><div class="card-pip" style="background:#EF9F27"></div><span class="card-lbl" style="color:#EF9F27">code cross-check</span><span id="codecheck-badge" style="font-size:9px;font-family:'JetBrains Mono',monospace;color:#5a4a2a;border:0.5px solid #5a4a2a;border-radius:4px;padding:1px 6px;margin-left:8px;">static analysis — verify on device</span></div>
+        <div style="display:flex;gap:6px;">
+          <button class="dl-html-btn" onclick="downloadCodeCheckMD(this)" title="download as markdown">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v9M4 8l4 4 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>MD</span>
+          </button>
+          <button class="dl-html-btn" onclick="downloadCodeCheckHTML(this)" title="download as HTML">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v9M4 8l4 4 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>HTML</span>
+          </button>
+        </div>
+      </div>
+      <div id="codecheck-body"></div>
+    </div>
   </div>
 
   <div id="qa-section" style="display:none;width:100%;">
@@ -1822,6 +1917,7 @@ function applyPriorityBadges(prio) {
 }
 
 async function runDeepAnalysis() {
+  window._niSessId = null; // new analysis = new history entry
   var mainInput = document.getElementById('main-input');
   var contentText = mainInput ? mainInput.value.trim() : '';
   var title = document.getElementById('title-input') ? document.getElementById('title-input').value.trim() : '';
@@ -2313,6 +2409,13 @@ function autoResizeTitle(el) {
 }
 
 function clearAll() {
+  window._niSessId = null; // next analysis becomes a new history entry
+  try { renderHistoryList(); } catch(e) {}
+  window._codeCheckData = null;
+  var ccSec = document.getElementById('codecheck-section');
+  if (ccSec) ccSec.style.display = 'none';
+  var ccBody = document.getElementById('codecheck-body');
+  if (ccBody) ccBody.innerHTML = '';
   // Clear inputs
   var mainInput = document.getElementById('main-input');
   mainInput.value = '';
@@ -2753,6 +2856,7 @@ function renderAttTags() {
 async function runAnalysis() {
   if (window._analysisRunning) return; // prevent double execution
   window._analysisRunning = true;
+  window._niSessId = null; // new analysis = new history entry
   var title = document.getElementById('title-input').value.trim();
   var contentText = document.getElementById('main-input').value.trim();
   // reset title auto-edit flag for new run
@@ -3182,6 +3286,747 @@ function renderQATier(arr, isEdge) {
   // Show download full report button once QA is ready
   var bar = document.getElementById('full-report-bar');
   if (bar) bar.style.display = 'block';
+}
+
+// ── Code Cross-Check — verify ticket intent vs actual code in the repo ──
+function buildCodeCheckInstruction(requirements, repoUrl) {
+  var isRemote = /^(svn(\+\w+)?|https?):\/\//i.test(repoUrl || '');
+  var access, method;
+  if (isRemote) {
+    var m = (repoUrl || '').match(/^(.*?)@(\d+)$/);
+    var baseUrl = m ? m[1] : repoUrl;
+    var rev = m ? m[2] : '';
+    access = 'You do NOT have a local checkout. The code lives in a remote SVN repository:\n' +
+      'BRANCH URL: ' + baseUrl + (rev ? '\nREVISION: ' + rev + ' (use -r ' + rev + ' / peg @' + rev + ' on svn commands, and inspect the change itself with: svn diff -c ' + rev + ' "' + baseUrl + '")' : '') + '\n';
+    method = 'METHOD (remote SVN — minimise round-trips, each command costs seconds):\n' +
+      (rev ? '1. START with the revision diff: svn log -v -c ' + rev + ' "' + baseUrl + '" and svn diff -c ' + rev + ' "' + baseUrl + '" — this tells you exactly which files changed. Focus your review there.\n'
+           : '1. Check recent history first: svn log -v -l 15 "' + baseUrl + '" to see which files changed lately and find the relevant commit(s).\n') +
+      '2. Navigate structure only where needed: svn ls --depth immediates "' + baseUrl + '/<subpath>". Do not blind-crawl the tree.\n' +
+      '3. Read files with: svn cat "' + baseUrl + '/<path/to/file>"' + (rev ? '@' + rev : '') + ' — fetch only files you need (changed files + their direct collaborators: callers, callees, base classes).\n' +
+      '4. For each acceptance criterion: is it implemented? Cite file:line as evidence.\n' +
+      '5. Hunt edge cases: null guards, off-by-one, silent early returns, error handling, undo support, race conditions.\n';
+  } else {
+    access = 'You are inside the game repository (your working directory is the repo root).\n';
+    method = 'METHOD:\n' +
+      '1. Identify which files/modules the requirements touch. Use Glob/Grep to locate them — search for class names, feature keywords, UI strings from the requirements.\n' +
+      '2. Read the relevant source files. Trace the flow end to end.\n' +
+      '3. If svn or git is available, check recent changes (svn diff/log or git diff/log) to focus on what was actually modified.\n' +
+      '4. For each acceptance criterion: is it implemented? Cite file:line as evidence.\n' +
+      '5. Hunt edge cases: null guards, off-by-one, silent early returns, error handling, undo support, race conditions.\n';
+  }
+  return 'You are a senior QA engineer with 10+ years in mobile game testing, doing a static code review before this change reaches QA. ' + access +
+    'Your job has TWO audiences:\n' +
+    '- The DEVELOPER: concrete bugs and gaps with file:line evidence they can act on before handoff.\n' +
+    '- The QA TESTER: a practical test plan and a map of where this change is most likely to break, so they test the right things first.\n\n' +
+    '--- REQUIREMENTS (ticket / spec / notes) ---\n' + requirements + '\n--- END REQUIREMENTS ---\n\n' +
+    method + '\n' +
+    'THINK LIKE A SENIOR QA:\n' +
+    '- Follow the data: what state does this change touch (save data, configs, server flags, cached assets)? State that survives restarts/updates is where the nasty bugs live.\n' +
+    '- Follow the player: interruptions (backgrounding, network loss, force-close), doing things fast, doing things twice, doing things in the wrong order.\n' +
+    '- Follow the change: what EXISTING behaviour shares code with this change? That is your regression surface — name specific adjacent features, not "test everything".\n' +
+    '- Trust nothing implicit: silent early returns, missing null guards, error paths that swallow exceptions — call them out.\n\n' +
+    'RULES:\n' +
+    '- Every finding MUST cite real file paths and line numbers you actually read. Never invent code.\n' +
+    '- If you cannot find the relevant code, say so in gaps — do not guess.\n' +
+    '- Severity: high = crash/data loss/silent failure, med = wrong behaviour with workaround, low = polish.\n' +
+    '- CHECKLIST LANGUAGE — strict: every item is ONE short sentence a tester can act on with only the device in hand: "Do X — expect Y". Max ~15 words.\n' +
+    '  * NEVER mention class names, method names, variables, files, coroutines, dictionaries, findings, or any code internals in checklist items. Use the code knowledge to CHOOSE the checks, not to describe them.\n' +
+    '  * NEVER add parenthetical rationale like "(regression check for...)" or "(checks whether...)". If the reason matters, it belongs in bugSources — not on the checklist.\n' +
+    '  * Use words a new tester knows: open, close, tap, popup, screen, loading, restart. BAD: "expect a clean second camera-stack add with no duplicate-key errors". GOOD: "Close and reopen the same popup — expect it to display normally".\n' +
+    '  * Expected result must be something visible on screen or in the device log — not an internal state.\n' +
+    '- smoke = the critical happy paths that must work or the build is rejected (3-6 items). sanity = quick post-fix/re-test checks around the changed area (2-5 items). adhoc = exploratory attack ideas: interruptions, abuse, timing, unusual states (3-8 items).\n' +
+    '- Prefix EVERY checklist item with its priority: "[P0] " = run first, blocks sign-off; "[P1] " = should run this pass; "[P2] " = time-permitting. Order items within each list by priority.\n' +
+    '- bugSources: rank by likelihood. Each names a specific area of the change, why it is fragile (from the code you read), and what the player would experience if it breaks.\n' +
+    '- discrepancies is the MOST IMPORTANT section: every place the code deviates from what the ticket/AC/spec describes — missing behaviour, different behaviour, or extra behaviour the ticket never mentions. This is what QA flags back to the programmer. The "question" field must be a complete, polite, self-contained sentence citing file:line that QA can paste into a Jira comment verbatim. If code and ticket fully match, return an empty array — never pad.\n' +
+    '- This is static analysis: flag "verify on device" where runtime behaviour matters.\n\n' +
+    'BREVITY — this is a scan-first report, not documentation. Respect every word limit below strictly. One idea per field. No sub-clauses chained with semicolons or em-dashes. Never repeat the same fact in two sections — evidence lives ONCE, in the most specific section. File paths appear ONLY in file/rootCause/note fields, never in verdict, bullets, or checklist.\n\n' +
+    'OUTPUT — return ONLY this JSON object, no markdown fences, no prose:\n' +
+    '{"summary":{"match":"yes|partial|no — does the implementation match the ticket","verdict":"max 15 words in PLAIN QA LANGUAGE — no class names, no code jargon. State whether the build does what the ticket promises and whether testing can proceed. e.g. Partial match — safe to test, but popup closing behaves differently than the ticket describes","subline":"max 12 words — the FIRST thing QA should test and why, in device actions. e.g. Start by reopening popups quickly — most likely place to break","forDev":["max 10 words each, max 3 bullets, no file paths"],"forQA":["max 10 words each, max 3 bullets, no file paths"]},' +
+    '"discrepancies":[{"ticketSays":"max 12 words","codeDoes":"max 12 words","file":"file:line only","question":"one polite self-contained sentence, max 35 words, citing file:line — pasteable to Jira"}],' +
+    '"findings":[{"title":"max 60 chars","severity":"high|med|low","repro":["max 3 steps, max 10 words each"],"observed":"max 20 words","rootCause":"file:line + max 25 words","proposedFix":"max 15 words"}],' +
+    '"acStatus":[{"ac":"max 12 words","status":"implemented|partial|missing","note":"file:line or gap, max 15 words"}],' +
+    '"gaps":["max 15 words each, max 4 items"],' +
+    '"checklist":{"smoke":["Do X — expect Y"],"sanity":["Do X — expect Y"],"adhoc":["attack idea — what to watch for"]},' +
+    '"bugSources":[{"area":"max 8 words, no file paths","why":"max 15 words","playerImpact":"max 12 words"}]}\n' +
+    'CAPS: max 5 findings (merge or drop lows), max 4 discrepancies, max 5 bugSources. Fewer strong items beat many weak ones.\n' +
+    'BALANCE: the limits kill padding, never evidence. If a rootCause or question is not actionable within its limit, exceed it by what the evidence needs — but never restate context, hedge, or explain what a section already implies. A finding the programmer cannot act on is worse than a slightly long one.';
+}
+
+function runCodeCheck() {
+  // Opens the per-run setup panel — branch URL changes per ticket, so ask every time
+  var p = document.getElementById('cc-setup');
+  if (!p) return;
+  if (p.style.display !== 'none' && p.style.display !== '') { p.style.display = 'none'; return; }
+  var u = document.getElementById('cc-svn-url');
+  if (u && !u.value.trim()) u.value = window._niRepoPath || '';
+  p.style.display = 'block';
+  if (u) u.focus();
+}
+
+async function runCodeCheckGo() {
+  if (currentProvider !== 'claude') { showErr('Code Cross-Check requires the Claude provider.'); return; }
+  var urlEl = document.getElementById('cc-svn-url');
+  var revEl = document.getElementById('cc-svn-rev');
+  var linkEl = document.getElementById('cc-review-link');
+  var repoUrl = urlEl ? urlEl.value.trim() : '';
+  var rev = revEl ? revEl.value.trim().replace(/^r/i, '') : '';
+  var reviewLink = linkEl ? linkEl.value.trim() : '';
+  if (!repoUrl) { showErr('Enter the SVN branch URL (or a local checkout folder) for this ticket.'); return; }
+  var repoVal = rev ? repoUrl.replace(/@\d+$/, '') + '@' + rev : repoUrl;
+  window._niRepoPath = repoVal;
+  window._ccReviewLink = reviewLink;
+  var rf0 = document.getElementById('ab-repo');
+  if (rf0) { rf0.value = repoVal; rf0.title = repoVal; }
+  // Persist BEFORE the analysis call — the backend reads repoPath from settings
+  try {
+    await fetch('/api/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ repoPath: repoVal }) });
+  } catch (se) { showErr('Could not save repo setting: ' + (se.message || 'unknown')); return; }
+  var setupPanel = document.getElementById('cc-setup');
+  if (setupPanel) setupPanel.style.display = 'none';
+  var mainInput = document.getElementById('main-input');
+  var contentText = mainInput ? mainInput.value.trim() : '';
+  var gistBody = document.getElementById('gist-body');
+  var gistText = gistBody ? (gistBody.innerText || '').trim() : '';
+  var jiraRefs = attachedLinks.filter(function(l){ return l.jiraTicketKey; }).map(function(l){ return l.jiraTicketKey; });
+  var confluenceRefs = attachedLinks.filter(function(l){ return l.confluenceId; }).map(function(l){ return l.confluenceId; });
+  if (!contentText && !gistText && !jiraRefs.length && !confluenceRefs.length) { showErr('Attach a Jira ticket, paste the ticket/spec content, or run Quick Analysis first — so the code check knows what to verify.'); return; }
+
+  var btn = document.getElementById('code-check-btn');
+  var orig = btn ? btn.innerHTML : '';
+  if (btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner-sm" style="border-top-color:#EF9F27;"></div> checking…'; }
+  setAnalysisStatus('cross-checking code against requirements — this can take several minutes…');
+
+  var sec = document.getElementById('codecheck-section');
+  var body = document.getElementById('codecheck-body');
+  var outSec = document.getElementById('output-section');
+  if (outSec) outSec.style.display = 'block';
+  if (sec) sec.style.display = 'block';
+  if (body) body.innerHTML = '<div class="skeleton" style="height:12px;margin-bottom:14px;width:95%"></div><div class="skeleton" style="height:12px;margin-bottom:14px;width:80%"></div><div class="skeleton" style="height:12px;width:65%"></div>';
+
+  try {
+    var requirements = (buildContextBlock() || '') + '\n' + (contentText ? 'INPUT CONTENT:\n' + contentText + '\n' : '') + (gistText ? '\nANALYSED GIST (structured summary of the ticket):\n' + gistText + '\n' : '');
+    if (window._ccReviewLink) requirements += '\nCODE REVIEW LINK (reference only — mention in your report if relevant): ' + window._ccReviewLink + '\n';
+
+    // Step 1 — pre-fetch ticket/page content via the normal unrestricted call.
+    // The restricted code-check sandbox cannot use MCP connectors, so we fetch first and pass text.
+    if (jiraRefs.length || confluenceRefs.length) {
+      setAnalysisStatus('fetching ' + (jiraRefs.length ? jiraRefs.join(', ') : 'attached sources') + '…');
+      var fetchPrompt = 'Fetch the following sources using the Atlassian tools (tactileentertainment.atlassian.net) and return their FULL content as plain text — title, description, acceptance criteria, and all comments. No commentary, just the content:\n' +
+        (jiraRefs.length ? 'Jira tickets: ' + jiraRefs.join(', ') + '\n' : '') +
+        (confluenceRefs.length ? 'Confluence pages: ' + confluenceRefs.join(', ') + '\n' : '');
+      var rf = await fetch(getApiUrl(), {
+        method: 'POST',
+        headers: getApiHeaders(),
+        body: JSON.stringify(wrapBody({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 6000,
+          temperature: 0,
+          messages: [{ role: 'user', content: fetchPrompt }]
+        }))
+      });
+      if (rf.ok) {
+        var df = await rf.json();
+        var ticketText = extractText(df).trim();
+        if (ticketText) requirements += '\nTICKET CONTENT (fetched from Jira/Confluence — treat as the primary requirements):\n' + ticketText + '\n';
+      }
+      setAnalysisStatus('cross-checking code against requirements — this can take several minutes…');
+    }
+
+    var r = await fetch(getApiUrl(), {
+      method: 'POST',
+      headers: getApiHeaders(),
+      body: JSON.stringify(Object.assign(wrapBody({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 8000,
+        temperature: 0,
+        system: 'You are a meticulous static-analysis QA reviewer. You only report what you verified by reading actual files. Output raw JSON only.',
+        messages: [{ role: 'user', content: buildCodeCheckInstruction(requirements, window._niRepoPath) }]
+      }), { useRepo: true, asyncJob: true }))
+    });
+    if (!r.ok) { var et = await r.text(); throw new Error('API error ' + r.status + ': ' + et.substring(0, 100)); }
+    var jd = await r.json();
+    var d = jd;
+    if (jd.jobId) {
+      // Poll the background job — survives dropped sockets, sleep, and long runs
+      var t0 = Date.now();
+      d = null;
+      while (Date.now() - t0 < 20 * 60 * 1000) {
+        await new Promise(function (rs) { setTimeout(rs, 5000); });
+        var mins = Math.floor((Date.now() - t0) / 60000);
+        setAnalysisStatus('cross-checking code against requirements — this can take several minutes' + (mins ? ' · ' + mins + ' min elapsed' : '') + '…');
+        var pr = null;
+        try { pr = await fetch('/api/job/' + jd.jobId); } catch (pe) { continue; }
+        if (!pr || !pr.ok) continue;
+        var js = await pr.json();
+        if (js.status === 'running') continue;
+        if (js.status === 'error') throw new Error(js.error || 'code check failed');
+        if (js.status === 'done') { d = js.payload; break; }
+        throw new Error('job lost — was the app restarted mid-analysis?');
+      }
+      if (!d) throw new Error('code check exceeded 20 minutes — narrow the input or add a revision number');
+    }
+    var raw = extractText(d);
+    var clean = raw.replace(/```json|```/g, '').trim();
+    var s = clean.indexOf('{'), e = clean.lastIndexOf('}');
+    if (s === -1 || e === -1) throw new Error('No JSON in response: ' + clean.substring(0, 150));
+    var data = JSON.parse(clean.slice(s, e + 1)
+      .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
+      .replace(/[‘’]/g, "'")
+      .replace(/[“”]/g, '"'));
+    window._codeCheckData = data;
+    window._ccUsage = (d && d.usage) ? d.usage : null;
+    renderCodeCheck(data);
+  } catch (err) {
+    if (body) body.innerHTML = '';
+    if (sec) sec.style.display = 'none';
+    showErr('Code check failed: ' + (err && err.message ? err.message.substring(0, 120) : 'unknown'));
+  } finally {
+    setAnalysisStatus('');
+    if (btn) { btn.disabled = false; btn.innerHTML = orig; }
+  }
+}
+
+var CC_TABS = [
+  { k: 'disc', icon: '⚑', lbl: 'Flags', col: '#EF9F27' },
+  { k: 'find', icon: '🛠', lbl: 'Findings', col: '#6090d8' },
+  { k: 'ac', icon: '✅', lbl: 'Criteria', col: '#5DCAA5' },
+  { k: 'checks', icon: '🧪', lbl: 'Checklist', col: '#5DCAA5' },
+  { k: 'bugs', icon: '🎯', lbl: 'Bug sources', col: '#e06060' }
+];
+
+function ccTab(key) {
+  CC_TABS.forEach(function (t) {
+    var p = document.getElementById('cc-pane-' + t.k);
+    var b = document.getElementById('cc-tab-' + t.k);
+    var on = t.k === key;
+    if (p) p.style.display = on ? 'block' : 'none';
+    if (b) {
+      b.style.color = on ? t.col : '#8a97a2';
+      b.style.background = on ? t.col + '1e' : 'transparent';
+      b.style.borderColor = on ? t.col + '70' : '#2a2a34';
+      var badge = b.querySelector('.cc-tab-n');
+      if (badge) { badge.style.background = on ? t.col + '33' : '#1e1e28'; badge.style.color = on ? t.col : '#7a7a86'; }
+    }
+  });
+}
+
+function ccCheckToggle(key) {
+  window._ccChecked = window._ccChecked || {};
+  window._ccChecked[key] = !window._ccChecked[key];
+  var on = window._ccChecked[key];
+  var box = document.getElementById('cc-box-' + key);
+  var txt = document.getElementById('cc-txt-' + key);
+  if (box) { box.style.background = on ? '#5DCAA5' : 'transparent'; box.style.borderColor = on ? '#5DCAA5' : '#3a4a3a'; box.textContent = on ? '✓' : ''; }
+  if (txt) { txt.style.color = on ? '#9FE1CB' : '#b0c0cc'; }
+  ccProgress();
+}
+
+function ccProgress() {
+  // In-app the checkbox means "selected for conversion" — "tested" tracking lives in the HTML export
+  var total = window._ccTotal || 0;
+  var done = 0; var c = window._ccChecked || {};
+  Object.keys(c).forEach(function (k) { if (c[k]) done++; });
+  var bar = document.getElementById('cc-prog-bar'); var lbl = document.getElementById('cc-prog-lbl');
+  if (bar) bar.style.width = total ? Math.round(done / total * 100) + '%' : '0%';
+  if (lbl) lbl.textContent = done + ' / ' + total + ' selected';
+  var cbtn = document.getElementById('cc-convert-btn');
+  if (cbtn) { cbtn.textContent = '⇄ Convert ' + done + ' selected → QA Focus'; cbtn.disabled = !done; cbtn.style.opacity = done ? '1' : '.45'; }
+}
+
+function ccPrio(t) {
+  var m = (t || '').match(/^\[(P[0-2])\]\s*(.*)$/);
+  var colMap = { P0: '#e06060', P1: '#d4a855', P2: '#7F77DD' };
+  return m ? { p: m[1], col: colMap[m[1]], txt: m[2] } : { p: '', col: '', txt: t };
+}
+
+function copyCCQuestion(i, btn) {
+  var d = window._codeCheckData;
+  if (!d || !d.discrepancies || !d.discrepancies[i]) return;
+  navigator.clipboard.writeText(d.discrepancies[i].question || '').then(function () {
+    var o = btn.textContent; btn.textContent = 'copied ✓';
+    setTimeout(function () { btn.textContent = o; }, 1500);
+  });
+}
+
+async function convertChecklistToQA(btn) {
+  var d = window._codeCheckData;
+  var c = window._ccChecked || {};
+  if (!d || !d.checklist) return;
+  var pmap = { P0: 'high', P1: 'med', P2: 'low' };
+  var selected = [];
+  Object.keys(c).forEach(function (k) {
+    if (!c[k]) return;
+    var m = k.match(/^(smoke|sanity|adhoc)-(\d+)$/);
+    if (!m || !d.checklist[m[1]] || d.checklist[m[1]][+m[2]] === undefined) return;
+    var pr = ccPrio(d.checklist[m[1]][+m[2]]);
+    selected.push({ pass: m[1], sev: pmap[pr.p] || 'med', text: pr.txt });
+  });
+  if (!selected.length) return;
+
+  var orig = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<div class="loading-spinner-sm" style="border-top-color:#5DCAA5;"></div> converting…';
+  setAnalysisStatus('converting ' + selected.length + ' checklist items to test cases…');
+
+  try {
+    var ctx = '';
+    if (d.summary && d.summary.verdict) ctx += 'CODE CHECK VERDICT: ' + d.summary.verdict + '\n';
+    if (d.bugSources && d.bugSources.length) ctx += 'LIKELY BUG SOURCES:\n' + d.bugSources.map(function (b) { return '- ' + (b.area || '') + ': ' + (b.why || '') + ' → ' + (b.playerImpact || ''); }).join('\n') + '\n';
+    if (d.discrepancies && d.discrepancies.length) ctx += 'TICKET/CODE DISCREPANCIES:\n' + d.discrepancies.map(function (x) { return '- ticket: ' + (x.ticketSays || '') + ' | code: ' + (x.codeDoes || ''); }).join('\n') + '\n';
+    var gistBody = document.getElementById('gist-body');
+    var gistText = gistBody ? (gistBody.innerText || '').trim() : '';
+    if (gistText) ctx += '\nFEATURE GIST:\n' + gistText.substring(0, 2000) + '\n';
+
+    var prompt = 'A code cross-check produced the QA checklist items below, and the QA engineer selected these to become formal test cases.\n\n' +
+      'CONTEXT FROM THE CODE ANALYSIS:\n' + ctx + '\n' +
+      'SELECTED CHECKLIST ITEMS (severity given per item):\n' +
+      selected.map(function (s, i) { return (i + 1) + '. [' + s.sev + '] (' + s.pass + ') ' + s.text; }).join('\n') + '\n\n' +
+      'Expand EACH item into one test case. Ground steps and expected results in the context above — do not invent behaviour it does not support. Keep the device-action language of the original item.\n' +
+      'Return ONLY a JSON array, one object per item, same order:\n' +
+      '[{"title":"max 70 chars","severity":"high|med|low (use the given severity)","originType":"derived_acceptance_check","confidence":"high","confidenceReason":"from code cross-check","detail":"max 90 chars — what this verifies and why it matters","testcase":{"objective":"max 90 chars","preconditions":"max 90 chars","steps":["3-6 device steps"],"expected":"max 200 chars"}}]';
+
+    var r = await fetch(getApiUrl(), {
+      method: 'POST',
+      headers: getApiHeaders(),
+      body: JSON.stringify(wrapBody({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 4000,
+        temperature: 0,
+        system: 'You output only raw JSON arrays. No markdown, no explanation. Single-line string values, straight quotes only.',
+        messages: [{ role: 'user', content: prompt }]
+      }))
+    });
+    if (!r.ok) { var et = await r.text(); throw new Error('API error ' + r.status + ': ' + et.substring(0, 80)); }
+    var resp = await r.json();
+    var raw = extractText(resp).replace(/```json|```/g, '').trim();
+    var s = raw.indexOf('['), e = raw.lastIndexOf(']');
+    if (s === -1 || e === -1) throw new Error('No JSON array in response');
+    var arr = JSON.parse(raw.slice(s, e + 1)
+      .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
+      .replace(/[‘’]/g, "'").replace(/[“”]/g, '"')
+      .replace(/,\s*([\]}])/g, '$1'));
+    if (!arr.length) throw new Error('Empty result');
+
+    _qaIsDeep = false;
+    renderQATier(arr, !!(qaData && qaData.length));
+    var qaSec = document.getElementById('qa-section');
+    if (qaSec) qaSec.style.display = 'block';
+    var qaToolbar = document.getElementById('qa-toolbar');
+    if (qaToolbar) qaToolbar.style.display = 'flex';
+    var jiraCard = document.getElementById('jira-section');
+    if (jiraCard) jiraCard.style.display = 'block';
+    var riskBtn = document.getElementById('risk-btn-wrap');
+    if (riskBtn) riskBtn.style.display = 'flex';
+    btn.innerHTML = '✓ Added ' + arr.length + ' to QA Focus';
+    setTimeout(function () { btn.innerHTML = orig; btn.disabled = false; ccProgress(); }, 2500);
+    if (qaSec) qaSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (err) {
+    showErr('Convert failed: ' + (err && err.message ? err.message.substring(0, 100) : 'unknown'));
+    btn.innerHTML = orig;
+    btn.disabled = false;
+    ccProgress();
+  } finally {
+    setAnalysisStatus('');
+  }
+}
+
+function renderCodeCheck(d) {
+  var sevCol = { high: '#e06060', med: '#d4a855', low: '#5DCAA5' };
+  var html = '';
+  var disc = d.discrepancies || [];
+  var findings = d.findings || [];
+  var acs = d.acStatus || [];
+  var cl = d.checklist || {};
+  var bugs = d.bugSources || [];
+  var highN = findings.filter(function (f) { return (f.severity || '').toLowerCase() === 'high'; }).length;
+  var medN = findings.filter(function (f) { return (f.severity || '').toLowerCase() === 'med'; }).length;
+  var acDone = acs.filter(function (a) { return (a.status || '').toLowerCase() === 'implemented'; }).length;
+  var checkN = (cl.smoke || []).length + (cl.sanity || []).length + (cl.adhoc || []).length;
+  var panes = {}, tabMetas = {};
+  window._ccChecked = {};
+  window._ccTotal = checkN;
+
+  // ── Verdict banner — match status drives colour and label ──
+  var sum = (d.summary && typeof d.summary === 'object') ? d.summary : { verdict: d.summary || '' };
+  var match = (sum.match || '').toLowerCase();
+  if (match !== 'yes' && match !== 'partial' && match !== 'no') match = (!highN && !disc.length) ? 'yes' : 'partial';
+  var matchCfg = {
+    yes:     { col: '#5DCAA5', bg: '#091812', icon: '✓', chip: 'MATCH',    txt: '#9FE1CB', sub: '#3a7a5a' },
+    partial: { col: '#EF9F27', bg: '#17100a', icon: '⚠', chip: 'PARTIAL',  txt: '#FAC775', sub: '#a8804a' },
+    no:      { col: '#e06060', bg: '#170a0a', icon: '✗', chip: 'MISMATCH', txt: '#F0B5B5', sub: '#a05a5a' }
+  }[match];
+  html += '<div style="display:flex;align-items:flex-start;gap:11px;background:' + matchCfg.bg + ';border:0.5px solid ' + matchCfg.col + '30;border-radius:9px;padding:13px 15px;margin-bottom:12px;">' +
+    '<span style="font-size:18px;color:' + matchCfg.col + ';flex-shrink:0;line-height:1.3;">' + matchCfg.icon + '</span><div style="flex:1;">' +
+    '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+    '<span style="font-size:10px;font-weight:700;font-family:JetBrains Mono,monospace;letter-spacing:.08em;color:' + matchCfg.col + ';border:0.5px solid ' + matchCfg.col + '50;border-radius:4px;padding:2px 8px;flex-shrink:0;">' + matchCfg.chip + '</span>' +
+    (sum.verdict ? '<span style="font-size:14.5px;color:' + matchCfg.txt + ';line-height:1.55;font-family:Sora,sans-serif;">' + esc(sum.verdict) + '</span>' : '') + '</div>' +
+    (sum.subline ? '<div style="font-size:13px;color:' + matchCfg.sub + ';margin-top:5px;line-height:1.55;font-family:Sora,sans-serif;">▸ ' + esc(sum.subline) + '</div>' : '') +
+    '</div></div>';
+
+  // ── Stat strip ──
+  var tile = function (num, unit, lbl, col) {
+    return '<div style="background:#151517;border-radius:8px;padding:10px 11px;text-align:center;">' +
+      '<div style="font-size:20px;color:' + col + ';font-family:JetBrains Mono,monospace;">' + num + (unit ? '<span style="font-size:11.5px;opacity:.6;"> ' + unit + '</span>' : '') + '</div>' +
+      '<div style="font-size:10px;color:#6a6a76;text-transform:uppercase;letter-spacing:.06em;margin-top:3px;font-family:JetBrains Mono,monospace;">' + lbl + '</div></div>';
+  };
+  html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;">' +
+    tile(disc.length, '', 'flags', disc.length ? '#EF9F27' : '#3a4a3a') +
+    tile(highN, 'high', 'findings', highN ? '#e06060' : '#3a4a3a') +
+    tile(acs.length ? acDone + '<span style="font-size:11px;opacity:.6;">/' + acs.length + '</span>' : '—', '', 'AC done', '#5DCAA5') +
+    tile(checkN, '', 'checks', '#7F77DD') +
+    '</div>';
+
+  // ── For dev / For QA quick bullets (always visible, short) ──
+  [{ key: 'forDev', label: '🛠 For the developer', col: '#6090d8' }, { key: 'forQA', label: '🧪 For QA', col: '#5DCAA5' }].forEach(function (g) {
+    var pts = sum[g.key];
+    if (!pts || !pts.length) return;
+    html += '<div style="font-size:11px;font-family:JetBrains Mono,monospace;color:' + g.col + ';letter-spacing:.06em;text-transform:uppercase;margin:10px 0 4px;">' + g.label + '</div>';
+    pts.forEach(function (p) { html += '<div style="display:flex;gap:9px;margin:5px 0;"><span style="color:' + g.col + '80;flex-shrink:0;">–</span><span style="font-size:14px;color:#b0c0cc;line-height:1.65;font-family:Sora,sans-serif;">' + esc(p) + '</span></div>'; });
+  });
+  html += '<div style="height:10px;"></div>';
+
+  // ── Section 1: Flag to programmer (discrepancies) — open by default ──
+  if (disc.length) {
+    var db = '';
+    disc.forEach(function (x, i) {
+      db += '<div style="' + (i ? 'border-top:0.5px solid #1e1e28;' : '') + 'padding:11px 0;">' +
+        '<div style="display:grid;grid-template-columns:82px 1fr;gap:6px 10px;align-items:baseline;">' +
+        '<span style="font-size:11px;font-family:JetBrains Mono,monospace;color:#5DCAA5;text-transform:uppercase;letter-spacing:.05em;">ticket says</span>' +
+        '<span style="font-size:14px;color:#9FE1CB;line-height:1.6;font-family:Sora,sans-serif;">' + esc(x.ticketSays || '') + '</span>' +
+        '<span style="font-size:11px;font-family:JetBrains Mono,monospace;color:#e06060;text-transform:uppercase;letter-spacing:.05em;">code does</span>' +
+        '<span style="font-size:14px;color:#F0B5B5;line-height:1.6;font-family:Sora,sans-serif;">' + esc(x.codeDoes || '') + '</span></div>' +
+        (x.file ? '<div style="font-size:11.5px;font-family:JetBrains Mono,monospace;color:#5a6a7a;margin-top:6px;">' + esc(x.file) + '</div>' : '') +
+        (x.question ? '<div style="display:flex;gap:8px;align-items:flex-start;margin-top:8px;background:#0a0f16;border:0.5px solid #1c2430;border-radius:6px;padding:9px 12px;">' +
+          '<span style="font-size:13px;color:#9aacb8;line-height:1.65;flex:1;font-family:Sora,sans-serif;">' + esc(x.question) + '</span>' +
+          '<button onclick="copyCCQuestion(' + i + ',this)" style="flex-shrink:0;background:transparent;border:0.5px solid #2a3a4a;border-radius:5px;color:#6090d8;font-size:10.5px;font-family:JetBrains Mono,monospace;padding:3px 10px;cursor:pointer;">copy</button></div>' : '') +
+        '</div>';
+    });
+    panes.disc = db; tabMetas.disc = disc.length;
+  }
+
+  // ── Section 2: Code findings ──
+  if (findings.length) {
+    var fb = '';
+    findings.forEach(function (f, i) {
+      var col = sevCol[(f.severity || '').toLowerCase()] || '#607080';
+      fb += '<div style="' + (i ? 'border-top:0.5px solid #1e1e28;' : '') + 'padding:11px 0;">' +
+        '<div style="display:flex;align-items:baseline;gap:9px;margin-bottom:6px;">' +
+        '<span style="font-size:10px;font-weight:700;text-transform:uppercase;font-family:JetBrains Mono,monospace;padding:2px 8px;border-radius:4px;border:0.5px solid ' + col + '40;color:' + col + ';flex-shrink:0;">' + esc(f.severity || '?') + '</span>' +
+        '<span style="font-size:14.5px;font-weight:500;color:#d0dce8;font-family:Sora,sans-serif;">' + esc(f.title || '') + '</span></div>';
+      if (f.repro && f.repro.length) fb += '<div style="font-size:11px;font-family:JetBrains Mono,monospace;color:#5a6a7a;margin:7px 0 3px;letter-spacing:.05em;">REPRO</div>' + f.repro.map(function (st, n) { return '<div style="font-size:13.5px;color:#88b8ac;line-height:1.65;padding-left:8px;font-family:Sora,sans-serif;">' + (n + 1) + '. ' + esc(st) + '</div>'; }).join('');
+      if (f.observed) fb += '<div style="font-size:11px;font-family:JetBrains Mono,monospace;color:#5a6a7a;margin:8px 0 3px;letter-spacing:.05em;">OBSERVED</div><div style="font-size:13.5px;color:#c0a0a0;line-height:1.65;padding-left:8px;font-family:Sora,sans-serif;">' + esc(f.observed) + '</div>';
+      if (f.rootCause) fb += '<div style="font-size:11px;font-family:JetBrains Mono,monospace;color:#5a6a7a;margin:8px 0 3px;letter-spacing:.05em;">ROOT CAUSE</div><div style="font-size:13px;font-family:JetBrains Mono,monospace;color:#9aacb8;line-height:1.7;background:#0a0f16;border:0.5px solid #1c2430;border-radius:6px;padding:9px 12px;">' + esc(f.rootCause) + '</div>';
+      if (f.proposedFix) fb += '<div style="font-size:11px;font-family:JetBrains Mono,monospace;color:#5a6a7a;margin:8px 0 3px;letter-spacing:.05em;">PROPOSED FIX</div><div style="font-size:13.5px;color:#88b8ac;line-height:1.65;padding-left:8px;font-family:Sora,sans-serif;">' + esc(f.proposedFix) + '</div>';
+      fb += '</div>';
+    });
+    panes.find = fb; tabMetas.find = findings.length;
+  }
+
+  // ── Section 3: Acceptance criteria ──
+  if (acs.length) {
+    var stIcon = { implemented: '✅', partial: '⚠️', missing: '❌' };
+    var ab = '';
+    acs.forEach(function (a) {
+      ab += '<div style="display:flex;gap:9px;margin:9px 0;align-items:baseline;"><span style="flex-shrink:0;">' + (stIcon[(a.status || '').toLowerCase()] || '·') + '</span>' +
+        '<div><div style="font-size:14px;color:#b0c0cc;line-height:1.6;font-family:Sora,sans-serif;">' + esc(a.ac || '') + '</div>' +
+        (a.note ? '<div style="font-size:12px;font-family:JetBrains Mono,monospace;color:#5a6a7a;margin-top:3px;">' + esc(a.note) + '</div>' : '') + '</div></div>';
+    });
+    panes.ac = ab; tabMetas.ac = acDone + '/' + acs.length;
+  }
+
+  // ── Section 4: Gap analysis ──
+  if (d.gaps && d.gaps.length) {
+    var gb = '';
+    d.gaps.forEach(function (g) { gb += '<div style="display:flex;gap:9px;margin:6px 0;"><span style="color:#7F77DD;flex-shrink:0;">–</span><span style="font-size:14px;color:#a8a0cc;line-height:1.65;font-family:Sora,sans-serif;">' + esc(g) + '</span></div>'; });
+    panes.ac = (panes.ac || '') + '<div style="font-size:11px;font-family:JetBrains Mono,monospace;color:#7F77DD;letter-spacing:.06em;text-transform:uppercase;margin:14px 0 5px;">◈ Gap analysis</div>' + gb;
+    if (!tabMetas.ac) tabMetas.ac = d.gaps.length + ' gaps';
+  }
+
+  // ── Section 5: QA checklist ──
+  var passes = [
+    { key: 'smoke', label: 'Smoke — must pass or reject build', col: '#e06060' },
+    { key: 'sanity', label: 'Sanity — quick checks around the change', col: '#d4a855' },
+    { key: 'adhoc', label: 'Adhoc — exploratory attack ideas', col: '#7F77DD' }
+  ];
+  if (checkN) {
+    var cb = '<div style="display:flex;align-items:center;gap:10px;margin:8px 0 12px;">' +
+      '<div style="flex:1;height:5px;background:#151517;border-radius:3px;overflow:hidden;"><div id="cc-prog-bar" style="width:0%;height:100%;background:#5DCAA5;transition:width .2s;"></div></div>' +
+      '<span id="cc-prog-lbl" style="font-size:11.5px;color:#5DCAA5;font-family:JetBrains Mono,monospace;">0 / ' + checkN + ' tested</span></div>';
+    passes.forEach(function (p) {
+      var items = cl[p.key];
+      if (!items || !items.length) return;
+      cb += '<div style="font-size:11px;font-family:JetBrains Mono,monospace;color:' + p.col + ';letter-spacing:.06em;text-transform:uppercase;margin:12px 0 4px;">' + esc(p.label) + ' · ' + items.length + '</div>';
+      items.forEach(function (t, i) {
+        var key = p.key + '-' + i;
+        var pr = ccPrio(t);
+        cb += '<div style="display:flex;align-items:center;gap:9px;padding:6px 2px;">' +
+          '<span id="cc-box-' + key + '" onclick="ccCheckToggle(\'' + key + '\')" style="width:15px;height:15px;border-radius:4px;border:0.5px solid #3a4a3a;color:#04342C;font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-family:JetBrains Mono,monospace;"></span>' +
+          (pr.p ? '<span style="font-size:10px;color:' + pr.col + ';border:0.5px solid ' + pr.col + '40;border-radius:3px;padding:1px 6px;font-family:JetBrains Mono,monospace;flex-shrink:0;">' + pr.p + '</span>' : '') +
+          '<span id="cc-txt-' + key + '" style="font-size:14px;color:#b0c0cc;font-family:Sora,sans-serif;line-height:1.55;">' + esc(pr.txt) + '</span></div>';
+      });
+    });
+    cb += '<div style="margin-top:14px;padding-top:12px;border-top:0.5px solid #1e1e28;">' +
+      '<button id="cc-convert-btn" onclick="convertChecklistToQA(this)" disabled style="opacity:.45;display:flex;align-items:center;gap:7px;padding:8px 16px;background:#091812;border:0.5px solid #1a4a3a;border-radius:8px;font-size:12px;color:#5DCAA5;cursor:pointer;font-family:JetBrains Mono,monospace;">⇄ Convert 0 selected → QA Focus</button>' +
+      '<div style="font-size:11px;color:#4a5a56;margin-top:6px;font-family:Sora,sans-serif;">Tick items above, convert them to full test cases, then push to Jira from the QA Focus section.</div></div>';
+    panes.checks = cb; tabMetas.checks = checkN;
+  }
+
+  // ── Section 6: Likely bug sources ──
+  if (bugs.length) {
+    var bb = '';
+    bugs.forEach(function (b, i) {
+      bb += '<div style="' + (i ? 'border-top:0.5px solid #1e1e28;' : '') + 'padding:10px 0;">' +
+        '<div style="font-size:14.5px;font-weight:500;color:#d0dce8;margin-bottom:4px;font-family:Sora,sans-serif;">' + (i + 1) + '. ' + esc(b.area || '') + '</div>' +
+        (b.why ? '<div style="font-size:13.5px;color:#8898a8;line-height:1.65;padding-left:16px;font-family:Sora,sans-serif;">Why: ' + esc(b.why) + '</div>' : '') +
+        (b.playerImpact ? '<div style="font-size:13.5px;color:#c0a0a0;line-height:1.65;padding-left:16px;font-family:Sora,sans-serif;">Player sees: ' + esc(b.playerImpact) + '</div>' : '') +
+        '</div>';
+    });
+    panes.bugs = bb; tabMetas.bugs = bugs.length;
+  }
+
+  // ── Tab bar + panes ──
+  var avail = CC_TABS.filter(function (t) { return panes[t.k]; });
+  if (avail.length) {
+    var active = avail[0].k;
+    html += '<div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;">';
+    avail.forEach(function (t) {
+      var on = t.k === active;
+      html += '<button id="cc-tab-' + t.k + '" onclick="ccTab(\'' + t.k + '\')" style="display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-family:Sora,sans-serif;color:' + (on ? t.col : '#8a97a2') + ';background:' + (on ? t.col + '1e' : 'transparent') + ';border:0.5px solid ' + (on ? t.col + '70' : '#2a2a34') + ';border-radius:8px;padding:8px 14px;cursor:pointer;white-space:nowrap;transition:all .12s;">' +
+        '<span style="font-size:13px;">' + t.icon + '</span>' + t.lbl +
+        '<span class="cc-tab-n" style="font-size:11px;font-family:JetBrains Mono,monospace;background:' + (on ? t.col + '33' : '#1e1e28') + ';color:' + (on ? t.col : '#7a7a86') + ';border-radius:10px;padding:1px 8px;">' + tabMetas[t.k] + '</span></button>';
+    });
+    html += '</div>';
+    avail.forEach(function (t) {
+      html += '<div id="cc-pane-' + t.k + '" style="' + (t.k === active ? '' : 'display:none;') + '">' + panes[t.k] + '</div>';
+    });
+  }
+
+  var u = window._ccUsage;
+  if (u) {
+    var fmtK = function (n) { return n >= 1000 ? Math.round(n / 1000) + 'k' : '' + n; };
+    html += '<div style="margin-top:16px;padding-top:10px;border-top:0.5px solid #1e1e28;font-size:10.5px;color:#4a5a56;font-family:JetBrains Mono,monospace;">' +
+      'this run: ' + fmtK(u.input || 0) + ' in · ' + fmtK(u.output || 0) + ' out' +
+      (u.turns ? ' · ' + u.turns + ' turns' : '') +
+      (u.cost != null ? ' · $' + Number(u.cost).toFixed(3) : '') + '</div>';
+  }
+
+  document.getElementById('codecheck-body').innerHTML = html || '<div style="font-size:13px;color:#607070;">No findings returned.</div>';
+  ccProgress();
+}
+
+function downloadCodeCheckMD(btn) {
+  var d = window._codeCheckData;
+  if (!d) return;
+  var title = (document.getElementById('title-input') ? document.getElementById('title-input').value.trim() : '') || 'Code Cross-Check';
+  var md = '# Code Cross-Check — ' + title + '\n\n**Method**: Static analysis (no runtime) — verify on device\n\n## Summary\n\n';
+  if (d.summary && typeof d.summary === 'object') {
+    if (d.summary.verdict) md += '**Verdict**: ' + d.summary.verdict + '\n';
+    if (d.summary.subline) md += '\n' + d.summary.subline + '\n';
+    if (d.summary.forDev && d.summary.forDev.length) md += '\n**For the developer:**\n\n' + d.summary.forDev.map(function (p) { return '- ' + p; }).join('\n') + '\n';
+    if (d.summary.forQA && d.summary.forQA.length) md += '\n**For QA:**\n\n' + d.summary.forQA.map(function (p) { return '- ' + p; }).join('\n') + '\n';
+  } else {
+    md += (d.summary || '') + '\n';
+  }
+  if (d.discrepancies && d.discrepancies.length) {
+    md += '\n---\n\n## Flag to Programmer — Ticket vs Code\n\n';
+    d.discrepancies.forEach(function (x, i) {
+      md += (i + 1) + '. **Ticket says**: ' + (x.ticketSays || '') + '\n   **Code does**: ' + (x.codeDoes || '') + '\n' +
+        (x.file ? '   **Evidence**: `' + x.file + '`\n' : '') +
+        (x.question ? '   **Question for programmer**: ' + x.question + '\n' : '') + '\n';
+    });
+  }
+  if (d.findings && d.findings.length) {
+    d.findings.forEach(function (f, i) {
+      md += '\n---\n\n## Finding ' + (i + 1) + ' — ' + (f.title || '') + '\n\n**Severity**: ' + (f.severity || '?') + '\n';
+      if (f.repro && f.repro.length) md += '\n### Repro\n\n' + f.repro.map(function (s, n) { return (n + 1) + '. ' + s; }).join('\n') + '\n';
+      if (f.observed) md += '\n### Observed\n\n' + f.observed + '\n';
+      if (f.rootCause) md += '\n### Root cause\n\n' + f.rootCause + '\n';
+      if (f.proposedFix) md += '\n### Proposed fix\n\n' + f.proposedFix + '\n';
+    });
+  }
+  if (d.acStatus && d.acStatus.length) {
+    md += '\n---\n\n## Acceptance Criteria Status\n\n| AC | Status | Note |\n|----|--------|------|\n';
+    d.acStatus.forEach(function (a) { md += '| ' + (a.ac || '') + ' | ' + (a.status || '') + ' | ' + (a.note || '') + ' |\n'; });
+  }
+  if (d.gaps && d.gaps.length) md += '\n## Gap Analysis\n\n' + d.gaps.map(function (g) { return '- ' + g; }).join('\n') + '\n';
+  var cl = d.checklist || {};
+  if ((cl.smoke && cl.smoke.length) || (cl.sanity && cl.sanity.length) || (cl.adhoc && cl.adhoc.length)) {
+    md += '\n---\n\n## Test Checklist\n';
+    if (cl.smoke && cl.smoke.length) md += '\n### Smoke — must pass or reject build\n\n' + cl.smoke.map(function (t) { return '- [ ] ' + t; }).join('\n') + '\n';
+    if (cl.sanity && cl.sanity.length) md += '\n### Sanity — quick checks around the change\n\n' + cl.sanity.map(function (t) { return '- [ ] ' + t; }).join('\n') + '\n';
+    if (cl.adhoc && cl.adhoc.length) md += '\n### Adhoc — exploratory attack ideas\n\n' + cl.adhoc.map(function (t) { return '- [ ] ' + t; }).join('\n') + '\n';
+  }
+  if (d.bugSources && d.bugSources.length) {
+    md += '\n## Likely Bug Sources\n\n';
+    d.bugSources.forEach(function (b, i) {
+      md += (i + 1) + '. **' + (b.area || '') + '**\n   - Why: ' + (b.why || '') + '\n   - Player sees: ' + (b.playerImpact || '') + '\n';
+    });
+  }
+  if (d.testFocus && d.testFocus.length) md += '\n## Verify on Device\n\n' + d.testFocus.map(function (t, i) { return (i + 1) + '. ' + t; }).join('\n') + '\n';
+  var blob = new Blob([md], { type: 'text/markdown' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = title.replace(/[^a-z0-9\s-]/gi, '').replace(/\s+/g, '-').toLowerCase() + '-code-check.md';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+function downloadCodeCheckHTML(btn) {
+  var d = window._codeCheckData;
+  if (!d) return;
+  var title = (document.getElementById('title-input') ? document.getElementById('title-input').value.trim() : '') || 'Code Cross-Check';
+  var sum = (d.summary && typeof d.summary === 'object') ? d.summary : { verdict: d.summary || '' };
+  var sevCol = { high: '#e06060', med: '#d4a855', low: '#5DCAA5' };
+  var h = '';
+  var secHd = function (label, col) { return '<div style="border-left:3px solid ' + col + ';padding:4px 10px;margin:22px 0 9px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:' + col + ';font-family:monospace;">' + esc(label) + '</div>'; };
+
+  var xDisc = d.discrepancies || [], xFind = d.findings || [], xAcs = d.acStatus || [], xCl = d.checklist || {};
+  var xHighN = xFind.filter(function (f) { return (f.severity || '').toLowerCase() === 'high'; }).length;
+  var xAcDone = xAcs.filter(function (a) { return (a.status || '').toLowerCase() === 'implemented'; }).length;
+  var xCheckN = (xCl.smoke || []).length + (xCl.sanity || []).length + (xCl.adhoc || []).length;
+  var xm = (sum.match || '').toLowerCase();
+  if (xm !== 'yes' && xm !== 'partial' && xm !== 'no') xm = (!xHighN && !xDisc.length) ? 'yes' : 'partial';
+  var xCfg = { yes: { col: '#5DCAA5', bg: '#091812', icon: '✓', chip: 'MATCH', txt: '#9FE1CB', sub: '#3a7a5a' },
+    partial: { col: '#EF9F27', bg: '#17100a', icon: '⚠', chip: 'PARTIAL', txt: '#FAC775', sub: '#a8804a' },
+    no: { col: '#e06060', bg: '#170a0a', icon: '✗', chip: 'MISMATCH', txt: '#F0B5B5', sub: '#a05a5a' } }[xm];
+  if (sum.verdict) h += '<div style="display:flex;align-items:flex-start;gap:11px;background:' + xCfg.bg + ';border:0.5px solid ' + xCfg.col + '30;border-radius:9px;padding:13px 15px;margin-bottom:12px;">' +
+    '<span style="font-size:18px;color:' + xCfg.col + ';">' + xCfg.icon + '</span><div>' +
+    '<div><span style="font-size:10px;font-family:monospace;letter-spacing:.08em;color:' + xCfg.col + ';border:0.5px solid ' + xCfg.col + '50;border-radius:4px;padding:2px 8px;margin-right:8px;">' + xCfg.chip + '</span>' +
+    '<span style="font-size:14.5px;color:' + xCfg.txt + ';line-height:1.55;">' + esc(sum.verdict) + '</span></div>' +
+    (sum.subline ? '<div style="font-size:13px;color:' + xCfg.sub + ';margin-top:5px;">▸ ' + esc(sum.subline) + '</div>' : '') + '</div></div>';
+  var xTile = function (num, lbl, col) { return '<div style="background:#151517;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:20px;color:' + col + ';font-family:monospace;">' + num + '</div><div style="font-size:10px;color:#6a6a76;text-transform:uppercase;letter-spacing:.06em;margin-top:3px;font-family:monospace;">' + lbl + '</div></div>'; };
+  h += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;">' +
+    xTile(xDisc.length, 'flags', xDisc.length ? '#EF9F27' : '#3a4a3a') +
+    xTile(xHighN, 'high findings', xHighN ? '#e06060' : '#3a4a3a') +
+    xTile(xAcs.length ? xAcDone + '/' + xAcs.length : '—', 'AC done', '#5DCAA5') +
+    xTile(xCheckN, 'checks', '#7F77DD') + '</div>';
+
+  [{ key: 'forDev', label: '🛠 For the developer' }, { key: 'forQA', label: '🧪 For QA' }].forEach(function (g) {
+    var pts = sum[g.key];
+    if (!pts || !pts.length) return;
+    h += '<div style="font-size:11px;font-family:monospace;color:#5DCAA5;letter-spacing:.08em;text-transform:uppercase;margin:12px 0 5px;">' + g.label + '</div>';
+    pts.forEach(function (p) { h += '<div style="display:flex;gap:9px;margin:5px 0;"><span style="color:#3d8060;">–</span><span style="font-size:14px;color:#88b8ac;line-height:1.7;">' + esc(p) + '</span></div>'; });
+  });
+
+  if (d.discrepancies && d.discrepancies.length) {
+    h += '<!--SPLIT:disc-->';
+    d.discrepancies.forEach(function (x) {
+      h += '<div style="border:0.5px solid #252530;border-radius:8px;padding:12px 14px;margin-bottom:9px;">' +
+        '<div style="font-size:13.5px;line-height:1.7;"><span style="color:#5DCAA5;font-family:monospace;font-size:10.5px;text-transform:uppercase;">ticket says </span><span style="color:#9FE1CB;">' + esc(x.ticketSays || '') + '</span></div>' +
+        '<div style="font-size:13.5px;line-height:1.7;"><span style="color:#e06060;font-family:monospace;font-size:10.5px;text-transform:uppercase;">code does </span><span style="color:#F0B5B5;">' + esc(x.codeDoes || '') + '</span></div>' +
+        (x.file ? '<div style="font-size:11.5px;font-family:monospace;color:#5a6a7a;margin-top:5px;">' + esc(x.file) + '</div>' : '') +
+        (x.question ? '<div style="font-size:13px;color:#9aacb8;line-height:1.7;margin-top:8px;background:#0a0f16;border:0.5px solid #1c2430;border-radius:6px;padding:9px 12px;">' + esc(x.question) + '</div>' : '') + '</div>';
+    });
+  }
+
+  if (d.findings && d.findings.length) {
+    h += '<!--SPLIT:find-->';
+    d.findings.forEach(function (f) {
+      var col = sevCol[(f.severity || '').toLowerCase()] || '#607080';
+      h += '<div style="border-top:0.5px solid #1e1e28;padding:13px 0;">' +
+        '<div style="margin-bottom:6px;"><span style="font-size:10px;text-transform:uppercase;font-family:monospace;padding:2px 8px;border-radius:4px;border:0.5px solid ' + col + '40;color:' + col + ';margin-right:9px;">' + esc(f.severity || '?') + '</span><span style="font-size:15px;color:#d0dce8;">' + esc(f.title || '') + '</span></div>' +
+        (f.repro && f.repro.length ? '<div style="font-size:10.5px;font-family:monospace;color:#5a6a7a;margin:7px 0 3px;">REPRO</div>' + f.repro.map(function (st, n) { return '<div style="font-size:13.5px;color:#88b8ac;line-height:1.7;padding-left:8px;">' + (n + 1) + '. ' + esc(st) + '</div>'; }).join('') : '') +
+        (f.observed ? '<div style="font-size:10.5px;font-family:monospace;color:#5a6a7a;margin:7px 0 3px;">OBSERVED</div><div style="font-size:13.5px;color:#c0a0a0;line-height:1.7;padding-left:8px;">' + esc(f.observed) + '</div>' : '') +
+        (f.rootCause ? '<div style="font-size:10.5px;font-family:monospace;color:#5a6a7a;margin:7px 0 3px;">ROOT CAUSE</div><div style="font-size:13px;font-family:monospace;color:#9aacb8;line-height:1.7;background:#0a0f16;border:0.5px solid #1c2430;border-radius:6px;padding:9px 12px;">' + esc(f.rootCause) + '</div>' : '') +
+        (f.proposedFix ? '<div style="font-size:10.5px;font-family:monospace;color:#5a6a7a;margin:7px 0 3px;">PROPOSED FIX</div><div style="font-size:13.5px;color:#88b8ac;line-height:1.7;padding-left:8px;">' + esc(f.proposedFix) + '</div>' : '') + '</div>';
+    });
+  }
+
+  if (d.acStatus && d.acStatus.length) {
+    var stIcon = { implemented: '✅', partial: '⚠️', missing: '❌' };
+    h += '<!--SPLIT:ac-->';
+    d.acStatus.forEach(function (a) {
+      h += '<div style="display:flex;gap:10px;margin:8px 0;align-items:baseline;"><span>' + (stIcon[(a.status || '').toLowerCase()] || '·') + '</span><div>' +
+        '<div style="font-size:14px;color:#b0c0cc;line-height:1.6;">' + esc(a.ac || '') + '</div>' +
+        (a.note ? '<div style="font-size:12px;font-family:monospace;color:#5a6a7a;margin-top:2px;">' + esc(a.note) + '</div>' : '') + '</div></div>';
+    });
+  }
+
+  if (d.gaps && d.gaps.length) {
+    if (!(d.acStatus && d.acStatus.length)) h += '<!--SPLIT:ac-->';
+    h += '<div style="font-size:11px;font-family:monospace;color:#7F77DD;letter-spacing:.08em;text-transform:uppercase;margin:16px 0 5px;">◈ Gap analysis</div>';
+    d.gaps.forEach(function (g) { h += '<div style="display:flex;gap:9px;margin:6px 0;"><span style="color:#7F77DD;">–</span><span style="font-size:14px;color:#a8a0cc;line-height:1.7;">' + esc(g) + '</span></div>'; });
+  }
+
+  var cl2 = d.checklist || {};
+  var passDefs = [['smoke', 'Smoke — must pass or reject build', '#e06060'], ['sanity', 'Sanity — quick checks around the change', '#d4a855'], ['adhoc', 'Adhoc — exploratory attack ideas', '#7F77DD']];
+  if (passDefs.some(function (p) { return (cl2[p[0]] || []).length; })) {
+    h += '<!--SPLIT:checks-->';
+    h += '<div style="display:flex;align-items:center;gap:10px;margin:8px 0 12px;"><div style="flex:1;height:5px;background:#151517;border-radius:3px;overflow:hidden;"><div id="xprog" style="width:0%;height:100%;background:#5DCAA5;transition:width .2s;"></div></div><span id="xprogl" style="font-size:11.5px;color:#5DCAA5;font-family:monospace;">0 / ' + xCheckN + ' tested</span></div>';
+    passDefs.forEach(function (p) {
+      var items = cl2[p[0]];
+      if (!items || !items.length) return;
+      h += '<div style="font-size:11px;font-family:monospace;color:' + p[2] + ';letter-spacing:.08em;text-transform:uppercase;margin:12px 0 5px;">' + p[1] + '</div>';
+      items.forEach(function (t) {
+        var pr = ccPrio(t);
+        h += '<label style="display:flex;align-items:baseline;gap:9px;margin:7px 0;cursor:pointer;">' +
+          '<input type="checkbox" class="xck" onchange="xprog(this)" style="accent-color:#5DCAA5;margin-top:2px;"/>' +
+          (pr.p ? '<span style="font-size:10px;color:' + pr.col + ';border:0.5px solid ' + pr.col + '40;border-radius:3px;padding:1px 6px;font-family:monospace;flex-shrink:0;">' + pr.p + '</span>' : '') +
+          '<span class="xtxt" style="font-size:14px;color:#b0c0cc;line-height:1.7;">' + esc(pr.txt) + '</span></label>';
+      });
+    });
+  }
+
+  if (d.bugSources && d.bugSources.length) {
+    h += '<!--SPLIT:bugs-->';
+    d.bugSources.forEach(function (b, i) {
+      h += '<div style="border-top:0.5px solid #1e1e28;padding:10px 0;">' +
+        '<div style="font-size:14.5px;color:#d0dce8;margin-bottom:3px;">' + (i + 1) + '. ' + esc(b.area || '') + '</div>' +
+        (b.why ? '<div style="font-size:13px;color:#8898a8;line-height:1.7;padding-left:16px;">Why: ' + esc(b.why) + '</div>' : '') +
+        (b.playerImpact ? '<div style="font-size:13px;color:#c0a0a0;line-height:1.7;padding-left:16px;">Player sees: ' + esc(b.playerImpact) + '</div>' : '') + '</div>';
+    });
+  }
+
+  // Split accumulated sections into tab panes on the SPLIT markers
+  var xparts = h.split(/<!--SPLIT:(\w+)-->/);
+  var xhead = xparts[0];
+  var xpanes = {};
+  for (var xi = 1; xi < xparts.length; xi += 2) { xpanes[xparts[xi]] = (xpanes[xparts[xi]] || '') + xparts[xi + 1]; }
+  var xtabs = [
+    ['disc', '⚑ Flags', '#EF9F27', xDisc.length],
+    ['find', '🛠 Findings', '#6090d8', xFind.length],
+    ['ac', '✅ Criteria', '#5DCAA5', xAcs.length ? xAcDone + '/' + xAcs.length : (d.gaps || []).length],
+    ['checks', '🧪 Checklist', '#5DCAA5', xCheckN],
+    ['bugs', '🎯 Bug sources', '#e06060', (d.bugSources || []).length]
+  ].filter(function (t) { return xpanes[t[0]]; });
+  var xbody = xhead;
+  if (xtabs.length) {
+    xbody += '<div style="display:flex;gap:7px;flex-wrap:wrap;margin:6px 0 14px;">';
+    xtabs.forEach(function (t, i) {
+      var on = i === 0;
+      xbody += '<button class="xtab" data-k="' + t[0] + '" data-c="' + t[2] + '" data-n="' + t[3] + '" style="display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-family:\'Sora\',sans-serif;color:' + (on ? t[2] : '#8a97a2') + ';background:' + (on ? t[2] + '1e' : 'transparent') + ';border:0.5px solid ' + (on ? t[2] + '70' : '#2a2a34') + ';border-radius:8px;padding:8px 14px;cursor:pointer;white-space:nowrap;">' + t[1] +
+        '<span class="xtab-n" style="font-size:11px;font-family:monospace;background:' + (on ? t[2] + '33' : '#1e1e28') + ';color:' + (on ? t[2] : '#7a7a86') + ';border-radius:10px;padding:1px 8px;">' + t[3] + '</span></button>';
+    });
+    xbody += '</div>';
+    xtabs.forEach(function (t, i) { xbody += '<div class="xpane" id="xp-' + t[0] + '" style="' + (i ? 'display:none;' : '') + '">' + xpanes[t[0]] + '</div>'; });
+  }
+  var xscript = '<script>' +
+    'document.querySelectorAll(".xtab").forEach(function(tb){tb.addEventListener("click",function(){' +
+    'document.querySelectorAll(".xtab").forEach(function(o){o.style.color="#8a97a2";o.style.background="transparent";o.style.borderColor="#2a2a34";var n=o.querySelector(".xtab-n");if(n){n.style.background="#1e1e28";n.style.color="#7a7a86";}});' +
+    'var c=tb.dataset.c;tb.style.color=c;tb.style.background=c+"1e";tb.style.borderColor=c+"70";var bn=tb.querySelector(".xtab-n");if(bn){bn.style.background=c+"33";bn.style.color=c;}' +
+    'document.querySelectorAll(".xpane").forEach(function(p){p.style.display="none";});' +
+    'var p=document.getElementById("xp-"+tb.dataset.k);if(p)p.style.display="block";});});' +
+    'function xprog(cb){var l=cb.parentNode.querySelector(".xtxt");if(l){l.style.textDecoration=cb.checked?"line-through":"none";l.style.color=cb.checked?"#5a6a5a":"#b0c0cc";}' +
+    'var all=document.querySelectorAll(".xck"),dn=0;all.forEach(function(c){if(c.checked)dn++;});' +
+    'var b=document.getElementById("xprog"),lb=document.getElementById("xprogl");' +
+    'if(b)b.style.width=all.length?Math.round(dn/all.length*100)+"%":"0%";if(lb)lb.textContent=dn+" / "+all.length+" tested";}' +
+    '<\/script>';
+
+  var doc = '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8"/>\n<title>' + esc(title) + ' — Code Cross-Check</title>\n' +
+    '<style>*{box-sizing:border-box;margin:0;padding:0;}body{background:#080f0d;font-family:\'Sora\',sans-serif;padding:36px;max-width:720px;margin:0 auto;}</style>\n' +
+    '<link rel="preconnect" href="https://fonts.googleapis.com"/><link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600&display=swap" rel="stylesheet"/>\n</head>\n<body>\n' +
+    '<div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#EF9F27;font-family:monospace;margin-bottom:8px;">● code cross-check · notes intel</div>' +
+    '<div style="font-size:19px;color:#e8eef4;margin-bottom:6px;">' + esc(title) + '</div>' +
+    '<div style="font-size:10.5px;color:#5a6a7a;font-family:monospace;margin-bottom:20px;">static analysis — verify on device · ' + new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + '</div>' +
+    xbody + '<div style="margin-top:32px;font-size:10px;color:#2a4a38;font-family:monospace;">generated by notes intel</div>\n' + xscript + '</body>\n</html>';
+
+  var blob2 = new Blob([doc], { type: 'text/html' });
+  var url2 = URL.createObjectURL(blob2);
+  var a2 = document.createElement('a');
+  a2.href = url2; a2.download = title.replace(/[^a-z0-9\s-]/gi, '').replace(/\s+/g, '-').toLowerCase() + '-code-check.html';
+  document.body.appendChild(a2); a2.click();
+  document.body.removeChild(a2); URL.revokeObjectURL(url2);
 }
 
 function showQAButton() {
@@ -4950,6 +5795,7 @@ function renderGist(text) {
     var autoTitle = (parsed && parsed.title) ? parsed.title : (summary ? summary.split('.')[0].substring(0, 80) : '');
     if (autoTitle) { titleEl.value = autoTitle; autoResizeTitle(titleEl); }
   }
+  try { historySnapshot(); } catch(e) {}
 }
 
 function renderQA(items) {
@@ -4993,6 +5839,7 @@ function renderQA(items) {
     '</div>';
   }).join('');
   document.getElementById('qa-body').innerHTML = html;
+  try { historySnapshot(); } catch(e) {}
 }
 
 function rowToggle(event, i) {
@@ -5373,6 +6220,7 @@ function renderRisk(items) {
     '</div>';
   }).join('');
   document.getElementById('risk-body').innerHTML = html;
+  try { historySnapshot(); } catch(e) {}
 }
 
 function riskRowToggle(event, i) {
@@ -5847,12 +6695,141 @@ document.addEventListener('keydown', function(e) {
 
 window.addEventListener('load', loadApiKey);
 
+// ── Analysis history sidebar ──
+var NI_HIST_KEY = 'ni_history';
+
+function histAll() {
+  try { return JSON.parse(localStorage.getItem(NI_HIST_KEY) || '[]'); } catch(e) { return []; }
+}
+function histStore(list) {
+  // cap at 40 — drop oldest unpinned first
+  while (list.length > 40) {
+    var idx = -1;
+    for (var i = list.length - 1; i >= 0; i--) { if (!list[i].pinned) { idx = i; break; } }
+    if (idx === -1) break;
+    list.splice(idx, 1);
+  }
+  try { localStorage.setItem(NI_HIST_KEY, JSON.stringify(list)); } catch(e) {
+    // quota — drop oldest unpinned and retry once
+    if (list.length > 1) { list.pop(); try { localStorage.setItem(NI_HIST_KEY, JSON.stringify(list)); } catch(e2) {} }
+  }
+}
+
+function historyToggle() {
+  var sb = document.getElementById('hist-sidebar');
+  if (!sb) return;
+  sb.classList.toggle('open');
+  if (sb.classList.contains('open')) renderHistoryList();
+}
+
+function historySnapshot() {
+  var gistBody = document.getElementById('gist-body');
+  var gistHTML = gistBody ? gistBody.innerHTML : '';
+  if (!gistHTML.trim() && !(qaData && qaData.length)) return;
+  if (!window._niSessId) window._niSessId = 's' + Date.now();
+  var ti = document.getElementById('title-input');
+  var title = (ti && ti.value.trim()) || (window._gistParsed && window._gistParsed.title) || 'Untitled analysis';
+  var list = histAll();
+  var entry = null;
+  for (var i = 0; i < list.length; i++) { if (list[i].id === window._niSessId) { entry = list[i]; break; } }
+  if (!entry) { entry = { id: window._niSessId, pinned: false }; list.unshift(entry); }
+  entry.ts = Date.now();
+  entry.title = title;
+  entry.gistHTML = gistHTML;
+  entry.parsed = window._gistParsed || null;
+  entry.qaData = qaData || [];
+  entry.riskData = riskData || [];
+  entry.textBase = typeof _textBase === 'string' ? _textBase : '';
+  histStore(list);
+  renderHistoryList();
+}
+
+function historyOpen(id) {
+  var h = null;
+  histAll().forEach(function(e) { if (e.id === id) h = e; });
+  if (!h) return;
+  window._niSessId = h.id;
+  _textBase = h.textBase || '';
+  _msgContent = null;
+  window._gistParsed = h.parsed || null;
+  var outSec = document.getElementById('output-section');
+  if (outSec) outSec.style.display = 'block';
+  var gistBody = document.getElementById('gist-body');
+  if (gistBody) gistBody.innerHTML = h.gistHTML || '';
+  var ti = document.getElementById('title-input');
+  if (ti) { ti.value = h.title || ''; ti._userEdited = true; if (typeof autoResizeTitle === 'function') autoResizeTitle(ti); }
+  qaData = h.qaData || [];
+  var qaSec = document.getElementById('qa-section');
+  var qaToolbar = document.getElementById('qa-toolbar');
+  if (qaData.length) {
+    renderQA(qaData);
+    if (qaSec) qaSec.style.display = 'block';
+    if (qaToolbar) qaToolbar.style.display = 'flex';
+  } else {
+    if (qaSec) qaSec.style.display = 'none';
+    if (_textBase) showQAButton();
+  }
+  riskData = h.riskData || [];
+  var riskSec = document.getElementById('risk-section');
+  if (riskData.length) { renderRisk(riskData); if (riskSec) riskSec.style.display = 'block'; }
+  else if (riskSec) riskSec.style.display = 'none';
+  renderHistoryList();
+  historyToggle();
+  window.scrollTo(0, 0);
+}
+
+function historyPin(id, ev) {
+  ev.stopPropagation();
+  var list = histAll();
+  list.forEach(function(e) { if (e.id === id) e.pinned = !e.pinned; });
+  histStore(list);
+  renderHistoryList();
+}
+
+function historyDel(id, ev) {
+  ev.stopPropagation();
+  histStore(histAll().filter(function(e) { return e.id !== id; }));
+  renderHistoryList();
+}
+
+function histFmtDate(ts) {
+  var d = new Date(ts);
+  var p = function(n) { return n < 10 ? '0' + n : '' + n; };
+  return d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+}
+
+function renderHistoryList(filter) {
+  var pinnedEl = document.getElementById('hist-pinned');
+  var recentEl = document.getElementById('hist-recent');
+  if (!pinnedEl || !recentEl) return;
+  var f = (filter || (document.getElementById('hist-search') ? document.getElementById('hist-search').value : '') || '').toLowerCase();
+  var list = histAll().filter(function(e) { return !f || (e.title || '').toLowerCase().indexOf(f) > -1; });
+  var row = function(e) {
+    var sub = histFmtDate(e.ts) + ' · ' + (e.qaData ? e.qaData.length : 0) + ' tests' + (e.riskData && e.riskData.length ? ' · ' + e.riskData.length + ' risks' : '');
+    return '<div class="hist-row' + (e.id === window._niSessId ? ' active' : '') + '" onclick="historyOpen(\'' + e.id + '\')">' +
+      '<div class="hist-row-main"><div class="hist-row-ttl">' + esc(e.title || 'Untitled') + '</div><div class="hist-row-sub">' + sub + '</div></div>' +
+      '<button class="hist-pin' + (e.pinned ? ' pinned' : '') + '" onclick="historyPin(\'' + e.id + '\',event)" title="' + (e.pinned ? 'Unpin' : 'Pin') + '">' + (e.pinned ? '★' : '☆') + '</button>' +
+      '<button class="hist-x" onclick="historyDel(\'' + e.id + '\',event)" title="Delete">×</button></div>';
+  };
+  var pinned = list.filter(function(e) { return e.pinned; });
+  var recent = list.filter(function(e) { return !e.pinned; });
+  var pl = document.getElementById('hist-pinned-lbl');
+  if (pl) pl.style.display = pinned.length ? 'block' : 'none';
+  pinnedEl.innerHTML = pinned.map(row).join('');
+  recentEl.innerHTML = recent.length ? recent.map(row).join('') : '<div class="hist-empty">' + (f ? 'no matches' : 'no analyses yet') + '</div>';
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') { var sb = document.getElementById('hist-sidebar'); if (sb) sb.classList.remove('open'); }
+});
+window.addEventListener('load', function() { renderHistoryList(); });
+
 // App bar — shown only in Electron (127.0.0.1), wired to /api/settings
 function abSetProvider(p) {
   currentProvider = p;
   if (p === 'openai' && window._niOpenaiKey) openaiKey = window._niOpenaiKey;
-  document.getElementById('ab-claude').className = 'appbar-chip' + (p === 'claude' ? ' on' : '');
-  document.getElementById('ab-openai').className = 'appbar-chip' + (p === 'openai' ? ' on-openai' : '');
+  var sel = document.getElementById('ab-provider');
+  if (sel && sel.value !== p) sel.value = p;
   fetch('/api/settings', { method:'POST', headers:{'Content-Type':'application/json'},
     body: JSON.stringify({ provider: p }) }).catch(function(){});
 }
@@ -5860,8 +6837,34 @@ function abSetProvider(p) {
 function setFolderLabel(p) {
   var fl = document.getElementById('ab-folder');
   if (!fl || !p) return;
-  fl.textContent = p.split(/[\\/]/).pop() || p;
+  fl.value = p;
   fl.title = p;
+}
+
+function abSaveJira(url) {
+  url = (url || '').trim();
+  window._niJiraUrl = url;
+  fetch('/api/settings', { method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ jiraUrl: url }) }).catch(function(){});
+}
+
+function abSaveRepo(v) {
+  v = (v || '').trim();
+  window._niRepoPath = v;
+  fetch('/api/settings', { method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ repoPath: v }) }).catch(function(){});
+}
+
+function abPickRepo() {
+  fetch('/api/pick-folder').then(function(r){ return r.json(); }).then(function(d) {
+    if (d.path) {
+      window._niRepoPath = d.path;
+      var rf = document.getElementById('ab-repo');
+      if (rf) { rf.value = d.path; rf.title = d.path; }
+      fetch('/api/settings', { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ repoPath: d.path }) }).catch(function(){});
+    }
+  }).catch(function(){});
 }
 
 function abPickFolder() {
@@ -5886,6 +6889,9 @@ window.addEventListener('load', function() {
     if (spacer) spacer.style.display = 'block';
     abSetProvider(s.provider || 'claude');
     setFolderLabel(s.folderPath);
+    if (s.jiraUrl) { window._niJiraUrl = s.jiraUrl; var ji = document.getElementById('ab-jira'); if (ji) ji.value = s.jiraUrl; }
+    if (s.appVersion) { var lv = document.getElementById('logo-ver'); if (lv) lv.textContent = 'v' + s.appVersion + ' · QA intelligence engine'; }
+    if (s.repoPath) { window._niRepoPath = s.repoPath; var rf = document.getElementById('ab-repo'); if (rf) { rf.value = s.repoPath; rf.title = s.repoPath; } }
   }).catch(function(){});
 });
 </script>

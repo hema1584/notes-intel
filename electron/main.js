@@ -1,4 +1,4 @@
-const { app, BrowserWindow, shell, dialog, Menu } = require('electron');
+const { app, BrowserWindow, shell, dialog, Menu, powerSaveBlocker } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const fs   = require('node:fs');
 const http = require('node:http');
@@ -121,6 +121,9 @@ function getFreePort() {
   });
 }
 
+// In-memory results for async jobs (code cross-check) — polled via /api/job/<id>
+const claudeJobs = {};
+
 function handleClaudeRequest(req, res) {
   let raw = '';
   req.on('data', chunk => { raw += chunk; });
@@ -137,7 +140,16 @@ function handleClaudeRequest(req, res) {
 
     const claudePath = resolveClaudeCli();
     const model      = cliModelAlias(body.model);
-    const args = ['--dangerously-skip-permissions', '--model', model, '-p'];
+    // Code cross-check mode: read-only tools scoped to the repo, never skip-permissions.
+    // repoPath can be a local checkout folder OR a remote SVN URL (svn:// or https?://) —
+    // remote mode runs in a scratch dir and the agent reads files via svn cat/ls.
+    const repoVal = (appSettings.repoPath || '').trim();
+    const isRemoteRepo = /^(svn(\+\w+)?|https?):\/\//i.test(repoVal);
+    const useRepo = body.useRepo === true && repoVal && (isRemoteRepo || fs.existsSync(repoVal));
+    // For code cross-check use JSON output format so we capture token usage + cost per run.
+    const args = useRepo
+      ? ['--allowedTools', 'Read Grep Glob Bash(svn:*) Bash(git:*)', '--output-format', 'json', '--model', model, '-p']
+      : ['--dangerously-skip-permissions', '--model', model, '-p'];
 
     // shell:true required on Windows to execute .cmd batch files.
     // Prepend npm global bin so claude.cmd is found even when Electron
@@ -150,8 +162,24 @@ function handleClaudeRequest(req, res) {
       shell: process.platform === 'win32' && claudePath.endsWith('.cmd'),
       stdio: ['pipe', 'pipe', 'pipe'],
     };
+    if (useRepo) {
+      if (isRemoteRepo) {
+        const ws = path.join(os.tmpdir(), 'notes-intel-svn');
+        try { fs.mkdirSync(ws, { recursive: true }); } catch {}
+        spawnOpts.cwd = ws;
+        log(`code cross-check (remote svn): url=${repoVal} cwd=${ws}`);
+      } else {
+        spawnOpts.cwd = repoVal;
+        log(`code cross-check (local): cwd=${repoVal}`);
+      }
+    }
 
     log(`spawn: ${claudePath} ${args.join(' ')} | prompt length=${prompt.length}`);
+
+    // Keep the machine awake while the CLI runs — standby mid-analysis kills the local socket
+    let psbId = null;
+    try { psbId = powerSaveBlocker.start('prevent-app-suspension'); } catch {}
+    const releasePsb = () => { if (psbId !== null) { try { powerSaveBlocker.stop(psbId); } catch {} psbId = null; } };
 
     if (body.stream) {
       res.on('error', err => log(`res socket error (stream): ${err.message}`));
@@ -173,6 +201,7 @@ function handleClaudeRequest(req, res) {
       });
 
       proc.on('close', (code, signal) => {
+        releasePsb();
         log(`stream close: code=${code} signal=${signal} stderr_len=${stderrBuf.length}`);
         if (stderrBuf) log(`stderr: ${stderrBuf.slice(0, 800)}`);
         cleanupTempFiles(tempFiles);
@@ -192,9 +221,33 @@ function handleClaudeRequest(req, res) {
       // Let Claude finish; writes to a closed socket are silently ignored.
 
     } else {
-      // Non-streaming: 120-second timeout, capture both stdout and stderr.
+      // Non-streaming. With body.asyncJob the result is stored in claudeJobs and the
+      // request returns a jobId immediately — the frontend polls /api/job/<id>.
+      // This keeps long code-check runs off a single fragile HTTP connection.
       let output = '';
       let stderrBuf = '';
+      let timedOut = false;
+      const asyncJob = body.asyncJob === true;
+      let jobId = null;
+      if (asyncJob) {
+        jobId = 'j' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+        claudeJobs[jobId] = { status: 'running', startedAt: Date.now() };
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ jobId }));
+        log(`async job started: ${jobId}`);
+      }
+      const finish = (statusCode, payload) => {
+        if (asyncJob) {
+          claudeJobs[jobId] = statusCode === 200
+            ? { status: 'done', payload }
+            : { status: 'error', error: payload.error };
+          log(`async job ${jobId}: ${claudeJobs[jobId].status}`);
+        } else {
+          res.writeHead(statusCode, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify(payload));
+        }
+      };
+
       const proc = spawn(claudePath, args, spawnOpts);
       proc.stdin.on('error', err => log(`stdin error (non-stream): ${err.message}`));
       try { proc.stdin.write(prompt, 'utf8'); proc.stdin.end(); } catch (e) { log(`stdin write error (non-stream): ${e.message}`); }
@@ -204,29 +257,51 @@ function handleClaudeRequest(req, res) {
 
       const timer = setTimeout(() => {
         log('non-streaming call timed out — killing process');
+        timedOut = true;
         proc.kill();
-      }, 300000); // 5 min — Sonnet JSON calls can take 2-3 min on large prompts
+      }, useRepo ? 900000 : 300000); // 15 min for code cross-check, 5 min otherwise
 
       proc.on('close', (code, signal) => {
+        releasePsb();
         clearTimeout(timer);
         log(`non-stream close: code=${code} signal=${signal} output_len=${output.length} stderr_len=${stderrBuf.length}`);
         if (stderrBuf) log(`stderr: ${stderrBuf.slice(0, 800)}`);
         cleanupTempFiles(tempFiles);
 
+        if (timedOut) {
+          finish(500, { error: `analysis timed out after ${useRepo ? 15 : 5} minutes — try narrowing the input or adding a revision number` });
+          return;
+        }
         if (!output.trim() && (code !== 0 || code === null)) {
           const detail = stderrBuf.trim().slice(0, 200) ||
             (signal ? `claude killed by signal ${signal} — try again or reduce input size` : `claude exited with code ${code}`);
-          res.writeHead(500); res.end(JSON.stringify({ error: detail })); return;
+          finish(500, { error: detail });
+          return;
         }
 
         // Strip markdown code fences — HTML already does this too, belt-and-braces.
-        const text = output.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({
+        let text = output.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
+        let usage = null;
+        // Code cross-check uses --output-format json: unwrap .result and capture token usage.
+        if (useRepo) {
+          try {
+            const wrap = JSON.parse(output);
+            if (typeof wrap.result === 'string') text = wrap.result.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
+            const u = wrap.usage || {};
+            const inTok = (u.input_tokens || 0) + (u.cache_read_input_tokens || 0) + (u.cache_creation_input_tokens || 0);
+            const cost = wrap.total_cost_usd != null ? wrap.total_cost_usd : wrap.cost_usd;
+            usage = { input: inTok, output: u.output_tokens || 0, turns: wrap.num_turns || null, cost: cost != null ? cost : null };
+            log(`code-check tokens: input=${inTok} output=${u.output_tokens || 0} turns=${wrap.num_turns || '?'} cost=${cost != null ? '$' + Number(cost).toFixed(4) : 'n/a'}`);
+          } catch (e) {
+            log(`code-check: could not parse json output-format (${e.message}) — using raw output`);
+          }
+        }
+        finish(200, {
           id: 'cli', type: 'message', role: 'assistant', model,
           content: [{ type: 'text', text }],
+          usage: usage,
           stop_reason: code === 0 ? 'end_turn' : 'error',
-        }));
+        });
       });
     }
   });
@@ -246,9 +321,17 @@ async function startServer() {
     if (req.method === 'POST' && req.url === '/api/claude') {
       handleClaudeRequest(req, res); return;
     }
+    if (req.url.startsWith('/api/job/') && req.method === 'GET') {
+      const jid = req.url.slice('/api/job/'.length);
+      const j = claudeJobs[jid];
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(j || { status: 'unknown' }));
+      if (j && j.status !== 'running') delete claudeJobs[jid];
+      return;
+    }
     if (req.url === '/api/settings' && req.method === 'GET') {
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(appSettings));
+      res.end(JSON.stringify(Object.assign({ appVersion: app.getVersion() }, appSettings)));
       return;
     }
     if (req.url === '/api/settings' && req.method === 'POST') {
@@ -257,7 +340,7 @@ async function startServer() {
       req.on('end', () => {
         try {
           const patch = JSON.parse(raw);
-          const allowed = ['provider', 'openaiKey', 'folderPath'];
+          const allowed = ['provider', 'openaiKey', 'folderPath', 'jiraUrl', 'repoPath'];
           allowed.forEach(k => { if (k in patch) appSettings[k] = patch[k]; });
           saveSettings();
           log(`settings updated: provider=${appSettings.provider} folder=${appSettings.folderPath}`);
@@ -315,6 +398,12 @@ async function startServer() {
       res.writeHead(404); res.end('Not found');
     }
   });
+
+  // Long-running requests (code cross-check reads a repo for up to 10 min) —
+  // disable Node's default 5-min request timeout which drops the socket mid-call.
+  proxyServer.requestTimeout = 0;
+  proxyServer.headersTimeout = 60000;
+  proxyServer.keepAliveTimeout = 620000;
 
   await new Promise(resolve => proxyServer.listen(proxyPort, '127.0.0.1', resolve));
   log(`server started on port ${proxyPort}`);
