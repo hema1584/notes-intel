@@ -1,6 +1,6 @@
 {
   "name": "notes-intel",
-  "version": "4.6.1",
+  "version": "4.6.2",
   "description": "Notes Intel — QA assistant desktop app.",
   "main": "electron/main.js",
   "private": true,
@@ -38,7 +38,8 @@
     "mac": {
       "icon": "electron-resources/icon.png",
       "category": "public.app-category.developer-tools",
-      "identity": null,
+      "identity": "-",
+      "hardenedRuntime": false,
       "target": ["dmg"]
     },
     "nsis": {

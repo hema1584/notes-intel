@@ -135,48 +135,164 @@ function svn(args, timeoutMs) {
   });
 }
 
-// Fast code-check: fetch the full text of every file changed in a revision.
-// One `svn diff --summarize` + one `svn cat` per changed file — no agentic crawl.
+// Derive the trunk URL from a branch URL: .../<Repo>/branches/<name>[/...] -> .../<Repo>/trunk
+function deriveTrunkUrl(branchUrl) {
+  const m = branchUrl.match(/^(.*)\/branches\/[^/]+/);
+  return m ? m[1] + '/trunk' : null;
+}
+
+// Parse an svn:externals property block into [{local, url, rev}].
+function parseExternals(text) {
+  const out = [];
+  (text || '').split(/\r?\n/).map(l => l.trim()).filter(Boolean).forEach(line => {
+    const tok = line.split(/\s+/);
+    let rev = null, url = null, local = null;
+    for (let i = 0; i < tok.length; i++) {
+      const t = tok[i];
+      if (t === '-r' && tok[i + 1]) { rev = tok[i + 1]; i++; continue; }
+      const rm = t.match(/^-r(\d+)$/); if (rm) { rev = rm[1]; continue; }
+      if (t.includes('://') || t.startsWith('^/') || t.startsWith('^../') || t.startsWith('../') || t.startsWith('/')) { url = t; continue; }
+      if (!local) local = t;
+    }
+    if (!url) return;
+    const at = url.lastIndexOf('@');
+    if (at > 0 && /^\d+$/.test(url.slice(at + 1))) { if (!rev) rev = url.slice(at + 1); url = url.slice(0, at); }
+    out.push({ local: local || url, url, rev });
+  });
+  return out;
+}
+
+// Fetch the full text of every file the BRANCH changed relative to trunk.
+// Compares branch@rev against the branch's copy point on trunk (so trunk drift adds no noise).
+// When the branch only changes svn:externals pins (module-based games), it follows the pin
+// change into the module repo and reviews the module's actual code diff. No agentic crawl.
 async function fetchSvnChangedFiles(baseUrl, rev) {
   const SKIP_EXT = /\.(meta|png|jpg|jpeg|gif|tga|psd|fbx|anim|controller|prefab|unity|asset|dll|so|a|mat|wav|mp3|ogg|ttf|otf|bytes)$/i;
-  const MAX_FILES = 12;
+  const MAX_FILES = 14;
   const MAX_FILE_BYTES = 55000;
   const peg = rev ? '@' + rev : '';
-  const revArg = rev ? ['-c', rev] : ['-c', 'HEAD'];
-  // --summarize gives one line per changed path: "M       <url>"
-  const summary = await svn(['diff', '--summarize'].concat(revArg).concat([baseUrl]), 90000);
-  const lines = summary.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-  const all = [];
+  const trunkUrl = deriveTrunkUrl(baseUrl);
+  let copyRev = null;
+  let summary, mode;
+  if (trunkUrl) {
+    try {
+      const xml = await svn(['log', '--stop-on-copy', '-v', '--xml', baseUrl + (peg || '@HEAD')], 60000);
+      const cm = [...xml.matchAll(/copyfrom-rev="(\d+)"/g)];
+      if (cm.length) copyRev = cm[cm.length - 1][1];
+    } catch (e) {}
+    const trunkPeg = copyRev ? '@' + copyRev : '@HEAD';
+    try {
+      summary = await svn(['diff', '--summarize', trunkUrl + trunkPeg, baseUrl + (peg || '@HEAD')], 120000);
+      mode = 'branch-vs-trunk';
+    } catch (e) {
+      log(`branch-vs-trunk failed (${(e.message || '').slice(0, 120)}) — falling back to single revision`);
+      summary = await svn(['diff', '--summarize', '-c', rev || 'HEAD', baseUrl], 120000);
+      mode = 'single-revision (trunk not found)';
+    }
+  } else {
+    summary = await svn(['diff', '--summarize', '-c', rev || 'HEAD', baseUrl], 120000);
+    mode = 'single-revision';
+  }
+
+  // repo root for resolving ^/ externals
+  let reposRoot = '';
+  try { reposRoot = (await svn(['info', '--show-item', 'repos-root-url', baseUrl + (peg || '@HEAD')], 30000)).trim(); } catch (e) {}
+  const resolveUrl = u => (u && u.startsWith('^/')) ? reposRoot + u.slice(1) : u;
+  // svn diff --summarize prints paths on the OLD (first) target's URL. In branch-vs-trunk
+  // mode that's the trunk prefix — map it back to the branch to read the branch's version.
+  const isBvT = mode === 'branch-vs-trunk';
+  const toBranch = u => (isBvT && trunkUrl && u.indexOf(trunkUrl) === 0) ? baseUrl + u.slice(trunkUrl.length) : u;
+
+  const lines = summary.split(/\r?\n/).map(l => l.replace(/\s+$/, '')).filter(Boolean);
+  const fileEntries = [];
+  const dirEntries = [];
   const skipped = [];
   for (const line of lines) {
-    const m = line.match(/^([AMDR!~ ]+)\s+(\S.*)$/);
+    const m = line.match(/^(.)(.)\s+(\S.*)$/); // col1 content, col2 property
     if (!m) continue;
-    const status = m[1].trim();
-    const url = m[2].trim();
-    if (status === 'D') { skipped.push({ url, why: 'deleted' }); continue; }
+    const cst = m[1].trim(), pst = m[2].trim(), url = m[3].trim();
+    if (cst === 'D') { skipped.push({ url, why: 'deleted' }); continue; }
     if (SKIP_EXT.test(url)) { skipped.push({ url, why: 'asset/binary' }); continue; }
-    all.push({ status, url });
+    if (!cst && pst === 'M') { dirEntries.push(url); continue; } // property-only → likely externals/mergeinfo
+    fileEntries.push({ status: cst || pst, url });
   }
-  const picked = all.slice(0, MAX_FILES);
+
   const files = [];
-  for (const f of picked) {
+  const externalModules = [];
+
+  // 1) Direct files changed in the branch itself (map old-side path -> branch, cat at branch rev).
+  for (const f of fileEntries.slice(0, MAX_FILES)) {
+    const bUrl = toBranch(f.url);
     try {
-      let content = await svn(['cat', f.url + peg], 60000);
+      let content = await svn(['cat', bUrl + peg], 60000);
       let truncated = false;
       if (content.length > MAX_FILE_BYTES) { content = content.slice(0, MAX_FILE_BYTES); truncated = true; }
-      files.push({ path: f.url.replace(baseUrl, '').replace(/^\//, ''), status: f.status, content, truncated });
+      files.push({ path: bUrl.replace(baseUrl, '').replace(/^\//, ''), status: f.status, content, truncated });
     } catch (e) {
-      files.push({ path: f.url.replace(baseUrl, '').replace(/^\//, ''), status: f.status, content: '', error: e.message });
+      if (!/E200009|refers to a directory|was not found/i.test(e.message || '')) {
+        files.push({ path: bUrl.replace(baseUrl, '').replace(/^\//, ''), status: f.status, content: '', error: e.message });
+      } else { dirEntries.push(f.url); }
     }
   }
+
+  // 2) Follow svn:externals pin changes into the module repos (module-based games).
+  // dirUrl comes from the OLD (trunk) side; branch side is the mapped URL.
+  for (const dirUrl of dirEntries) {
+    if (files.length >= MAX_FILES) break;
+    if (!trunkUrl) continue;
+    const trunkDirUrl = dirUrl;                 // already trunk-based
+    const branchDirUrl = toBranch(dirUrl);      // branch-side
+    let extB = [], extT = [];
+    try { extB = parseExternals(await svn(['propget', 'svn:externals', branchDirUrl + (peg || '@HEAD')], 30000)); } catch (e) {}
+    try { extT = parseExternals(await svn(['propget', 'svn:externals', trunkDirUrl + (copyRev ? '@' + copyRev : '@HEAD')], 30000)); } catch (e) {}
+    if (!extB.length) continue;
+    for (const eb of extB) {
+      const et = extT.find(x => x.local === eb.local);
+      const newU = resolveUrl(eb.url), newR = eb.rev;
+      const oldU = et ? resolveUrl(et.url) : null, oldR = et ? et.rev : null;
+      if (!oldU || (oldU === newU && oldR === newR)) continue; // pin unchanged
+      externalModules.push({ local: eb.local, oldU, oldR, newU, newR });
+      // Diff the module between the old pin and the new pin, then fetch changed files.
+      try {
+        const oldT = oldU + (oldR ? '@' + oldR : '@HEAD');
+        const newT = newU + (newR ? '@' + newR : '@HEAD');
+        const modSum = await svn(['diff', '--summarize', oldT, newT], 120000);
+        const modLines = modSum.split(/\r?\n/).map(l => l.replace(/\s+$/, '')).filter(Boolean);
+        for (const ml of modLines) {
+          if (files.length >= MAX_FILES) break;
+          const mm = ml.match(/^(.)(.)\s+(\S.*)$/);
+          if (!mm) continue;
+          const cst = mm[1].trim(), url = mm[3].trim();
+          if (cst === 'D') continue;
+          if (SKIP_EXT.test(url)) continue;
+          if (!cst) continue; // property-only inside module — skip
+          // module diff prints old-side (oldU) paths; map to new pin and cat at the new rev.
+          const catUrl = url.indexOf(oldU) === 0 ? newU + url.slice(oldU.length) : url;
+          try {
+            let content = await svn(['cat', catUrl + (newR ? '@' + newR : '')], 60000);
+            let truncated = false;
+            if (content.length > MAX_FILE_BYTES) { content = content.slice(0, MAX_FILE_BYTES); truncated = true; }
+            files.push({ path: '[' + eb.local + '] ' + url.replace(oldU, '').replace(/^\//, ''), status: cst, content, truncated });
+          } catch (e2) {}
+        }
+      } catch (e) { log(`module diff failed for ${eb.local}: ${(e.message || '').slice(0, 120)}`); }
+    }
+  }
+
   let logMsg = '';
-  try { logMsg = await svn(['log'].concat(revArg).concat([baseUrl]), 30000); } catch (e) {}
+  try {
+    logMsg = mode.startsWith('branch-vs-trunk')
+      ? await svn(['log', '--stop-on-copy', '-l', '15', baseUrl + (peg || '@HEAD')], 30000)
+      : await svn(['log', '-c', rev || 'HEAD', baseUrl], 30000);
+  } catch (e) {}
+
   return {
     files,
+    mode,
+    externalModules: externalModules.map(m => ({ module: m.local, from: (m.oldU || '').split('/').slice(-2).join('/') + '@' + (m.oldR || 'HEAD'), to: (m.newU || '').split('/').slice(-2).join('/') + '@' + (m.newR || 'HEAD') })),
     commitLog: logMsg.slice(0, 2000),
-    changedCount: all.length,
     includedCount: files.length,
-    droppedForCap: Math.max(0, all.length - picked.length),
+    droppedForCap: Math.max(0, fileEntries.length - files.length),
     skipped: skipped.slice(0, 30)
   };
 }

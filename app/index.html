@@ -796,31 +796,11 @@
       </div>
     <div class="input-tip" id="input-tip" style="color:#787880;">💡 Attach tickets, docs, chats, screenshots, or HTML reports individually—or combine them for deeper insights.</div>
     <div class="err-bar" id="err-bar"></div>
-    <div id="cc-setup" style="display:none;margin:10px 0;padding:13px 15px;background:#0d0b06;border:0.5px solid #B4551730;border-radius:9px;">
-      <div style="font-size:11px;font-family:'JetBrains Mono',monospace;color:#EF9F27;letter-spacing:.06em;text-transform:uppercase;margin-bottom:9px;">&lt;&gt; Code cross-check setup</div>
-      <input id="cc-svn-url" placeholder="SVN branch URL or local checkout folder (required)" spellcheck="false" style="width:100%;background:#111116;border:0.5px solid #252530;border-radius:7px;padding:9px 12px;font-size:12.5px;font-family:'JetBrains Mono',monospace;color:#a0b0c0;outline:none;"/>
-      <div style="display:flex;gap:8px;margin-top:8px;">
-        <input id="cc-svn-rev" placeholder="revision (optional)" spellcheck="false" style="width:170px;background:#111116;border:0.5px solid #252530;border-radius:7px;padding:9px 12px;font-size:12.5px;font-family:'JetBrains Mono',monospace;color:#a0b0c0;outline:none;"/>
-        <input id="cc-review-link" placeholder="code review link (optional)" spellcheck="false" style="flex:1;background:#111116;border:0.5px solid #252530;border-radius:7px;padding:9px 12px;font-size:12.5px;font-family:'JetBrains Mono',monospace;color:#a0b0c0;outline:none;"/>
-      </div>
-      <label style="display:flex;align-items:flex-start;gap:8px;margin-top:11px;cursor:pointer;">
-        <input type="checkbox" id="cc-deep-mode" style="accent-color:#EF9F27;margin-top:2px;"/>
-        <span style="font-size:11.5px;color:#8a8a96;font-family:'Sora',sans-serif;line-height:1.5;">Deep check — read the whole module, not just changed files. Slower and costs more; use when a bug may come from code this change <em>touches but doesn't modify</em>.</span>
-      </label>
-      <div style="display:flex;gap:8px;margin-top:11px;align-items:center;">
-        <button onclick="runCodeCheckGo()" style="display:flex;align-items:center;gap:7px;padding:8px 16px;background:#17100a;border:0.5px solid #B45517;border-radius:8px;font-size:12px;color:#EF9F27;cursor:pointer;font-family:'JetBrains Mono',monospace;">Run check →</button>
-        <button onclick="document.getElementById('cc-setup').style.display='none'" style="padding:8px 14px;background:transparent;border:0.5px solid #252530;border-radius:8px;font-size:11.5px;color:#5a5a66;cursor:pointer;font-family:'JetBrains Mono',monospace;">cancel</button>
-      </div>
-    </div>
     <div class="run-row">
       <div class="shortcut-hint">
         <span class="kbd">⌘</span><span style="color:#2e2e38">+</span><span class="kbd">↵</span>
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
-        <button id="code-check-btn" onclick="runCodeCheck()" class="review-launch-btn" style="padding:8px 16px;font-size:12px;border-color:#B4551730;color:#EF9F27;">
-          <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M5 4L1.5 8 5 12M11 4l3.5 4L11 12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Code Cross-Check
-        </button>
         <button id="deep-analysis-btn" onclick="runDeepAnalysis()" class="review-launch-btn" style="padding:8px 16px;font-size:12px;">
           <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 1a7 7 0 1 1 0 14A7 7 0 0 1 8 1z" stroke="currentColor" stroke-width="1.2"/><path d="M5.5 8h5M8 5.5v5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
           Deep Analysis
@@ -845,7 +825,7 @@
     </div>
   </div>
 
-  <div class="card">
+  <div class="card" id="gist-card-wrap">
     <div class="out-card gist-card">
       <div class="card-top">
         <div class="card-head"><div class="card-pip" style="background:#5DCAA5"></div><span class="card-lbl" style="color:#5DCAA5">gist</span></div>
@@ -907,6 +887,22 @@
       <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 5h10M3 8h7M3 11h5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="13" cy="11" r="2.5" stroke="currentColor" stroke-width="1.2"/><path d="M13 10v1.5M12.25 11.75l.75-.75" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></circle></svg>
       Generate QA Focus
     </button>
+    <button id="code-check-btn" onclick="runCodeCheck()" class="qa-gen-btn" style="border-color:#B4551730;color:#EF9F27;">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M5 4L1.5 8 5 12M11 4l3.5 4L11 12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Code Cross-Check
+    </button>
+  </div>
+  <div id="cc-setup" style="display:none;width:100%;max-width:720px;margin:0 auto 8px;padding:13px 15px;background:#0d0b06;border:0.5px solid #B4551730;border-radius:9px;">
+    <div style="font-size:11px;font-family:'JetBrains Mono',monospace;color:#EF9F27;letter-spacing:.06em;text-transform:uppercase;margin-bottom:9px;">&lt;&gt; Code cross-check setup</div>
+    <input id="cc-svn-url" placeholder="SVN branch URL or local checkout folder (required)" spellcheck="false" style="width:100%;background:#111116;border:0.5px solid #252530;border-radius:7px;padding:9px 12px;font-size:12.5px;font-family:'JetBrains Mono',monospace;color:#a0b0c0;outline:none;"/>
+    <div style="display:flex;gap:8px;margin-top:8px;">
+      <input id="cc-svn-rev" placeholder="final revision (optional)" spellcheck="false" style="flex:1;background:#111116;border:0.5px solid #252530;border-radius:7px;padding:9px 12px;font-size:12.5px;font-family:'JetBrains Mono',monospace;color:#a0b0c0;outline:none;"/>
+    </div>
+    <div style="font-size:11px;color:#5a5a66;margin-top:6px;font-family:'Sora',sans-serif;">Reviews everything the branch changed vs trunk. Paste the dev's final revision to pin it, or leave blank for the latest.</div>
+    <div style="display:flex;gap:8px;margin-top:11px;align-items:center;">
+      <button onclick="runCodeCheckGo()" style="display:flex;align-items:center;gap:7px;padding:8px 16px;background:#17100a;border:0.5px solid #B45517;border-radius:8px;font-size:12px;color:#EF9F27;cursor:pointer;font-family:'JetBrains Mono',monospace;">Run check →</button>
+      <button onclick="document.getElementById('cc-setup').style.display='none'" style="padding:8px 14px;background:transparent;border:0.5px solid #252530;border-radius:8px;font-size:11.5px;color:#5a5a66;cursor:pointer;font-family:'JetBrains Mono',monospace;">cancel</button>
+    </div>
   </div>
 
   <div id="review-section" style="display:none;width:100%;">
@@ -1967,7 +1963,7 @@ async function runDeepAnalysis() {
 
   // Hide gist + title cards — deep analysis has its own output
   var titleCard = document.getElementById('title-card');
-  var gistCardWrap = document.querySelector('#output-section > .card');
+  var gistCardWrap = document.getElementById('gist-card-wrap');
   if (titleCard) titleCard.style.display = 'none';
   if (gistCardWrap) gistCardWrap.style.display = 'none';
 
@@ -2415,11 +2411,13 @@ function autoResizeTitle(el) {
 function clearAll() {
   window._niSessId = null; // next analysis becomes a new history entry
   try { renderHistoryList(); } catch(e) {}
+  window._niSrcCache = null;
+  window._niSrcKey = null;
+  window._ccBriefCache = {};
   window._codeCheckData = null;
   window._ccUsage = null;
   window._ccFilesBlock = '';
   window._ccChecked = {};
-  window._ccReviewLink = '';
   var ccSec = document.getElementById('codecheck-section');
   if (ccSec) ccSec.style.display = 'none';
   var ccBody = document.getElementById('codecheck-body');
@@ -2427,9 +2425,7 @@ function clearAll() {
   // Reset the code cross-check setup panel + its fields (revision/link are per-ticket)
   var ccSetup = document.getElementById('cc-setup');
   if (ccSetup) ccSetup.style.display = 'none';
-  ['cc-svn-url', 'cc-svn-rev', 'cc-review-link'].forEach(function (id) { var el = document.getElementById(id); if (el) el.value = ''; });
-  var ccDeep = document.getElementById('cc-deep-mode');
-  if (ccDeep) ccDeep.checked = false;
+  ['cc-svn-url', 'cc-svn-rev'].forEach(function (id) { var el = document.getElementById(id); if (el) el.value = ''; });
   // Clear inputs
   var mainInput = document.getElementById('main-input');
   mainInput.value = '';
@@ -2457,10 +2453,10 @@ function clearAll() {
   // Hide output section
   var outSec = document.getElementById('output-section');
   if (outSec) outSec.style.display = 'none';
-  // Restore title + gist cards in case Deep Analysis hid them
+  // Restore title + gist cards in case Deep Analysis or Code Cross-Check hid them
   var titleCard = document.getElementById('title-card');
   if (titleCard) titleCard.style.display = 'block';
-  var gistCardWrap = document.querySelector('#output-section > .card');
+  var gistCardWrap = document.getElementById('gist-card-wrap');
   if (gistCardWrap) gistCardWrap.style.display = 'block';
   // Clear deep analysis status
   var deepStatus = document.getElementById('deep-status');
@@ -3006,7 +3002,7 @@ async function runAnalysis() {
   // Always generate gist — ensure cards are visible
   var titleCardR = document.getElementById('title-card');
   if (titleCardR) titleCardR.style.display = 'block';
-  var gistCardR = document.querySelector('#output-section > .card');
+  var gistCardR = document.getElementById('gist-card-wrap');
   if (gistCardR) gistCardR.style.display = 'block';
 
   try {
@@ -3148,6 +3144,46 @@ function buildQaInstruction(tier) {
     'They must COMPLEMENT, not repeat, the critical cases.' + alreadyCovered + common;
 }
 
+// Fetch attached Jira/Confluence/Slack/Cortex content ONCE per session and cache it,
+// so QA/edge/risk generations reuse the text instead of re-invoking connectors each time.
+function _mcpSourceKey() {
+  try {
+    return attachedLinks.filter(function (l) { return l.confluenceId || l.jiraTicketKey || l.slackChannelId || l.cortexUrl; })
+      .map(function (l) { return l.jiraTicketKey || l.confluenceId || l.slackChannelId || l.cortexUrl; }).join('|');
+  } catch (e) { return ''; }
+}
+async function ensureSourcesFetched() {
+  if (currentProvider !== 'claude') return '';
+  var key = _mcpSourceKey();
+  if (!key) return '';
+  if (window._niSrcCache && window._niSrcKey === key) return window._niSrcCache;
+  var servers = [];
+  if (attachedLinks.some(function (l) { return l.confluenceId || l.jiraTicketKey; })) servers.push({ type: 'url', url: 'https://mcp.atlassian.com/v1/mcp', name: 'atlassian-mcp' });
+  if (attachedLinks.some(function (l) { return l.slackChannelId; })) servers.push({ type: 'url', url: 'https://mcp.slack.com/mcp', name: 'slack-mcp' });
+  if (attachedLinks.some(function (l) { return l.cortexUrl; })) servers.push({ type: 'url', url: 'https://cortex-api.tactilews.com/mcp', name: 'cortex-mcp' });
+  if (!servers.length) return '';
+  var refs = [];
+  attachedLinks.forEach(function (l) {
+    if (l.jiraTicketKey) refs.push('Jira ticket ' + l.jiraTicketKey);
+    else if (l.confluenceId) refs.push('Confluence page ' + l.confluenceId);
+    else if (l.slackChannelId) refs.push('Slack thread ' + l.slackChannelId);
+    else if (l.cortexUrl) refs.push('Cortex changelog ' + l.cortexUrl);
+  });
+  var p = 'Fetch these sources using the available tools and return their content as plain text for QA reference — description, acceptance criteria, decisions, and QA-relevant comments. Skip metadata, status history, greetings, and automation noise. Return only the content:\n' + refs.join('\n');
+  try {
+    var r = await fetch(getApiUrl(), {
+      method: 'POST', headers: getApiHeaders(),
+      body: JSON.stringify(wrapBody(Object.assign({ model: 'claude-sonnet-4-6', max_tokens: 4000, temperature: 0, messages: [{ role: 'user', content: p }] }, { mcp_servers: servers })))
+    });
+    if (!r.ok) return '';
+    var dj = await r.json();
+    var txt = extractText(dj).trim();
+    if (!txt && dj.content) txt = (dj.content || []).filter(function (b) { return b.type === 'mcp_tool_result'; }).map(function (b) { return (b.content || []).map(function (c) { return c.text || ''; }).join(''); }).join('');
+    if (txt) { window._niSrcCache = txt; window._niSrcKey = key; }
+    return txt || '';
+  } catch (e) { return ''; }
+}
+
 async function generateQA(tier) {
   tier = tier || 'critical';
   var isEdge = (tier === 'edge');
@@ -3185,20 +3221,26 @@ async function generateQA(tier) {
         window._prioritySlackPoints.map(function(p){ return '- ' + p; }).join('\n') + '\n';
     }
 
-    var qaPrompt = (_msgContent && typeof _msgContent !== 'string')
-      ? [..._msgContent, { type: 'text', text: gistAddendum + qaInstruction }]
-      : _textBase + gistAddendum + '\n\n' + qaInstruction;
-
+    // Reuse the once-fetched source content; only attach connectors if that fetch produced nothing (fallback).
     var qaServers = [];
-    if (currentProvider === 'claude') {
+    var srcText = await ensureSourcesFetched();
+    if (srcText) {
+      gistAddendum += '\n\nATTACHED SOURCE CONTENT (already fetched — do NOT fetch again; treat as the source of truth):\n' + srcText + '\n';
+    } else if (currentProvider === 'claude') {
       if (attachedLinks.some(function(l){ return l.confluenceId || l.jiraTicketKey; })) qaServers.push({ type: 'url', url: 'https://mcp.atlassian.com/v1/mcp', name: 'atlassian-mcp' });
       if (attachedLinks.some(function(l){ return l.slackChannelId; })) qaServers.push({ type: 'url', url: 'https://mcp.slack.com/mcp', name: 'slack-mcp' });
       if (attachedLinks.some(function(l){ return l.cortexUrl; })) qaServers.push({ type: 'url', url: 'https://cortex-api.tactilews.com/mcp', name: 'cortex-mcp' });
     }
+
+    var qaPrompt = (_msgContent && typeof _msgContent !== 'string')
+      ? [..._msgContent, { type: 'text', text: gistAddendum + qaInstruction }]
+      : _textBase + gistAddendum + '\n\n' + qaInstruction;
+
     var r2 = await fetch(getApiUrl(), {
       method: 'POST',
       headers: getApiHeaders(),
       body: JSON.stringify(wrapBody(Object.assign({
+        // Keep Sonnet whenever sources are involved (same quality as before) — Haiku only for plain paste, which was always Haiku.
         model: (attachedLinks.some(function(l){ return l.confluenceId || l.slackChannelId || l.jiraTicketKey || l.cortexUrl; })) ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001',
         max_tokens: 3000,
         temperature: 0,
@@ -3391,15 +3433,11 @@ async function runCodeCheckGo() {
   if (currentProvider !== 'claude') { showErr('Code Cross-Check requires the Claude provider.'); return; }
   var urlEl = document.getElementById('cc-svn-url');
   var revEl = document.getElementById('cc-svn-rev');
-  var linkEl = document.getElementById('cc-review-link');
   var repoUrl = urlEl ? urlEl.value.trim() : '';
   var rev = revEl ? revEl.value.trim().replace(/^r/i, '') : '';
-  var reviewLink = linkEl ? linkEl.value.trim() : '';
-  var deepMode = !!(document.getElementById('cc-deep-mode') && document.getElementById('cc-deep-mode').checked);
   if (!repoUrl) { showErr('Enter the SVN branch URL (or a local checkout folder) for this ticket.'); return; }
   var repoVal = rev ? repoUrl.replace(/@\d+$/, '') + '@' + rev : repoUrl;
   window._niRepoPath = repoVal;
-  window._ccReviewLink = reviewLink;
   var rf0 = document.getElementById('ab-repo');
   if (rf0) { rf0.value = repoVal; rf0.title = repoVal; }
   // Persist BEFORE the analysis call — the backend reads repoPath from settings
@@ -3427,41 +3465,49 @@ async function runCodeCheckGo() {
   var outSec = document.getElementById('output-section');
   if (outSec) outSec.style.display = 'block';
   if (sec) sec.style.display = 'block';
+  // Code-check-only run (no gist): hide the empty title + gist cards so the report stands alone
+  if (!gistText) {
+    var tCard = document.getElementById('title-card'); if (tCard) tCard.style.display = 'none';
+    var gCard = document.getElementById('gist-card-wrap'); if (gCard) gCard.style.display = 'none';
+  }
   if (body) body.innerHTML = '<div class="skeleton" style="height:12px;margin-bottom:14px;width:95%"></div><div class="skeleton" style="height:12px;margin-bottom:14px;width:80%"></div><div class="skeleton" style="height:12px;width:65%"></div>';
 
   try {
     var requirements = (buildContextBlock() || '') + '\n' + (contentText ? 'INPUT CONTENT:\n' + contentText + '\n' : '') + (gistText ? '\nANALYSED GIST (structured summary of the ticket):\n' + gistText + '\n' : '');
-    if (window._ccReviewLink) requirements += '\nCODE REVIEW LINK (reference only — mention in your report if relevant): ' + window._ccReviewLink + '\n';
 
-    // Step 1 — pre-fetch ticket/page content via the normal unrestricted call.
-    // The restricted code-check sandbox cannot use MCP connectors, so we fetch first and pass text.
-    if (jiraRefs.length || confluenceRefs.length) {
-      setAnalysisStatus('fetching ' + (jiraRefs.length ? jiraRefs.join(', ') : 'attached sources') + '…');
-      var fetchPrompt = 'Fetch the following sources using the Atlassian tools (tactileentertainment.atlassian.net) and return their FULL content as plain text — title, description, acceptance criteria, and all comments. No commentary, just the content:\n' +
-        (jiraRefs.length ? 'Jira tickets: ' + jiraRefs.join(', ') + '\n' : '') +
-        (confluenceRefs.length ? 'Confluence pages: ' + confluenceRefs.join(', ') + '\n' : '');
-      var rf = await fetch(getApiUrl(), {
-        method: 'POST',
-        headers: getApiHeaders(),
-        body: JSON.stringify(wrapBody({
-          model: 'claude-sonnet-4-6',
-          max_tokens: 6000,
-          temperature: 0,
-          messages: [{ role: 'user', content: fetchPrompt }]
-        }))
-      });
-      if (rf.ok) {
-        var df = await rf.json();
-        var ticketText = extractText(df).trim();
-        if (ticketText) requirements += '\nTICKET CONTENT (fetched from Jira/Confluence — treat as the primary requirements):\n' + ticketText + '\n';
+    // Step 1 — requirements brief. Prefer the analysed gist (it IS a compact brief and is
+    // already in `requirements`). Only fetch from Jira/Confluence when no usable gist exists —
+    // and then only a COMPACT brief (Haiku, capped, cached by ticket key).
+    var haveGist = gistText && gistText.length > 200;
+    if (!haveGist && (jiraRefs.length || confluenceRefs.length)) {
+      var cacheKey = jiraRefs.concat(confluenceRefs).join(',');
+      window._ccBriefCache = window._ccBriefCache || {};
+      var brief = window._ccBriefCache[cacheKey];
+      if (!brief) {
+        setAnalysisStatus('fetching a compact brief for ' + (jiraRefs.join(', ') || 'attached sources') + '…');
+        var fetchPrompt = 'Fetch these Jira/Confluence sources and return a compact QA/code-check brief only. Include only: title, user-facing change, acceptance criteria, implementation notes, final decisions, QA-relevant comments, branch/revision/code-review links, and open questions. Exclude metadata, status history, assignee, sprint, duplicate comments, greetings, old discussion, automation noise, and unrelated comments. Hard limit: 1200 words. Return plain text only.\n' +
+          (jiraRefs.length ? 'Jira tickets: ' + jiraRefs.join(', ') + '\n' : '') +
+          (confluenceRefs.length ? 'Confluence pages: ' + confluenceRefs.join(', ') + '\n' : '');
+        var rf = await fetch(getApiUrl(), {
+          method: 'POST',
+          headers: getApiHeaders(),
+          body: JSON.stringify(wrapBody({
+            model: 'claude-haiku-4-5-20251001',
+            max_tokens: 2000,
+            temperature: 0,
+            messages: [{ role: 'user', content: fetchPrompt }]
+          }))
+        });
+        if (rf.ok) { var df = await rf.json(); brief = extractText(df).trim(); if (brief) window._ccBriefCache[cacheKey] = brief; }
       }
-      setAnalysisStatus('cross-checking code against requirements — this can take several minutes…');
+      if (brief) requirements += '\nTICKET BRIEF (compact, from Jira/Confluence — treat as the primary requirements):\n' + brief + '\n';
+      setAnalysisStatus('cross-checking code against requirements…');
     }
 
     window._ccFilesBlock = '';
     var d;
 
-    if (!deepMode) {
+    {
       // ── FAST MODE — app fetches the changed files, one non-agentic reasoning call ──
       setAnalysisStatus('fetching changed files from svn…');
       var scr = await fetch('/api/svn-changes', {
@@ -3470,13 +3516,20 @@ async function runCodeCheckGo() {
       });
       var sc = await scr.json();
       if (!scr.ok) throw new Error(sc.error || 'could not read svn changes');
-      if (!sc.files || !sc.files.length) throw new Error('No source files changed' + (rev ? ' in revision ' + rev : '') + '. Check the URL/revision, or enable Deep check.');
+      if (!sc.files || !sc.files.length) {
+        throw new Error('No code changes found for this branch vs trunk. If the feature lives in a module, the branch may not have re-pinned it yet — check the branch URL and (optionally) the final revision with the dev.');
+      }
       var block = sc.files.map(function (f) {
         return '### FILE: ' + f.path + ' (' + (f.status || '?') + ')' + (f.truncated ? ' [truncated]' : '') + (f.error ? ' [could not read: ' + f.error + ']' : '') + '\n' + (f.content || '');
       }).join('\n\n');
       window._ccFilesBlock = block;
       var note = sc.includedCount + ' changed file' + (sc.includedCount === 1 ? '' : 's');
-      if (sc.droppedForCap) note += ' (' + sc.droppedForCap + ' more over the cap — enable Deep check for full coverage)';
+      if (sc.externalModules && sc.externalModules.length) {
+        note += ' from module ' + sc.externalModules.map(function (m) { return m.module; }).join(', ');
+        requirements += '\nMODULE PIN CHANGES (the branch re-points these external modules — the reviewed files come from the new pin):\n' +
+          sc.externalModules.map(function (m) { return '- ' + m.module + ': ' + m.from + '  →  ' + m.to; }).join('\n') + '\n';
+      }
+      if (sc.droppedForCap) note += ' (' + sc.droppedForCap + ' more not shown — over the size cap)';
       if (sc.commitLog) requirements += '\nCOMMIT MESSAGE(S) for this change:\n' + sc.commitLog + '\n';
       setAnalysisStatus('reviewing ' + note + ' against requirements…');
       var rFast = await fetch(getApiUrl(), {
@@ -3490,41 +3543,6 @@ async function runCodeCheckGo() {
       if (!rFast.ok) { var etf = await rFast.text(); throw new Error('API error ' + rFast.status + ': ' + etf.substring(0, 100)); }
       d = await rFast.json();
       window._ccFilesBlock = '';
-    } else {
-      // ── DEEP MODE — agentic crawl of the whole module (slower, costs more) ──
-      var r = await fetch(getApiUrl(), {
-        method: 'POST',
-        headers: getApiHeaders(),
-        body: JSON.stringify(Object.assign(wrapBody({
-          model: 'claude-sonnet-4-6',
-          max_tokens: 8000,
-          temperature: 0,
-          system: 'You are a meticulous static-analysis QA reviewer. You only report what you verified by reading actual files. Output raw JSON only.',
-          messages: [{ role: 'user', content: buildCodeCheckInstruction(requirements, window._niRepoPath) }]
-        }), { useRepo: true, asyncJob: true }))
-      });
-      if (!r.ok) { var et = await r.text(); throw new Error('API error ' + r.status + ': ' + et.substring(0, 100)); }
-      var jd = await r.json();
-      d = jd;
-      if (jd.jobId) {
-        // Poll the background job — survives dropped sockets, sleep, and long runs
-        var t0 = Date.now();
-        d = null;
-        while (Date.now() - t0 < 20 * 60 * 1000) {
-          await new Promise(function (rs) { setTimeout(rs, 5000); });
-          var mins = Math.floor((Date.now() - t0) / 60000);
-          setAnalysisStatus('deep cross-check — reading the module, this can take several minutes' + (mins ? ' · ' + mins + ' min elapsed' : '') + '…');
-          var pr = null;
-          try { pr = await fetch('/api/job/' + jd.jobId); } catch (pe) { continue; }
-          if (!pr || !pr.ok) continue;
-          var js = await pr.json();
-          if (js.status === 'running') continue;
-          if (js.status === 'error') throw new Error(js.error || 'code check failed');
-          if (js.status === 'done') { d = js.payload; break; }
-          throw new Error('job lost — was the app restarted mid-analysis?');
-        }
-        if (!d) throw new Error('deep check exceeded 20 minutes — add a revision number or use fast mode');
-      }
     }
     var raw = extractText(d);
     var clean = raw.replace(/```json|```/g, '').trim();
@@ -6204,19 +6222,25 @@ async function generateRisk() {
     '[{"title":"max 70 chars","severity":"critical|high|med","originType":"explicit_requirement|derived_acceptance_check|inferred_edge_case|known_team_context","confidence":"high|medium|low","confidenceReason":"max 60 chars","detail":"max 100 chars — what the player experiences","howToTrigger":"max 140 chars — concrete steps to provoke it","whatYouSee":"max 120 chars — observable symptom that confirms it","whereToLook":"max 100 chars — which screen or flow to watch","sourceEvidence":[{"source":"source type","evidence":"max 80 chars","reason":"max 60 chars"}]}]\n' +
     'Order by severity desc. No markdown, no explanation. Array only.';
 
+  // Reuse the once-fetched source content; only attach connectors as a fallback.
   var mcpServers = [];
-  if (currentProvider === 'claude') {
+  var riskSrc = await ensureSourcesFetched();
+  var srcAddendum = '';
+  if (riskSrc) {
+    srcAddendum = '\nATTACHED SOURCE CONTENT (already fetched — do NOT fetch again; treat as the source of truth):\n' + riskSrc + '\n';
+  } else if (currentProvider === 'claude') {
     if (attachedLinks.some(function(l){ return l.confluenceId || l.jiraTicketKey; })) mcpServers.push({ type: 'url', url: 'https://mcp.atlassian.com/v1/mcp', name: 'atlassian-mcp' });
     if (attachedLinks.some(function(l){ return l.slackChannelId; })) mcpServers.push({ type: 'url', url: 'https://mcp.slack.com/mcp', name: 'slack-mcp' });
     if (attachedLinks.some(function(l){ return l.cortexUrl; })) mcpServers.push({ type: 'url', url: 'https://cortex-api.tactilews.com/mcp', name: 'cortex-mcp' });
   }
 
   var reqBody = {
-    model: mcpServers.length ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001',
+    // Keep Sonnet whenever sources are involved (same quality as before) — Haiku only for plain paste.
+    model: (attachedLinks.some(function(l){ return l.confluenceId || l.slackChannelId || l.jiraTicketKey || l.cortexUrl; })) ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001',
     max_tokens: 2000,
     temperature: 0,
     system: 'You output only raw JSON arrays. No markdown. No explanation. All strings single-line, under 120 chars.',
-    messages: [{ role: 'user', content: _textBase + (currentGist ? '\nGIST:\n' + currentGist + '\n\n' : '') + riskInstruction }]
+    messages: [{ role: 'user', content: _textBase + (currentGist ? '\nGIST:\n' + currentGist + '\n\n' : '') + srcAddendum + riskInstruction }]
   };
   if (mcpServers.length) reqBody.mcp_servers = mcpServers;
 
