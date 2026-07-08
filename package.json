@@ -1,6 +1,6 @@
 {
   "name": "notes-intel",
-  "version": "4.6.2",
+  "version": "4.6.3",
   "description": "Notes Intel — QA assistant desktop app.",
   "main": "electron/main.js",
   "private": true,

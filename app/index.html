@@ -3404,13 +3404,14 @@ function buildCodeCheckInstruction(requirements, repoUrl) {
     '- Prefix EVERY checklist item with its priority: "[P0] " = run first, blocks sign-off; "[P1] " = should run this pass; "[P2] " = time-permitting. Order items within each list by priority.\n' +
     '- bugSources: rank by likelihood. Each names a specific area of the change, why it is fragile (from the code you read), and what the player would experience if it breaks.\n' +
     '- discrepancies is the MOST IMPORTANT section: every place the code deviates from what the ticket/AC/spec describes — missing behaviour, different behaviour, or extra behaviour the ticket never mentions. This is what QA flags back to the programmer. The "question" field must be a complete, polite, self-contained sentence citing file:line that QA can paste into a Jira comment verbatim. If code and ticket fully match, return an empty array — never pad.\n' +
-    '- This is static analysis: flag "verify on device" where runtime behaviour matters.\n\n' +
+    '- This is static analysis: flag "verify on device" where runtime behaviour matters.\n' +
+    '- TEST COVERAGE (important for gap analysis): the changed files may include unit tests (files under UnitTests/ or named *Tests.cs). Use them. For EACH acceptance criterion set "tested": "yes" if a test clearly exercises it, "partial" if only partly, "no" if no test covers it. An AC with no test is a concrete coverage gap — call it out plainly in the note (e.g. "no test covers this"). A test that asserts behaviour matching or contradicting an AC is strong, non-speculative evidence — prefer it over guessing from code. If no test files are present, set "tested": "no" for all and note that tests were not found.\n\n' +
     'BREVITY — this is a scan-first report, not documentation. Respect every word limit below strictly. One idea per field. No sub-clauses chained with semicolons or em-dashes. Never repeat the same fact in two sections — evidence lives ONCE, in the most specific section. File paths appear ONLY in file/rootCause/note fields, never in verdict, bullets, or checklist.\n\n' +
     'OUTPUT — return ONLY this JSON object, no markdown fences, no prose:\n' +
     '{"summary":{"match":"yes|partial|no — does the implementation match the ticket","verdict":"max 15 words in PLAIN QA LANGUAGE — no class names, no code jargon. State whether the build does what the ticket promises and whether testing can proceed. e.g. Partial match — safe to test, but popup closing behaves differently than the ticket describes","subline":"max 12 words — the FIRST thing QA should test and why, in device actions. e.g. Start by reopening popups quickly — most likely place to break","forQA":["max 10 words each, max 3 bullets, no file paths — what to test and why"],"forDev":["max 12 words each, max 3 bullets, no file paths — phrase as SUGGESTIONS a QA peer would raise, never bare orders. Use \\"Consider…\\", \\"Worth confirming…\\", \\"Might be safer to…\\" — NOT \\"Add X\\" / \\"Fix Y\\""]},' +
     '"discrepancies":[{"ticketSays":"max 12 words","codeDoes":"max 12 words","file":"file:line only","question":"one polite self-contained sentence, max 35 words, citing file:line — pasteable to Jira"}],' +
     '"findings":[{"title":"max 60 chars","severity":"high|med|low","repro":["max 3 steps, max 10 words each"],"observed":"max 20 words","rootCause":"file:line + max 25 words","proposedFix":"max 15 words"}],' +
-    '"acStatus":[{"ac":"max 12 words","status":"implemented|partial|missing","note":"file:line or gap, max 15 words"}],' +
+    '"acStatus":[{"ac":"max 12 words","status":"implemented|partial|missing","tested":"yes|partial|no","note":"file:line or gap, max 15 words"}],' +
     '"gaps":["max 15 words each, max 4 items"],' +
     '"checklist":{"smoke":["Do X — expect Y"],"sanity":["Do X — expect Y"],"adhoc":["attack idea — what to watch for"]},' +
     '"bugSources":[{"area":"max 8 words, no file paths","why":"max 15 words","playerImpact":"max 12 words"}]}\n' +
@@ -3538,7 +3539,7 @@ async function runCodeCheckGo() {
           model: 'claude-sonnet-4-6', max_tokens: 8000, temperature: 0,
           system: 'You are a meticulous static-analysis QA reviewer. You only report what the provided files actually show. Output raw JSON only.',
           messages: [{ role: 'user', content: buildCodeCheckInstruction(requirements, repoUrl) }]
-        }), { meter: true }))
+        }), { meter: true, effort: 'medium' }))
       });
       if (!rFast.ok) { var etf = await rFast.text(); throw new Error('API error ' + rFast.status + ': ' + etf.substring(0, 100)); }
       d = await rFast.json();
@@ -3812,12 +3813,20 @@ function renderCodeCheck(d) {
   // ── Section 3: Acceptance criteria ──
   if (acs.length) {
     var stIcon = { implemented: '✅', partial: '⚠️', missing: '❌' };
+    var testChip = function (t) {
+      t = (t || '').toLowerCase();
+      var cfg = { yes: ['✓ test', '#5DCAA5'], partial: ['~ test', '#d4a855'], no: ['no test', '#e06060'] }[t];
+      if (!cfg) return '';
+      return '<span style="font-size:10px;font-family:JetBrains Mono,monospace;color:' + cfg[1] + ';border:0.5px solid ' + cfg[1] + '40;border-radius:3px;padding:1px 6px;margin-left:7px;flex-shrink:0;">' + cfg[0] + '</span>';
+    };
+    var noTest = acs.filter(function (a) { return (a.tested || '').toLowerCase() === 'no'; }).length;
     var ab = '';
     acs.forEach(function (a) {
       ab += '<div style="display:flex;gap:9px;margin:9px 0;align-items:baseline;"><span style="flex-shrink:0;">' + (stIcon[(a.status || '').toLowerCase()] || '·') + '</span>' +
-        '<div><div style="font-size:14px;color:#b0c0cc;line-height:1.6;font-family:Sora,sans-serif;">' + esc(a.ac || '') + '</div>' +
+        '<div style="flex:1;"><div style="font-size:14px;color:#b0c0cc;line-height:1.6;font-family:Sora,sans-serif;">' + esc(a.ac || '') + testChip(a.tested) + '</div>' +
         (a.note ? '<div style="font-size:12px;font-family:JetBrains Mono,monospace;color:#5a6a7a;margin-top:3px;">' + esc(a.note) + '</div>' : '') + '</div></div>';
     });
+    if (noTest) ab = '<div style="font-size:11.5px;color:#e06060;font-family:JetBrains Mono,monospace;margin-bottom:8px;">⚠ ' + noTest + ' of ' + acs.length + ' criteria have no test coverage</div>' + ab;
     panes.ac = ab; tabMetas.ac = acDone + '/' + acs.length;
   }
 
@@ -3954,8 +3963,8 @@ function downloadCodeCheckMD(btn) {
     });
   }
   if (d.acStatus && d.acStatus.length) {
-    md += '\n---\n\n## Acceptance Criteria Status\n\n| AC | Status | Note |\n|----|--------|------|\n';
-    d.acStatus.forEach(function (a) { md += '| ' + (a.ac || '') + ' | ' + (a.status || '') + ' | ' + (a.note || '') + ' |\n'; });
+    md += '\n---\n\n## Acceptance Criteria Status\n\n| AC | Status | Test | Note |\n|----|--------|------|------|\n';
+    d.acStatus.forEach(function (a) { md += '| ' + (a.ac || '') + ' | ' + (a.status || '') + ' | ' + (a.tested || '') + ' | ' + (a.note || '') + ' |\n'; });
   }
   if (d.gaps && d.gaps.length) md += '\n## Gap Analysis\n\n' + d.gaps.map(function (g) { return '- ' + g; }).join('\n') + '\n';
   var cl = d.checklist || {};
@@ -4036,10 +4045,17 @@ function downloadCodeCheckHTML(btn) {
 
   if (d.acStatus && d.acStatus.length) {
     var stIcon = { implemented: '✅', partial: '⚠️', missing: '❌' };
+    var xTestChip = function (t) {
+      t = (t || '').toLowerCase();
+      var cfg = { yes: ['✓ test', '#5DCAA5'], partial: ['~ test', '#d4a855'], no: ['no test', '#e06060'] }[t];
+      return cfg ? '<span style="font-size:10px;font-family:monospace;color:' + cfg[1] + ';border:0.5px solid ' + cfg[1] + '40;border-radius:3px;padding:1px 6px;margin-left:7px;">' + cfg[0] + '</span>' : '';
+    };
     h += '<!--SPLIT:ac-->';
+    var xNoTest = d.acStatus.filter(function (a) { return (a.tested || '').toLowerCase() === 'no'; }).length;
+    if (xNoTest) h += '<div style="font-size:11.5px;color:#e06060;font-family:monospace;margin-bottom:8px;">⚠ ' + xNoTest + ' of ' + d.acStatus.length + ' criteria have no test coverage</div>';
     d.acStatus.forEach(function (a) {
       h += '<div style="display:flex;gap:10px;margin:8px 0;align-items:baseline;"><span>' + (stIcon[(a.status || '').toLowerCase()] || '·') + '</span><div>' +
-        '<div style="font-size:14px;color:#b0c0cc;line-height:1.6;">' + esc(a.ac || '') + '</div>' +
+        '<div style="font-size:14px;color:#b0c0cc;line-height:1.6;">' + esc(a.ac || '') + xTestChip(a.tested) + '</div>' +
         (a.note ? '<div style="font-size:12px;font-family:monospace;color:#5a6a7a;margin-top:2px;">' + esc(a.note) + '</div>' : '') + '</div></div>';
     });
   }
