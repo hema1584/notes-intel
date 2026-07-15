@@ -591,7 +591,7 @@
   </button>
   <div class="logo">
     <div class="logo-icon"><svg width="19" height="19" viewBox="0 0 20 20" fill="none"><ellipse cx="10" cy="10" rx="8" ry="3.4" stroke="#5DCAA5" stroke-width="1.1"/><ellipse cx="10" cy="10" rx="8" ry="3.4" transform="rotate(60 10 10)" stroke="#7F77DD" stroke-width="1.1"/><ellipse cx="10" cy="10" rx="8" ry="3.4" transform="rotate(-60 10 10)" stroke="#EF9F27" stroke-width="1.1"/><path d="M8.2 10l1.3 1.3 2.3-2.6" stroke="#5DCAA5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    <div><div class="logo-name">Notes Intel</div><div class="logo-ver" id="logo-ver">QA intelligence engine</div></div>
+    <div><div class="logo-name">Notes Intel</div><div class="logo-ver" id="logo-ver">QA intelligence engine · v4.7.0</div></div>
   </div>
   </div>
   <div style="display:flex;align-items:center;gap:6px;flex-wrap:nowrap;">
@@ -898,7 +898,8 @@
     <div style="display:flex;gap:8px;margin-top:8px;">
       <input id="cc-svn-rev" placeholder="final revision (optional)" spellcheck="false" style="flex:1;background:#111116;border:0.5px solid #252530;border-radius:7px;padding:9px 12px;font-size:12.5px;font-family:'JetBrains Mono',monospace;color:#a0b0c0;outline:none;"/>
     </div>
-    <div style="font-size:11px;color:#5a5a66;margin-top:6px;font-family:'Sora',sans-serif;">Reviews everything the branch changed vs trunk. Paste the dev's final revision to pin it, or leave blank for the latest.</div>
+    <textarea id="cc-review-links" rows="2" placeholder="code review links (optional) — paste the ticket's code-reviews.tactilews.com links, one per line" spellcheck="false" style="width:100%;margin-top:8px;background:#111116;border:0.5px solid #252530;border-radius:7px;padding:9px 12px;font-size:12px;font-family:'JetBrains Mono',monospace;color:#a0b0c0;outline:none;resize:vertical;"></textarea>
+    <div style="font-size:11px;color:#5a5a66;margin-top:6px;font-family:'Sora',sans-serif;">Reviews everything the branch changed vs trunk. Paste the dev's final revision to pin it, or leave blank for the latest. Review links help find the module branch even before the dev re-pins it.</div>
     <div style="display:flex;gap:8px;margin-top:11px;align-items:center;">
       <button onclick="runCodeCheckGo()" style="display:flex;align-items:center;gap:7px;padding:8px 16px;background:#17100a;border:0.5px solid #B45517;border-radius:8px;font-size:12px;color:#EF9F27;cursor:pointer;font-family:'JetBrains Mono',monospace;">Run check →</button>
       <button onclick="document.getElementById('cc-setup').style.display='none'" style="padding:8px 14px;background:transparent;border:0.5px solid #252530;border-radius:8px;font-size:11.5px;color:#5a5a66;cursor:pointer;font-family:'JetBrains Mono',monospace;">cancel</button>
@@ -2417,6 +2418,9 @@ function clearAll() {
   window._codeCheckData = null;
   window._ccUsage = null;
   window._ccFilesBlock = '';
+  window._ccConsumerBlock = '';
+  window._ccUnrelatedList = '';
+  window._ccPlanInfo = null;
   window._ccChecked = {};
   var ccSec = document.getElementById('codecheck-section');
   if (ccSec) ccSec.style.display = 'none';
@@ -2425,7 +2429,7 @@ function clearAll() {
   // Reset the code cross-check setup panel + its fields (revision/link are per-ticket)
   var ccSetup = document.getElementById('cc-setup');
   if (ccSetup) ccSetup.style.display = 'none';
-  ['cc-svn-url', 'cc-svn-rev'].forEach(function (id) { var el = document.getElementById(id); if (el) el.value = ''; });
+  ['cc-svn-url', 'cc-svn-rev', 'cc-review-links'].forEach(function (id) { var el = document.getElementById(id); if (el) el.value = ''; });
   // Clear inputs
   var mainInput = document.getElementById('main-input');
   mainInput.value = '';
@@ -3350,14 +3354,23 @@ function buildCodeCheckInstruction(requirements, repoUrl) {
   var access, method;
   if (window._ccFilesBlock) {
     // Fast mode — the changed files are provided inline; no repo access, no exploration.
-    access = 'You are reviewing a code change. The COMPLETE current text of every file this change touched is provided below — you do NOT need to fetch anything, and there is no other code available to you.\n';
+    // Two-stage runs additionally provide CONSUMER CONTEXT (unchanged code the ACs reference)
+    // and a one-line list of changed-but-unrelated files that were not sent.
+    var hasConsumer = !!window._ccConsumerBlock;
+    access = 'You are reviewing a code change. The COMPLETE current text of every relevant file this change touched is provided below' +
+      (hasConsumer ? ', plus excerpts of unchanged CONSUMER code that the acceptance criteria reference' : '') +
+      ' — you do NOT need to fetch anything, and there is no other code available to you.\n';
     method = 'METHOD:\n' +
       '1. Read the changed files below in full. They ARE the change under review.\n' +
       '2. Compare what they do against the REQUIREMENTS. Note every mismatch, missing behaviour, or extra behaviour.\n' +
       '3. Hunt bugs IN this code: null guards, off-by-one, silent early returns, swallowed errors, wrong event/lifecycle timing, race conditions.\n' +
       '4. For each acceptance criterion: is it implemented in these files? Cite file:line.\n' +
-      '5. If judging something needs code that is NOT shown here (a base class, a caller in another file), do NOT guess — note it in gaps as "not verifiable from the changed files".\n\n' +
-      '--- CHANGED FILES ---\n' + window._ccFilesBlock + '\n--- END CHANGED FILES ---\n';
+      (hasConsumer
+        ? '5. The CONSUMER CONTEXT section contains unchanged code fetched because the acceptance criteria reference it. Use it to verify each AC at its real call sites. Do NOT report bugs in consumer context as findings — it did not change; it is evidence for AC verdicts and discrepancies only. Only mark an AC "not verifiable" if the code it needs is missing from BOTH sections.\n'
+        : '5. If judging something needs code that is NOT shown here (a base class, a caller in another file), do NOT guess — note it in gaps as "not verifiable from the changed files".\n') +
+      '\n--- CHANGED FILES ---\n' + window._ccFilesBlock + '\n--- END CHANGED FILES ---\n' +
+      (window._ccUnrelatedList ? '\nAlso changed but judged unrelated to the acceptance criteria (not shown — do not speculate about them): ' + window._ccUnrelatedList + '\n' : '') +
+      (hasConsumer ? '\n--- CONSUMER CONTEXT (unchanged code, excerpts — evidence only) ---\n' + window._ccConsumerBlock + '\n--- END CONSUMER CONTEXT ---\n' : '');
   } else if (isRemote) {
     var m = (repoUrl || '').match(/^(.*?)@(\d+)$/);
     var baseUrl = m ? m[1] : repoUrl;
@@ -3380,43 +3393,251 @@ function buildCodeCheckInstruction(requirements, repoUrl) {
       '4. For each acceptance criterion: is it implemented? Cite file:line as evidence.\n' +
       '5. Hunt edge cases: null guards, off-by-one, silent early returns, error handling, undo support, race conditions.\n';
   }
-  return 'You are a senior QA engineer with 10+ years in mobile game testing, doing a static code review before this change reaches QA. ' + access +
-    'Your job has TWO audiences:\n' +
-    '- The DEVELOPER: concrete bugs and gaps with file:line evidence they can act on before handoff.\n' +
-    '- The QA TESTER: a practical test plan and a map of where this change is most likely to break, so they test the right things first.\n\n' +
+  return 'You are a senior QA engineer with 10+ years in mobile game testing. This is a QA gap-and-risk analysis, NOT a code review. ' + access +
+    'Your ONE audience is the QA TESTER. You do NOT report code bugs, root causes, or code fixes — the developer covers those in their own review, and duplicating that is noise QA does not want. Your job: compare what the TICKET asked for against what the BRANCH actually changed, surface the GAPS and the RISK-PRONE areas, and turn them into a focused test plan.\n\n' +
     '--- REQUIREMENTS (ticket / spec / notes) ---\n' + requirements + '\n--- END REQUIREMENTS ---\n\n' +
     method + '\n' +
-    'THINK LIKE A SENIOR QA:\n' +
-    '- Follow the data: what state does this change touch (save data, configs, server flags, cached assets)? State that survives restarts/updates is where the nasty bugs live.\n' +
-    '- Follow the player: interruptions (backgrounding, network loss, force-close), doing things fast, doing things twice, doing things in the wrong order.\n' +
-    '- Follow the change: what EXISTING behaviour shares code with this change? That is your regression surface — name specific adjacent features, not "test everything".\n' +
-    '- Trust nothing implicit: silent early returns, missing null guards, error paths that swallow exceptions — call them out.\n\n' +
+    'GAP ANALYSIS — the core of this report, in TWO directions:\n' +
+    '- IN THE TICKET, NOT (fully) IN THE CODE: for each acceptance criterion, is it implemented / partial / missing, with file:line or the gap. A partial or missing AC is a must-test or must-raise item.\n' +
+    '- IN THE CODE, NOT IN THE TICKET: behaviour the change adds or alters that the ticket never mentions. Unspecified behaviour is risk-prone — QA must know to test it. This goes in "discrepancies" as a question QA can raise with the programmer (a question, not a bug report).\n\n' +
+    'THINK LIKE A SENIOR QA — use this to CHOOSE what to test, never to describe code:\n' +
+    '- Follow the data: what state does this touch (save data, configs, server flags, cached assets)? State that survives restarts/updates is high-risk.\n' +
+    '- Follow the player: interruptions (backgrounding, network loss, force-close), doing things fast, twice, or out of order.\n' +
+    '- Follow the change: what EXISTING behaviour shares code with this change? That is the regression surface — name specific adjacent features, not "test everything".\n\n' +
     'RULES:\n' +
-    '- Every finding MUST cite real file paths and line numbers you actually read. Never invent code.\n' +
-    '- If you cannot find the relevant code, say so in gaps — do not guess.\n' +
-    '- Severity: high = crash/data loss/silent failure, med = wrong behaviour with workaround, low = polish.\n' +
+    '- Do NOT report code bugs, null-guard misses, race conditions, or propose code fixes — that is the developer\'s review, out of scope here. If code plainly contradicts an AC, express it as a GAP/discrepancy in QA terms, not as a bug with a root cause.\n' +
+    '- Cite real file:line ONLY as evidence for a gap or a risk area — never invent code. If you cannot find the relevant code, say so in gaps.\n' +
     '- CHECKLIST LANGUAGE — strict: every item is ONE short sentence a tester can act on with only the device in hand: "Do X — expect Y". Max ~15 words.\n' +
-    '  * NEVER mention class names, method names, variables, files, coroutines, dictionaries, findings, or any code internals in checklist items. Use the code knowledge to CHOOSE the checks, not to describe them.\n' +
-    '  * NEVER add parenthetical rationale like "(regression check for...)" or "(checks whether...)". If the reason matters, it belongs in bugSources — not on the checklist.\n' +
-    '  * Use words a new tester knows: open, close, tap, popup, screen, loading, restart. BAD: "expect a clean second camera-stack add with no duplicate-key errors". GOOD: "Close and reopen the same popup — expect it to display normally".\n' +
-    '  * Expected result must be something visible on screen or in the device log — not an internal state.\n' +
-    '- smoke = the critical happy paths that must work or the build is rejected (3-6 items). sanity = quick post-fix/re-test checks around the changed area (2-5 items). adhoc = exploratory attack ideas: interruptions, abuse, timing, unusual states (3-8 items).\n' +
-    '- Prefix EVERY checklist item with its priority: "[P0] " = run first, blocks sign-off; "[P1] " = should run this pass; "[P2] " = time-permitting. Order items within each list by priority.\n' +
-    '- bugSources: rank by likelihood. Each names a specific area of the change, why it is fragile (from the code you read), and what the player would experience if it breaks.\n' +
-    '- discrepancies is the MOST IMPORTANT section: every place the code deviates from what the ticket/AC/spec describes — missing behaviour, different behaviour, or extra behaviour the ticket never mentions. This is what QA flags back to the programmer. The "question" field must be a complete, polite, self-contained sentence citing file:line that QA can paste into a Jira comment verbatim. If code and ticket fully match, return an empty array — never pad.\n' +
-    '- This is static analysis: flag "verify on device" where runtime behaviour matters.\n' +
-    '- TEST COVERAGE (important for gap analysis): the changed files may include unit tests (files under UnitTests/ or named *Tests.cs). Use them. For EACH acceptance criterion set "tested": "yes" if a test clearly exercises it, "partial" if only partly, "no" if no test covers it. An AC with no test is a concrete coverage gap — call it out plainly in the note (e.g. "no test covers this"). A test that asserts behaviour matching or contradicting an AC is strong, non-speculative evidence — prefer it over guessing from code. If no test files are present, set "tested": "no" for all and note that tests were not found.\n\n' +
-    'BREVITY — this is a scan-first report, not documentation. Respect every word limit below strictly. One idea per field. No sub-clauses chained with semicolons or em-dashes. Never repeat the same fact in two sections — evidence lives ONCE, in the most specific section. File paths appear ONLY in file/rootCause/note fields, never in verdict, bullets, or checklist.\n\n' +
+    '  * NEVER mention class names, method names, variables, files, or any code internals in checklist items. Use code knowledge to CHOOSE the checks, not to describe them.\n' +
+    '  * NEVER add parenthetical rationale. If the reason matters, it belongs in riskAreas.\n' +
+    '  * Use words a new tester knows: open, close, tap, popup, screen, loading, restart. Expected result must be something visible on screen or in the device log — not internal state.\n' +
+    '- CHECKLIST LISTS: smoke = critical happy paths that must work or the build is rejected (3-6). sanity = quick checks around the changed area (2-5). regression = adjacent EXISTING features that share code with the change and could break (2-6). adhoc = exploratory attack ideas: interruptions, abuse, timing, unusual states (3-8).\n' +
+    '- Prefix EVERY checklist item with its priority: "[P0] " run first, blocks sign-off; "[P1] " this pass; "[P2] " time-permitting. Order each list by priority.\n' +
+    '- riskAreas: rank by likelihood. Each names a specific area of the change, why it is risk-prone, and what the player would experience if it breaks. This is where QA focuses first.\n' +
+    '- discrepancies: the "question" field must be a complete, polite, self-contained sentence citing file:line that QA can paste into a Jira comment verbatim. If code and ticket fully match, return an empty array — never pad.\n' +
+    '- TEST COVERAGE: changed files may include unit tests (under UnitTests/ or named *Tests.cs). For EACH acceptance criterion set "tested": yes|partial|no. An AC with no test is a coverage gap — say so in the note. If no test files are present, set "tested":"no" for all.\n' +
+    '- This is static analysis: flag "verify on device" where runtime behaviour matters.\n\n' +
+    'BREVITY — scan-first report, not documentation. Respect every word limit. One idea per field. Never repeat the same fact across sections. File paths appear ONLY in file/note fields, never in verdict, bullets, or checklist.\n\n' +
     'OUTPUT — return ONLY this JSON object, no markdown fences, no prose:\n' +
-    '{"summary":{"match":"yes|partial|no — does the implementation match the ticket","verdict":"max 15 words in PLAIN QA LANGUAGE — no class names, no code jargon. State whether the build does what the ticket promises and whether testing can proceed. e.g. Partial match — safe to test, but popup closing behaves differently than the ticket describes","subline":"max 12 words — the FIRST thing QA should test and why, in device actions. e.g. Start by reopening popups quickly — most likely place to break","forQA":["max 10 words each, max 3 bullets, no file paths — what to test and why"],"forDev":["max 12 words each, max 3 bullets, no file paths — phrase as SUGGESTIONS a QA peer would raise, never bare orders. Use \\"Consider…\\", \\"Worth confirming…\\", \\"Might be safer to…\\" — NOT \\"Add X\\" / \\"Fix Y\\""]},' +
+    '{"summary":{"match":"yes|partial|no — does the implementation match the ticket","verdict":"max 15 words PLAIN QA LANGUAGE — no code jargon. Does the build do what the ticket promises, and can testing proceed? e.g. Partial — safe to test, but the popup closes differently than the ticket describes","subline":"max 12 words — the FIRST thing QA should test and why, in device actions","forQA":["max 10 words each, max 3 bullets, no file paths — what to test first and why"]},' +
+    '"acStatus":[{"ac":"max 14 words","status":"implemented|partial|missing","tested":"yes|partial|no","note":"file:line or the gap, max 18 words"}],' +
     '"discrepancies":[{"ticketSays":"max 12 words","codeDoes":"max 12 words","file":"file:line only","question":"one polite self-contained sentence, max 35 words, citing file:line — pasteable to Jira"}],' +
-    '"findings":[{"title":"max 60 chars","severity":"high|med|low","repro":["max 3 steps, max 10 words each"],"observed":"max 20 words","rootCause":"file:line + max 25 words","proposedFix":"max 15 words"}],' +
-    '"acStatus":[{"ac":"max 12 words","status":"implemented|partial|missing","tested":"yes|partial|no","note":"file:line or gap, max 15 words"}],' +
-    '"gaps":["max 15 words each, max 4 items"],' +
-    '"checklist":{"smoke":["Do X — expect Y"],"sanity":["Do X — expect Y"],"adhoc":["attack idea — what to watch for"]},' +
-    '"bugSources":[{"area":"max 8 words, no file paths","why":"max 15 words","playerImpact":"max 12 words"}]}\n' +
-    'CAPS: max 5 findings (merge or drop lows), max 4 discrepancies, max 5 bugSources. Fewer strong items beat many weak ones.\n' +
-    'BALANCE: the limits kill padding, never evidence. If a rootCause or question is not actionable within its limit, exceed it by what the evidence needs — but never restate context, hedge, or explain what a section already implies. A finding the programmer cannot act on is worse than a slightly long one.';
+    '"gaps":["max 15 words each, max 4 items — anything unclear, unspecified, or missing that QA should raise before testing"],' +
+    '"checklist":{"smoke":["[P0] Do X — expect Y"],"sanity":["Do X — expect Y"],"regression":["Do X — expect Y"],"adhoc":["attack idea — what to watch for"]},' +
+    '"riskAreas":[{"area":"max 8 words, no file paths","why":"max 15 words","playerImpact":"max 12 words"}]}\n' +
+    'CAPS: max 4 discrepancies, max 5 riskAreas. Fewer strong items beat many weak ones. Do NOT include a "findings" section — code bugs are out of scope for this report.\n' +
+    'BALANCE: the limits kill padding, never evidence. If a note or question is not actionable within its limit, exceed it by what the evidence needs — never restate context or hedge.';
+}
+
+// ── Two-stage AC-driven retrieval ─────────────────────────────────────────────
+// Plan cheaply what code the acceptance criteria need, then fetch exactly that:
+// relevant changed files in full + excerpts of the unchanged consumer code the ACs
+// reference. Any failure falls back to the classic fetch-everything path.
+
+function ccParseReviewLinks(text) {
+  var out = [];
+  (text || '').split(/\s+/).forEach(function (u) {
+    var m = u.match(/\/repositories\/([^\/]+)\/branches\/([^\/]+)/);
+    if (m) { try { out.push({ repo: m[1], branch: decodeURIComponent(m[2]) }); } catch (e) { out.push({ repo: m[1], branch: m[2] }); } }
+  });
+  return out;
+}
+
+// Package/SDK changes (from manifest.json) → prompt context. A dependency bump is a
+// risk-prone area and a regression trigger even when no game code changed.
+function ccPkgNote(pc) {
+  if (!pc) return '';
+  var lines = [];
+  (pc.changed || []).forEach(function (c) { lines.push('- ' + c.name + ': ' + c.from + ' → ' + c.to); });
+  (pc.added || []).forEach(function (a) { lines.push('- + ' + a.name + ': ' + a.version + ' (added)'); });
+  (pc.removed || []).forEach(function (r) { lines.push('- − ' + r.name + ': ' + r.version + ' (removed)'); });
+  if (!lines.length) return '';
+  return '\nPACKAGE / DEPENDENCY CHANGES (from Packages/manifest.json — no game code, but each is a risk-prone area: add it to riskAreas and a regression check for the system it affects. An SDK major-version bump is high risk):\n' + lines.join('\n') + '\n';
+}
+
+function ccBuildPlanPrompt(requirements, entries, commitLog) {
+  var pathList = entries.map(function (e) { return (e.status || '?') + '  ' + e.path; }).join('\n');
+  return 'You are planning targeted code retrieval for a QA code review. Below are the REQUIREMENTS (ticket/spec with acceptance criteria) and the LIST of changed file paths for a branch.\n\n' +
+    '--- REQUIREMENTS ---\n' + requirements + '\n--- END REQUIREMENTS ---\n\n' +
+    '--- CHANGED FILE PATHS ---\n' + pathList + '\n--- END ---\n\n' +
+    (commitLog ? '--- COMMIT MESSAGES ---\n' + commitLog + '\n--- END ---\n\n' : '') +
+    'Return ONLY this JSON object, no markdown fences, no prose:\n' +
+    '{"acs":[{"ac":"max 12 words","files":["changed paths (exact strings from the list) relevant to this AC"],"symbols":["PascalCase class names this AC implies that are NOT in the changed list — the consumer/caller code that uses the change"],"codeVerifiable":true}],' +
+    '"irrelevant":["changed paths (exact strings from the list) relevant to NO acceptance criterion — generated files, unrelated config"]}\n' +
+    'RULES:\n' +
+    '- max 4 symbols per AC; each symbol is a single identifier likely to be a C# file name (e.g. InventoryHandler) — no sentences.\n' +
+    '- codeVerifiable=false when the AC is about art/assets/config values/server data rather than code logic.\n' +
+    '- when unsure whether a path is irrelevant, leave it OUT of "irrelevant" (it will then be reviewed).\n' +
+    '- if the requirements contain no explicit acceptance criteria, derive 2-5 acs from the described behaviour.';
+}
+
+// Match consumer symbols against .cs path indexes. Unity convention: class Foo → Foo.cs.
+function ccResolveSymbols(symbols, indexes, changedNameSet) {
+  var picks = [], seen = {};
+  symbols.forEach(function (sym) {
+    if (!sym || picks.length >= 6) return;
+    var lower = String(sym).toLowerCase(), per = 0, cands = [];
+    Object.keys(indexes).forEach(function (root) {
+      (indexes[root] || []).forEach(function (p) {
+        var fn = p.split('/').pop().toLowerCase();
+        if (fn === lower + '.cs') cands.push({ root: root, p: p, score: 2 });
+        else if (lower.length >= 5 && fn.indexOf(lower) !== -1) cands.push({ root: root, p: p, score: 1 });
+      });
+    });
+    cands.sort(function (a, b) { return b.score - a.score; });
+    for (var i = 0; i < cands.length && per < 2 && picks.length < 6; i++) {
+      var c = cands[i], key = c.root + '/' + c.p;
+      if (seen[key]) continue;
+      if (changedNameSet[c.p.split('/').pop().toLowerCase()]) continue; // already among the changed files
+      seen[key] = 1;
+      picks.push({ url: c.root.replace(/\/$/, '') + '/' + c.p, path: c.p, symbol: sym });
+      per++;
+    }
+  });
+  return picks;
+}
+
+// Keep the file header plus ±40 lines around every symbol mention — the AC usually
+// cares about one method, not the whole manager class.
+function ccExcerpt(content, symbols, maxChars) {
+  if (!content) return '';
+  if (content.length <= maxChars) return content;
+  var lines = content.split('\n');
+  var keep = new Array(lines.length);
+  for (var i = 0; i < Math.min(30, lines.length); i++) keep[i] = true; // usings + class decl
+  var res = symbols.filter(Boolean).map(function (s) {
+    return new RegExp('\\b' + String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b');
+  });
+  lines.forEach(function (ln, idx) {
+    for (var r = 0; r < res.length; r++) {
+      if (res[r].test(ln)) {
+        for (var j = Math.max(0, idx - 40); j <= Math.min(lines.length - 1, idx + 40); j++) keep[j] = true;
+        break;
+      }
+    }
+  });
+  var out = [], gap = false;
+  lines.forEach(function (ln, idx) {
+    if (keep[idx]) { if (gap) { out.push('    /* … lines omitted … */'); gap = false; } out.push(ln); }
+    else gap = true;
+  });
+  var s = out.join('\n');
+  return s.length > maxChars ? s.slice(0, maxChars) : s;
+}
+
+// Runs stages 0-2. On success sets _ccFilesBlock/_ccConsumerBlock/_ccUnrelatedList and
+// returns {extraReq, note}; throws on any failure (caller falls back to the classic path).
+async function ccTwoStagePrepare(requirements, repoUrl, rev, branchNames, setStatus) {
+  // Stage 0 — metadata only (changed paths + commit log + module branch discovery)
+  setStatus('reading the change list from svn…');
+  var sr = await fetch('/api/svn-changes', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url: repoUrl, rev: rev, summaryOnly: true, branchNames: branchNames })
+  });
+  var sum = await sr.json();
+  if (!sr.ok) throw new Error(sum.error || 'could not read svn changes');
+  if (!sum.entries || !sum.entries.length) throw new Error('no entries');
+
+  var extraReq = '';
+  if (sum.moduleBranches && sum.moduleBranches.length) {
+    extraReq += '\nMODULE BRANCHES (same ticket — reviewed alongside the game branch):\n' +
+      sum.moduleBranches.map(function (m) { return '- ' + m.module + ' branch ' + m.branch; }).join('\n') + '\n';
+  }
+  if (sum.externalModules && sum.externalModules.length) {
+    extraReq += '\nMODULE PIN CHANGES (the branch re-points these external modules — the reviewed files come from the new pin):\n' +
+      sum.externalModules.map(function (m) { return '- ' + m.module + ': ' + m.from + '  →  ' + m.to; }).join('\n') + '\n';
+  }
+  if (sum.commitLog) extraReq += '\nCOMMIT MESSAGE(S) for this change:\n' + sum.commitLog + '\n';
+  extraReq += ccPkgNote(sum.packageChanges);
+
+  // Stage 1 — retrieval plan (cheap model)
+  setStatus('planning what code the acceptance criteria need…');
+  var pr = await fetch(getApiUrl(), {
+    method: 'POST', headers: getApiHeaders(),
+    body: JSON.stringify(wrapBody({
+      model: 'claude-haiku-4-5-20251001', max_tokens: 1500, temperature: 0,
+      messages: [{ role: 'user', content: ccBuildPlanPrompt(requirements, sum.entries, sum.commitLog) }]
+    }))
+  });
+  if (!pr.ok) throw new Error('plan call failed: ' + pr.status);
+  var praw = extractText(await pr.json()).replace(/```json|```/g, '').trim();
+  var ps = praw.indexOf('{'), pe = praw.lastIndexOf('}');
+  if (ps === -1 || pe === -1) throw new Error('no JSON in plan');
+  var plan = JSON.parse(praw.slice(ps, pe + 1));
+  if (!plan.acs || !plan.acs.length) throw new Error('empty plan');
+  var nonCode = plan.acs.filter(function (a) { return a.codeVerifiable === false && a.ac; });
+  if (nonCode.length) {
+    extraReq += '\nNOTE: these acceptance criteria are asset/config/server-driven and cannot be verified from code — set their status honestly and note "verify on device" instead of guessing:\n' +
+      nonCode.map(function (a) { return '- ' + a.ac; }).join('\n') + '\n';
+  }
+
+  // Split entries: unrelated ones get demoted to a one-line mention instead of full text.
+  var irrelevant = {};
+  (plan.irrelevant || []).forEach(function (p) { irrelevant[p] = 1; });
+  var relevant = sum.entries.filter(function (e) { return !irrelevant[e.path]; });
+  var demoted = sum.entries.filter(function (e) { return irrelevant[e.path]; });
+  if (!relevant.length) { relevant = sum.entries; demoted = []; } // plan demoted everything — distrust it
+
+  // Consumer symbols = union over ACs, minus classes already among the changed files.
+  var changedNameSet = {};
+  sum.entries.forEach(function (e) { changedNameSet[(e.path.split('/').pop() || '').toLowerCase()] = 1; });
+  var symbols = [];
+  (plan.acs || []).forEach(function (a) {
+    (a.symbols || []).forEach(function (s) { if (s && symbols.indexOf(s) === -1) symbols.push(s); });
+  });
+  symbols = symbols.slice(0, 12);
+
+  // Locate consumer files by name in the module branches + the game branch (Assets-scoped).
+  var consumers = [];
+  if (symbols.length) {
+    var roots = (sum.moduleBranches || []).map(function (m) { return m.url; });
+    var hasAssets = sum.entries.some(function (e) { return e.source === 'branch' && /^Assets\//.test(e.path); });
+    var cleanRepo = repoUrl.replace(/@\d+$/, '').replace(/\/$/, '');
+    roots.push(hasAssets ? cleanRepo + '/Assets' : cleanRepo);
+    setStatus('locating the consumer code the criteria reference…');
+    try {
+      var ir = await fetch('/api/svn-index', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ roots: roots.slice(0, 4) })
+      });
+      var idx = await ir.json();
+      if (ir.ok && idx.indexes) consumers = ccResolveSymbols(symbols, idx.indexes, changedNameSet);
+    } catch (e) { /* consumer lookup is best-effort — AC verdicts just get weaker */ }
+  }
+
+  // Stage 2 fetch — relevant changed files in full + consumer files for excerpting.
+  var sendRel = relevant.slice(0, 14);
+  setStatus('fetching ' + sendRel.length + ' changed file' + (sendRel.length === 1 ? '' : 's') +
+    (consumers.length ? ' + ' + consumers.length + ' consumer file' + (consumers.length === 1 ? '' : 's') : '') + '…');
+  var toCat = sendRel.map(function (e) { return { url: e.catUrl, peg: e.catPeg || '' }; })
+    .concat(consumers.map(function (c) { return { url: c.url, peg: '' }; }));
+  var cr = await fetch('/api/svn-cat', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ files: toCat })
+  });
+  var cat = await cr.json();
+  if (!cr.ok || !cat.files) throw new Error('file fetch failed');
+  var byUrl = {};
+  cat.files.forEach(function (f) { byUrl[f.url] = f; });
+
+  window._ccFilesBlock = sendRel.map(function (e) {
+    var f = byUrl[e.catUrl] || {};
+    return '### FILE: ' + e.path + ' (' + (e.status || '?') + ')' + (f.truncated ? ' [truncated]' : '') + (f.error ? ' [could not read: ' + f.error + ']' : '') + '\n' + (f.content || '');
+  }).join('\n\n');
+  window._ccConsumerBlock = consumers.map(function (c) {
+    var f = byUrl[c.url] || {};
+    if (f.error || !f.content) return '### CONSUMER: ' + c.path + ' [could not read]';
+    var ex = ccExcerpt(f.content, symbols, 12000);
+    return '### CONSUMER: ' + c.path + (ex.length < f.content.length ? ' [excerpt]' : '') + ' (fetched because the ACs reference ' + c.symbol + ')\n' + ex;
+  }).join('\n\n');
+  window._ccUnrelatedList = demoted.map(function (e) { return e.path; }).join(', ');
+  window._ccPlanInfo = { acs: plan.acs.length, symbols: symbols.length, consumers: consumers.length, demoted: demoted.length };
+
+  var note = sendRel.length + ' relevant file' + (sendRel.length === 1 ? '' : 's') +
+    (relevant.length > sendRel.length ? ' (' + (relevant.length - sendRel.length) + ' more over the size cap)' : '') +
+    (consumers.length ? ' + ' + consumers.length + ' consumer excerpt' + (consumers.length === 1 ? '' : 's') : '') +
+    (demoted.length ? ' — ' + demoted.length + ' unrelated file' + (demoted.length === 1 ? '' : 's') + ' not sent' : '');
+  return { extraReq: extraReq, note: note };
 }
 
 function runCodeCheck() {
@@ -3437,6 +3658,8 @@ async function runCodeCheckGo() {
   var repoUrl = urlEl ? urlEl.value.trim() : '';
   var rev = revEl ? revEl.value.trim().replace(/^r/i, '') : '';
   if (!repoUrl) { showErr('Enter the SVN branch URL (or a local checkout folder) for this ticket.'); return; }
+  var linksEl = document.getElementById('cc-review-links');
+  var reviewBranchNames = ccParseReviewLinks(linksEl ? linksEl.value : '').map(function (l) { return l.branch; });
   var repoVal = rev ? repoUrl.replace(/@\d+$/, '') + '@' + rev : repoUrl;
   window._niRepoPath = repoVal;
   var rf0 = document.getElementById('ab-repo');
@@ -3506,19 +3729,32 @@ async function runCodeCheckGo() {
     }
 
     window._ccFilesBlock = '';
+    window._ccConsumerBlock = '';
+    window._ccUnrelatedList = '';
     var d;
 
     {
-      // ── FAST MODE — app fetches the changed files, one non-agentic reasoning call ──
+      // ── FAST MODE — two-stage AC-driven retrieval; classic fetch-everything as fallback ──
+      var prepared = false;
+      try {
+        var ts = await ccTwoStagePrepare(requirements, repoUrl, rev, reviewBranchNames, setAnalysisStatus);
+        requirements += ts.extraReq;
+        setAnalysisStatus('reviewing ' + ts.note + ' against requirements…');
+        prepared = true;
+      } catch (tsErr) {
+        console.warn('two-stage retrieval unavailable (' + ((tsErr && tsErr.message) || tsErr) + ') — using classic fetch');
+        window._ccFilesBlock = ''; window._ccConsumerBlock = ''; window._ccUnrelatedList = '';
+      }
+      if (!prepared) {
       setAnalysisStatus('fetching changed files from svn…');
       var scr = await fetch('/api/svn-changes', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: repoUrl, rev: rev })
+        body: JSON.stringify({ url: repoUrl, rev: rev, branchNames: reviewBranchNames })
       });
       var sc = await scr.json();
       if (!scr.ok) throw new Error(sc.error || 'could not read svn changes');
       if (!sc.files || !sc.files.length) {
-        throw new Error('No code changes found for this branch vs trunk. If the feature lives in a module, the branch may not have re-pinned it yet — check the branch URL and (optionally) the final revision with the dev.');
+        throw new Error('No code changes found for this branch vs trunk. If the feature lives in a module, the branch may not have re-pinned it yet — paste the ticket\'s code review links in the setup panel so the module branch can be found, or check the branch URL with the dev.');
       }
       var block = sc.files.map(function (f) {
         return '### FILE: ' + f.path + ' (' + (f.status || '?') + ')' + (f.truncated ? ' [truncated]' : '') + (f.error ? ' [could not read: ' + f.error + ']' : '') + '\n' + (f.content || '');
@@ -3530,9 +3766,15 @@ async function runCodeCheckGo() {
         requirements += '\nMODULE PIN CHANGES (the branch re-points these external modules — the reviewed files come from the new pin):\n' +
           sc.externalModules.map(function (m) { return '- ' + m.module + ': ' + m.from + '  →  ' + m.to; }).join('\n') + '\n';
       }
+      if (sc.moduleBranches && sc.moduleBranches.length) {
+        requirements += '\nMODULE BRANCHES (same ticket — reviewed alongside the game branch):\n' +
+          sc.moduleBranches.map(function (m) { return '- ' + m.module + ' branch ' + m.branch; }).join('\n') + '\n';
+      }
       if (sc.droppedForCap) note += ' (' + sc.droppedForCap + ' more not shown — over the size cap)';
       if (sc.commitLog) requirements += '\nCOMMIT MESSAGE(S) for this change:\n' + sc.commitLog + '\n';
+      requirements += ccPkgNote(sc.packageChanges);
       setAnalysisStatus('reviewing ' + note + ' against requirements…');
+      }
       var rFast = await fetch(getApiUrl(), {
         method: 'POST', headers: getApiHeaders(),
         body: JSON.stringify(Object.assign(wrapBody({
@@ -3544,6 +3786,8 @@ async function runCodeCheckGo() {
       if (!rFast.ok) { var etf = await rFast.text(); throw new Error('API error ' + rFast.status + ': ' + etf.substring(0, 100)); }
       d = await rFast.json();
       window._ccFilesBlock = '';
+      window._ccConsumerBlock = '';
+      window._ccUnrelatedList = '';
     }
     var raw = extractText(d);
     var clean = raw.replace(/```json|```/g, '').trim();
@@ -3571,16 +3815,15 @@ var CC_TABS = [
   { k: 'ac', icon: '✅', lbl: 'Criteria', col: '#5DCAA5' },
   { k: 'find', icon: '🛠', lbl: 'Findings', col: '#6090d8' },
   { k: 'checks', icon: '🧪', lbl: 'Checklist', col: '#5DCAA5' },
-  { k: 'bugs', icon: '🎯', lbl: 'Bug sources', col: '#e06060' }
+  { k: 'bugs', icon: '🎯', lbl: 'Risk areas', col: '#e06060' }
 ];
 
 function ccLegendHtml() {
   var rows = [
-    ['✅', 'Criteria', '#5DCAA5', 'Is each acceptance criterion in the ticket actually implemented in the code?'],
-    ['🛠', 'Findings', '#6090d8', 'Bugs in the code itself — crashes, missing guards, races. Real regardless of the ticket.'],
-    ['⚑', 'Flags', '#EF9F27', 'Where the code does something different from what the ticket says. Raise these with the programmer.'],
-    ['🧪', 'Checklist', '#5DCAA5', 'What to test on device, by priority. Tick as you go, or convert to QA Focus.'],
-    ['🎯', 'Bug sources', '#e06060', 'Where this change is most likely to break, and what the player would see.']
+    ['⚑', 'Flags', '#EF9F27', 'In the code but not in the ticket — behaviour the ticket never mentions. Raise these with the programmer.'],
+    ['✅', 'Criteria', '#5DCAA5', 'In the ticket — is each acceptance criterion actually implemented, and is it tested?'],
+    ['🧪', 'Checklist', '#5DCAA5', 'What to test on device, by priority: smoke / sanity / regression / adhoc. Tick as you go, or convert to QA Focus.'],
+    ['🎯', 'Risk areas', '#e06060', 'Where this change is most likely to break, and what the player would see. Test these first.']
   ];
   var inner = rows.map(function (r) {
     return '<div style="display:flex;gap:9px;margin:6px 0;align-items:baseline;">' +
@@ -3737,11 +3980,11 @@ function renderCodeCheck(d) {
   var findings = d.findings || [];
   var acs = d.acStatus || [];
   var cl = d.checklist || {};
-  var bugs = d.bugSources || [];
+  var bugs = d.riskAreas || d.bugSources || [];
   var highN = findings.filter(function (f) { return (f.severity || '').toLowerCase() === 'high'; }).length;
   var medN = findings.filter(function (f) { return (f.severity || '').toLowerCase() === 'med'; }).length;
   var acDone = acs.filter(function (a) { return (a.status || '').toLowerCase() === 'implemented'; }).length;
-  var checkN = (cl.smoke || []).length + (cl.sanity || []).length + (cl.adhoc || []).length;
+  var checkN = (cl.smoke || []).length + (cl.sanity || []).length + (cl.regression || []).length + (cl.adhoc || []).length;
   var panes = {}, tabMetas = {};
   window._ccChecked = {};
   window._ccTotal = checkN;
@@ -3764,8 +4007,8 @@ function renderCodeCheck(d) {
     (sum.subline ? '<div style="font-size:13px;color:' + matchCfg.sub + ';margin-top:5px;line-height:1.55;font-family:Sora,sans-serif;">▸ ' + esc(sum.subline) + '</div>' : '') +
     '</div></div>';
 
-  // ── QA first, then developer suggestions (counts live in the tab pills below — no separate stat strip) ──
-  [{ key: 'forQA', label: '🧪 For QA', col: '#5DCAA5' }, { key: 'forDev', label: '🛠 Suggestions for the developer', col: '#6090d8' }].forEach(function (g) {
+  // ── QA focus bullets (counts live in the tab pills below — no separate stat strip) ──
+  [{ key: 'forQA', label: '🧪 For QA', col: '#5DCAA5' }].forEach(function (g) {
     var pts = sum[g.key];
     if (!pts || !pts.length) return;
     html += '<div style="font-size:11px;font-family:JetBrains Mono,monospace;color:' + g.col + ';letter-spacing:.06em;text-transform:uppercase;margin:10px 0 4px;">' + g.label + '</div>';
@@ -3842,6 +4085,7 @@ function renderCodeCheck(d) {
   var passes = [
     { key: 'smoke', label: 'Smoke — must pass or reject build', col: '#e06060' },
     { key: 'sanity', label: 'Sanity — quick checks around the change', col: '#d4a855' },
+    { key: 'regression', label: 'Regression — adjacent features that share this code', col: '#5DCAA5' },
     { key: 'adhoc', label: 'Adhoc — exploratory attack ideas', col: '#7F77DD' }
   ];
   if (checkN) {
@@ -3940,43 +4184,35 @@ function downloadCodeCheckMD(btn) {
   if (d.summary && typeof d.summary === 'object') {
     if (d.summary.verdict) md += '**Verdict**: ' + d.summary.verdict + '\n';
     if (d.summary.subline) md += '\n' + d.summary.subline + '\n';
-    if (d.summary.forDev && d.summary.forDev.length) md += '\n**For the developer:**\n\n' + d.summary.forDev.map(function (p) { return '- ' + p; }).join('\n') + '\n';
     if (d.summary.forQA && d.summary.forQA.length) md += '\n**For QA:**\n\n' + d.summary.forQA.map(function (p) { return '- ' + p; }).join('\n') + '\n';
   } else {
     md += (d.summary || '') + '\n';
   }
+  if (d.acStatus && d.acStatus.length) {
+    md += '\n---\n\n## Gap Analysis — Ticket vs Code\n\n### Acceptance criteria (in the ticket)\n\n| AC | Status | Test | Note |\n|----|--------|------|------|\n';
+    d.acStatus.forEach(function (a) { md += '| ' + (a.ac || '') + ' | ' + (a.status || '') + ' | ' + (a.tested || '') + ' | ' + (a.note || '') + ' |\n'; });
+  }
   if (d.discrepancies && d.discrepancies.length) {
-    md += '\n---\n\n## Flag to Programmer — Ticket vs Code\n\n';
+    md += '\n### In the code, not in the ticket — raise with the programmer\n\n';
     d.discrepancies.forEach(function (x, i) {
       md += (i + 1) + '. **Ticket says**: ' + (x.ticketSays || '') + '\n   **Code does**: ' + (x.codeDoes || '') + '\n' +
         (x.file ? '   **Evidence**: `' + x.file + '`\n' : '') +
         (x.question ? '   **Question for programmer**: ' + x.question + '\n' : '') + '\n';
     });
   }
-  if (d.findings && d.findings.length) {
-    d.findings.forEach(function (f, i) {
-      md += '\n---\n\n## Finding ' + (i + 1) + ' — ' + (f.title || '') + '\n\n**Severity**: ' + (f.severity || '?') + '\n';
-      if (f.repro && f.repro.length) md += '\n### Repro\n\n' + f.repro.map(function (s, n) { return (n + 1) + '. ' + s; }).join('\n') + '\n';
-      if (f.observed) md += '\n### Observed\n\n' + f.observed + '\n';
-      if (f.rootCause) md += '\n### Root cause\n\n' + f.rootCause + '\n';
-      if (f.proposedFix) md += '\n### Proposed fix\n\n' + f.proposedFix + '\n';
-    });
-  }
-  if (d.acStatus && d.acStatus.length) {
-    md += '\n---\n\n## Acceptance Criteria Status\n\n| AC | Status | Test | Note |\n|----|--------|------|------|\n';
-    d.acStatus.forEach(function (a) { md += '| ' + (a.ac || '') + ' | ' + (a.status || '') + ' | ' + (a.tested || '') + ' | ' + (a.note || '') + ' |\n'; });
-  }
-  if (d.gaps && d.gaps.length) md += '\n## Gap Analysis\n\n' + d.gaps.map(function (g) { return '- ' + g; }).join('\n') + '\n';
+  if (d.gaps && d.gaps.length) md += '\n### Open questions / unclear before testing\n\n' + d.gaps.map(function (g) { return '- ' + g; }).join('\n') + '\n';
   var cl = d.checklist || {};
-  if ((cl.smoke && cl.smoke.length) || (cl.sanity && cl.sanity.length) || (cl.adhoc && cl.adhoc.length)) {
+  if ((cl.smoke && cl.smoke.length) || (cl.sanity && cl.sanity.length) || (cl.regression && cl.regression.length) || (cl.adhoc && cl.adhoc.length)) {
     md += '\n---\n\n## Test Checklist\n';
     if (cl.smoke && cl.smoke.length) md += '\n### Smoke — must pass or reject build\n\n' + cl.smoke.map(function (t) { return '- [ ] ' + t; }).join('\n') + '\n';
     if (cl.sanity && cl.sanity.length) md += '\n### Sanity — quick checks around the change\n\n' + cl.sanity.map(function (t) { return '- [ ] ' + t; }).join('\n') + '\n';
+    if (cl.regression && cl.regression.length) md += '\n### Regression — adjacent features that share this code\n\n' + cl.regression.map(function (t) { return '- [ ] ' + t; }).join('\n') + '\n';
     if (cl.adhoc && cl.adhoc.length) md += '\n### Adhoc — exploratory attack ideas\n\n' + cl.adhoc.map(function (t) { return '- [ ] ' + t; }).join('\n') + '\n';
   }
-  if (d.bugSources && d.bugSources.length) {
-    md += '\n## Likely Bug Sources\n\n';
-    d.bugSources.forEach(function (b, i) {
+  var mdRisk = d.riskAreas || d.bugSources || [];
+  if (mdRisk.length) {
+    md += '\n## Risk-Prone Areas — where QA focuses first\n\n';
+    mdRisk.forEach(function (b, i) {
       md += (i + 1) + '. **' + (b.area || '') + '**\n   - Why: ' + (b.why || '') + '\n   - Player sees: ' + (b.playerImpact || '') + '\n';
     });
   }
@@ -4001,7 +4237,8 @@ function downloadCodeCheckHTML(btn) {
   var xDisc = d.discrepancies || [], xFind = d.findings || [], xAcs = d.acStatus || [], xCl = d.checklist || {};
   var xHighN = xFind.filter(function (f) { return (f.severity || '').toLowerCase() === 'high'; }).length;
   var xAcDone = xAcs.filter(function (a) { return (a.status || '').toLowerCase() === 'implemented'; }).length;
-  var xCheckN = (xCl.smoke || []).length + (xCl.sanity || []).length + (xCl.adhoc || []).length;
+  var xCheckN = (xCl.smoke || []).length + (xCl.sanity || []).length + (xCl.regression || []).length + (xCl.adhoc || []).length;
+  var xRisk = d.riskAreas || d.bugSources || [];
   var xm = (sum.match || '').toLowerCase();
   if (xm !== 'yes' && xm !== 'partial' && xm !== 'no') xm = (!xHighN && !xDisc.length) ? 'yes' : 'partial';
   var xCfg = { yes: { col: '#5DCAA5', bg: '#091812', icon: '✓', chip: 'MATCH', txt: '#9FE1CB', sub: '#3a7a5a' },
@@ -4012,7 +4249,7 @@ function downloadCodeCheckHTML(btn) {
     '<div><span style="font-size:10px;font-family:monospace;letter-spacing:.08em;color:' + xCfg.col + ';border:0.5px solid ' + xCfg.col + '50;border-radius:4px;padding:2px 8px;margin-right:8px;">' + xCfg.chip + '</span>' +
     '<span style="font-size:14.5px;color:' + xCfg.txt + ';line-height:1.55;">' + esc(sum.verdict) + '</span></div>' +
     (sum.subline ? '<div style="font-size:13px;color:' + xCfg.sub + ';margin-top:5px;">▸ ' + esc(sum.subline) + '</div>' : '') + '</div></div>';
-  [{ key: 'forQA', label: '🧪 For QA', col: '#5DCAA5' }, { key: 'forDev', label: '🛠 Suggestions for the developer', col: '#6090d8' }].forEach(function (g) {
+  [{ key: 'forQA', label: '🧪 For QA', col: '#5DCAA5' }].forEach(function (g) {
     var pts = sum[g.key];
     if (!pts || !pts.length) return;
     h += '<div style="font-size:11px;font-family:monospace;color:' + g.col + ';letter-spacing:.08em;text-transform:uppercase;margin:12px 0 5px;">' + g.label + '</div>';
@@ -4067,7 +4304,7 @@ function downloadCodeCheckHTML(btn) {
   }
 
   var cl2 = d.checklist || {};
-  var passDefs = [['smoke', 'Smoke — must pass or reject build', '#e06060'], ['sanity', 'Sanity — quick checks around the change', '#d4a855'], ['adhoc', 'Adhoc — exploratory attack ideas', '#7F77DD']];
+  var passDefs = [['smoke', 'Smoke — must pass or reject build', '#e06060'], ['sanity', 'Sanity — quick checks around the change', '#d4a855'], ['regression', 'Regression — adjacent features that share this code', '#5DCAA5'], ['adhoc', 'Adhoc — exploratory attack ideas', '#7F77DD']];
   if (passDefs.some(function (p) { return (cl2[p[0]] || []).length; })) {
     h += '<!--SPLIT:checks-->';
     h += '<div style="display:flex;align-items:center;gap:10px;margin:8px 0 12px;"><div style="flex:1;height:5px;background:#151517;border-radius:3px;overflow:hidden;"><div id="xprog" style="width:0%;height:100%;background:#5DCAA5;transition:width .2s;"></div></div><span id="xprogl" style="font-size:11.5px;color:#5DCAA5;font-family:monospace;">0 / ' + xCheckN + ' tested</span></div>';
@@ -4085,9 +4322,9 @@ function downloadCodeCheckHTML(btn) {
     });
   }
 
-  if (d.bugSources && d.bugSources.length) {
+  if (xRisk.length) {
     h += '<!--SPLIT:bugs-->';
-    d.bugSources.forEach(function (b, i) {
+    xRisk.forEach(function (b, i) {
       h += '<div style="border-top:0.5px solid #1e1e28;padding:10px 0;">' +
         '<div style="font-size:14.5px;color:#d0dce8;margin-bottom:3px;">' + (i + 1) + '. ' + esc(b.area || '') + '</div>' +
         (b.why ? '<div style="font-size:13px;color:#8898a8;line-height:1.7;padding-left:16px;">Why: ' + esc(b.why) + '</div>' : '') +
@@ -4105,7 +4342,7 @@ function downloadCodeCheckHTML(btn) {
     ['ac', '✅ Criteria', '#5DCAA5', xAcs.length ? xAcDone + '/' + xAcs.length : (d.gaps || []).length],
     ['find', '🛠 Findings', '#6090d8', xFind.length],
     ['checks', '🧪 Checklist', '#5DCAA5', xCheckN],
-    ['bugs', '🎯 Bug sources', '#e06060', (d.bugSources || []).length]
+    ['bugs', '🎯 Risk areas', '#e06060', xRisk.length]
   ].filter(function (t) { return xpanes[t[0]]; });
   var xbody = xhead;
   if (xtabs.length) {
@@ -7017,7 +7254,7 @@ window.addEventListener('load', function() {
     abSetProvider(s.provider || 'claude');
     setFolderLabel(s.folderPath);
     if (s.jiraUrl) { window._niJiraUrl = s.jiraUrl; var ji = document.getElementById('ab-jira'); if (ji) ji.value = s.jiraUrl; }
-    if (s.appVersion) { var lv = document.getElementById('logo-ver'); if (lv) lv.textContent = 'v' + s.appVersion + ' · QA intelligence engine'; }
+    if (s.appVersion) { var lv = document.getElementById('logo-ver'); if (lv) lv.textContent = 'QA intelligence engine · v' + s.appVersion; }
     if (s.repoPath) { window._niRepoPath = s.repoPath; var rf = document.getElementById('ab-repo'); if (rf) { rf.value = s.repoPath; rf.title = s.repoPath; } }
   }).catch(function(){});
 });
