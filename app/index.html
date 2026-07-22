@@ -918,11 +918,11 @@
           <span class="qa-type-head-hint">— leave empty for full coverage</span>
         </div>
         <div class="qa-type-chips" id="qa-type-chips">
-          <button type="button" class="qa-type-chip" data-type="regression" onclick="toggleQAType(this)">Regression</button>
-          <button type="button" class="qa-type-chip" data-type="smoke" onclick="toggleQAType(this)">Smoke</button>
-          <button type="button" class="qa-type-chip" data-type="sanity" onclick="toggleQAType(this)">Sanity check</button>
-          <button type="button" class="qa-type-chip" data-type="negative" onclick="toggleQAType(this)">Negative</button>
-          <button type="button" class="qa-type-chip" data-type="functional" onclick="toggleQAType(this)">Functional</button>
+          <button type="button" class="qa-type-chip" data-type="regression" onclick="toggleQAType(this)">Regression Check</button>
+          <button type="button" class="qa-type-chip" data-type="smoke" onclick="toggleQAType(this)">Smoke Test</button>
+          <button type="button" class="qa-type-chip" data-type="sanity" onclick="toggleQAType(this)">Sanity Check</button>
+          <button type="button" class="qa-type-chip" data-type="negative" onclick="toggleQAType(this)">Negative Test</button>
+          <button type="button" class="qa-type-chip" data-type="functional" onclick="toggleQAType(this)">Functional Check</button>
         </div>
       </div>
     </div>
@@ -3162,7 +3162,7 @@ async function runAnalysis() {
 
 // ── QA test-type selection (checkbox footer in the gist card) ──
 var qaTypes = [];
-var QA_TYPE_NAMES = { regression:'Regression', smoke:'Smoke', sanity:'Sanity check', negative:'Negative', functional:'Functional' };
+var QA_TYPE_NAMES = { regression:'Regression Check', smoke:'Smoke Test', sanity:'Sanity Check', negative:'Negative Test', functional:'Functional Check' };
 var QA_TYPE_ORDER = ['regression','functional','smoke','sanity','negative']; // most-critical first
 var QA_TYPE_DIRECTIVES = {
   regression: 'REGRESSION — focus on existing functionality this change could break: integration points, shared systems, and previously-working flows near the change. Skip new-feature happy paths unless they touch existing behaviour.',
