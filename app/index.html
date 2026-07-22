@@ -923,6 +923,8 @@
           <button type="button" class="qa-type-chip" data-type="sanity" onclick="toggleQAType(this)">Sanity Check</button>
           <button type="button" class="qa-type-chip" data-type="negative" onclick="toggleQAType(this)">Negative Test</button>
           <button type="button" class="qa-type-chip" data-type="functional" onclick="toggleQAType(this)">Functional Check</button>
+          <button type="button" class="qa-type-chip" data-type="bugfix" onclick="toggleQAType(this)">Bug Fix Check</button>
+          <button type="button" class="qa-type-chip" data-type="acceptance" onclick="toggleQAType(this)">Acceptance Criteria Check</button>
         </div>
       </div>
     </div>
@@ -3162,14 +3164,16 @@ async function runAnalysis() {
 
 // ── QA test-type selection (checkbox footer in the gist card) ──
 var qaTypes = [];
-var QA_TYPE_NAMES = { regression:'Regression Check', smoke:'Smoke Test', sanity:'Sanity Check', negative:'Negative Test', functional:'Functional Check' };
-var QA_TYPE_ORDER = ['regression','functional','smoke','sanity','negative']; // most-critical first
+var QA_TYPE_NAMES = { regression:'Regression Check', smoke:'Smoke Test', sanity:'Sanity Check', negative:'Negative Test', functional:'Functional Check', bugfix:'Bug Fix Check', acceptance:'Acceptance Criteria Check' };
+var QA_TYPE_ORDER = ['acceptance','functional','bugfix','regression','smoke','sanity','negative']; // most-critical first
 var QA_TYPE_DIRECTIVES = {
   regression: 'REGRESSION — focus on existing functionality this change could break: integration points, shared systems, and previously-working flows near the change. Skip new-feature happy paths unless they touch existing behaviour.',
   smoke: 'SMOKE — broad, shallow pass over the critical end-to-end paths only; one check per critical path, no edge exploration.',
   sanity: 'SANITY CHECK — narrow, shallow pass on the specific changed area only; confirm the change works and did not obviously break its immediate surroundings.',
   negative: 'NEGATIVE / ERROR HANDLING — invalid inputs, unauthorised actions, failure responses, and graceful degradation; verify correct error messaging and that the system fails safely.',
-  functional: 'FUNCTIONAL (happy path) — verify each stated requirement and acceptance criterion behaves as specified under normal conditions.'
+  functional: 'FUNCTIONAL (happy path) — verify each stated requirement and acceptance criterion behaves as specified under normal conditions.',
+  bugfix: 'BUG FIX VERIFICATION — reproduce the original reported failure using the exact steps/conditions from the ticket and confirm it no longer occurs; include a check that the fix did not reintroduce closely related issues.',
+  acceptance: 'ACCEPTANCE CRITERIA — generate one verification per stated acceptance criterion in the ticket/spec; each case maps directly to an AC and confirms it is met. Do not add scope beyond the listed criteria.'
 };
 
 function toggleQAType(el) {
@@ -7294,7 +7298,7 @@ function renderHistoryList(filter) {
   var row = function(e) {
     var sub = histFmtDate(e.ts) + ' · ' + (e.qaData ? e.qaData.length : 0) + ' tests' + (e.riskData && e.riskData.length ? ' · ' + e.riskData.length + ' risks' : '');
     return '<div class="hist-row' + (e.id === window._niSessId ? ' active' : '') + '" onclick="historyOpen(\'' + e.id + '\')">' +
-      '<div class="hist-row-main"><div class="hist-row-ttl">' + esc(e.title || 'Untitled') + '</div><div class="hist-row-sub">' + sub + '</div></div>' +
+      '<div class="hist-row-main"><div class="hist-row-ttl" title="' + esc(e.title || 'Untitled') + '">' + esc(e.title || 'Untitled') + '</div><div class="hist-row-sub">' + sub + '</div></div>' +
       '<button class="hist-pin' + (e.pinned ? ' pinned' : '') + '" onclick="historyPin(\'' + e.id + '\',event)" title="' + (e.pinned ? 'Unpin' : 'Pin') + '">' + (e.pinned ? '★' : '☆') + '</button>' +
       '<button class="hist-x" onclick="historyDel(\'' + e.id + '\',event)" title="Delete">×</button></div>';
   };
