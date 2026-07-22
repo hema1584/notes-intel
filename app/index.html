@@ -8,10 +8,11 @@
 <style>@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Sora:wght@400;500&display=swap');
  *{box-sizing:border-box;margin:0;padding:0;}
 :root{
- --bg:#0d0d0f;--bg2:#111116;--border:#2a2a34;--border2:#333340;
+ --bg:#0d0d0f;--bg2:#111116;--border:#3a3a48;--border2:#454556;
  --teal:#5DCAA5;--teal-dark:#04342C;--amber:#EF9F27;
  --blue:#378ADD;--blue-dark:#0d1520;--purple:#AFA9EC;
- --muted:#606070;--text:#b0b0bc;--text2:#888898;--text3:#666678;
+ --muted:#7a7a8c;--text:#d2d2dd;--text2:#a2a2b2;--text3:#868698;
+ --maxw:1040px;--sbw:260px;--sbw-rail:48px;
 }
  html{background:#080809;min-height:100vh;}
  .key-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:flex;align-items:center;justify-content:center;}
@@ -26,21 +27,38 @@
  .key-modal-cancel{padding:8px 16px;background:transparent;border:0.5px solid #32323e;border-radius:8px;font-size:12px;color:#848490;cursor:pointer;font-family:'Sora',sans-serif;}
  .key-icon-btn{background:transparent;border:none;cursor:pointer;color:#848490;padding:4px;display:flex;align-items:center;border-radius:5px;transition:color .12s;}
  .key-icon-btn:hover{color:#5DCAA5;}body{min-height:100%;background:#080809;}
- body{font-family:'Sora',sans-serif;color:var(--text);display:flex;flex-direction:column;align-items:center;padding:24px 16px 60px;overflow-y:auto;}
- .topbar{width:100%;max-width:720px;display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
- .logo{display:flex;align-items:center;gap:10px;}
- .logo-icon{width:30px;height:30px;background:#08080c;border:0.5px solid #26263a;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
- .logo-name{font-size:15px;font-weight:500;color:#e8e8f0;}
- .logo-ver{font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:1px;}
+ body{font-family:'Sora',sans-serif;color:var(--text);display:flex;flex-direction:column;align-items:center;padding:24px 16px 60px;padding-left:calc(var(--sbw) + 16px);overflow-y:auto;transition:padding-left .2s ease;}
+ body.sb-collapsed{padding-left:calc(var(--sbw-rail) + 16px);}
+ .topbar{width:100%;max-width:var(--maxw);display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+ .logo{display:flex;align-items:center;gap:13px;}
+ .logo-icon{display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .3s ease;}
+ .logo:hover .logo-icon{transform:rotate(15deg);}
+ .logo-div{width:0.5px;height:26px;background:#2a2a34;flex-shrink:0;}
+ .logo-name-row{display:flex;align-items:center;gap:9px;}
+ .logo-name{font-size:16px;font-weight:500;color:#edeef2;letter-spacing:.05em;transition:color .15s;}
+ .logo:hover .logo-name{color:#fff;}
+ .logo-dot{width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;}
+ .logo-ver{font-size:9.5px;color:var(--text3);font-family:'JetBrains Mono',monospace;}
+ .logo-tag{font-size:10px;color:#5a5a64;font-family:'JetBrains Mono',monospace;letter-spacing:.02em;margin-top:3px;}
  .mode-row{display:flex;gap:1px;background:#111116;border-radius:8px;padding:3px;border:0.5px solid #1c1c24;}
  .mchip{font-size:11px;padding:5px 12px;border-radius:6px;border:none;color:#7a7a90;font-family:'JetBrains Mono',monospace;cursor:pointer;transition:all .15s;background:transparent;position:relative;letter-spacing:0.02em;}
  .mchip:hover{color:#6a6a7a;background:#141418;}
- .mchip.on{background:#0a1a14;color:var(--teal);box-shadow:0 0 0 1px #1D9E7560;font-weight:500;}
+ .mchip.on{background:transparent;color:var(--teal);box-shadow:none;font-weight:500;}
+ #qa-type-footer{border-top:0.5px solid #2a2a34;margin-top:14px;padding-top:13px;}
+ .qa-type-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+ .qa-type-head-lbl{font-size:10px;letter-spacing:.1em;color:#AFA9EC;font-family:'JetBrains Mono',monospace;}
+ .qa-type-head-hint{font-size:10px;color:#7a7a8c;font-family:'JetBrains Mono',monospace;}
+ .qa-type-chips{display:flex;flex-wrap:wrap;gap:8px;}
+ .qa-type-chip{font-size:12.5px;font-family:'Sora',sans-serif;color:#b6b6c4;background:#111117;border:1px solid #3a3a48;border-radius:7px;padding:7px 12px;cursor:pointer;display:flex;align-items:center;gap:7px;transition:all .13s;}
+ .qa-type-chip::before{content:'';width:14px;height:14px;border-radius:4px;border:1px solid #55555f;flex-shrink:0;display:inline-block;transition:all .13s;}
+ .qa-type-chip:hover{border-color:#4a4558;color:#cdc7e0;}
+ .qa-type-chip.sel{background:#15131f;border-color:#4a3f6e;color:#cdc7f0;}
+ .qa-type-chip.sel::before{background:#7F77DD;border-color:#7F77DD;box-shadow:inset 0 0 0 2px #15131f;}
  .tooltip{display:none;position:absolute;top:calc(100% + 8px);right:0;background:#1a1a22;border:0.5px solid #2e2e38;border-radius:9px;padding:9px 12px;width:200px;z-index:100;text-align:left;}
  .mchip:hover .tooltip{display:block;}
  .tt-name{font-size:11px;font-weight:500;color:#c0c0cc;margin-bottom:3px;font-family:'Sora',sans-serif;}
  .tt-desc{font-size:11px;color:#888896;line-height:1.5;font-family:'Sora',sans-serif;}
- .card{width:100%;max-width:720px;background:var(--bg);border-radius:14px;border:0.5px solid #38383e;overflow:hidden;margin-bottom:12px;}
+ .card{width:100%;max-width:var(--maxw);background:var(--bg);border-radius:14px;border:1px solid #4a4a56;overflow:hidden;margin-bottom:12px;}
  .input-zone{padding:18px 20px;display:flex;flex-direction:column;gap:11px;}
  .zone-label{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;}
  .title-input{background:var(--bg2);border:0.5px solid var(--border);border-radius:8px;padding:9px 14px;font-size:15px;font-family:'Sora',sans-serif;color:var(--text);outline:none;width:100%;transition:border-color .15s;resize:none;overflow:hidden;line-height:1.6;min-height:46px;height:auto;}
@@ -67,7 +85,7 @@
  .spinner{width:13px;height:13px;border:2px solid var(--teal-dark);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;display:none;}
  .loading-spinner-sm{width:12px;height:12px;border:1.5px solid #333344;border-top-color:currentColor;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;flex-shrink:0;}
  @keyframes spin{to{transform:rotate(360deg)}}
- .div-row{width:100%;max-width:720px;display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+ .div-row{width:100%;max-width:var(--maxw);display:flex;align-items:center;gap:12px;margin-bottom:12px;}
  .div-line{flex:1;height:0.5px;background:#18181e;}
  .div-txt{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--text3);letter-spacing:.1em;}
  .out-card{padding:16px 18px;}
@@ -512,8 +530,14 @@
  .appbar-select{background:#0a0f16;border:0.5px solid #1c2430;border-radius:6px;height:25px;padding:0 7px;font-size:12px;font-family:'JetBrains Mono',monospace;color:#8a9aaa;outline:none;cursor:pointer;-webkit-app-region:no-drag;}
  .appbar-select:hover{border-color:#2a3a4a;}
  /* History sidebar */
- #hist-sidebar{position:fixed;top:36px;left:0;bottom:0;width:280px;background:#0a0a0d;border-right:0.5px solid #1e1e28;z-index:9998;transform:translateX(-100%);transition:transform .22s ease;display:flex;flex-direction:column;box-shadow:4px 0 24px #00000060;}
- #hist-sidebar.open{transform:translateX(0);}
+ #hist-sidebar{position:fixed;top:36px;left:0;bottom:0;width:var(--sbw);background:#0a0a0d;border-right:0.5px solid #1e1e28;z-index:9998;transition:width .2s ease;display:flex;flex-direction:column;overflow:hidden;}
+ #hist-sidebar.collapsed{width:var(--sbw-rail);}
+ #hist-sidebar.collapsed .hist-hd,#hist-sidebar.collapsed .hist-scroll{display:none;}
+ .hist-rail{display:none;flex-direction:column;align-items:center;gap:16px;padding:16px 0;color:#5e6e7e;}
+ #hist-sidebar.collapsed .hist-rail{display:flex;}
+ .hist-rail button{background:none;border:none;color:#5e6e7e;cursor:pointer;padding:4px;display:flex;line-height:0;}
+ .hist-rail button:hover{color:#5DCAA5;}
+ .hist-rail .rail-star{color:#EF9F27;}
  .hist-hd{padding:14px 12px 10px;}
  #hist-search{width:100%;background:#111116;border:0.5px solid #252530;border-radius:7px;padding:8px 11px;font-size:13px;font-family:'Sora',sans-serif;color:#a0a0b4;outline:none;}
  #hist-search::placeholder{color:#4e4e5a;}
@@ -573,6 +597,11 @@
 <div style="height:36px;display:none;" id="appbar-spacer"></div>
 
 <div id="hist-sidebar">
+  <div class="hist-rail">
+    <button onclick="historyToggle()" title="Expand sidebar" aria-label="Expand sidebar"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button>
+    <button onclick="historyToggle()" title="Search analyses" aria-label="Search analyses"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
+    <span class="rail-star" title="Pinned">★</span>
+  </div>
   <div class="hist-hd">
     <input id="hist-search" placeholder="Search analyses…" oninput="renderHistoryList(this.value)" spellcheck="false"/>
   </div>
@@ -586,12 +615,16 @@
 
 <div class="topbar">
   <div style="display:flex;align-items:center;">
-  <button class="hist-toggle-btn" onclick="historyToggle()" title="Analysis history">
-    <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+  <button class="hist-toggle-btn" onclick="historyToggle()" title="Toggle sidebar">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M6 3v10" stroke="currentColor" stroke-width="1.3"/><path d="M11.3 6.2 9.5 8l1.8 1.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </button>
   <div class="logo">
-    <div class="logo-icon"><svg width="19" height="19" viewBox="0 0 20 20" fill="none"><ellipse cx="10" cy="10" rx="8" ry="3.4" stroke="#5DCAA5" stroke-width="1.1"/><ellipse cx="10" cy="10" rx="8" ry="3.4" transform="rotate(60 10 10)" stroke="#7F77DD" stroke-width="1.1"/><ellipse cx="10" cy="10" rx="8" ry="3.4" transform="rotate(-60 10 10)" stroke="#EF9F27" stroke-width="1.1"/><path d="M8.2 10l1.3 1.3 2.3-2.6" stroke="#5DCAA5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    <div><div class="logo-name">Notes Intel</div><div class="logo-ver" id="logo-ver">QA intelligence engine · v4.7.0</div></div>
+    <div class="logo-icon"><svg width="26" height="26" viewBox="0 0 20 20" fill="none"><ellipse cx="10" cy="10" rx="8" ry="3.4" stroke="#5DCAA5" stroke-width="1"/><ellipse cx="10" cy="10" rx="8" ry="3.4" transform="rotate(60 10 10)" stroke="#7F77DD" stroke-width="1"/><ellipse cx="10" cy="10" rx="8" ry="3.4" transform="rotate(-60 10 10)" stroke="#EF9F27" stroke-width="1"/><path d="M8.2 10l1.3 1.3 2.3-2.6" stroke="#5DCAA5" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="logo-div"></div>
+    <div>
+      <div class="logo-name-row"><span class="logo-name">Notes Intel</span><span class="logo-dot"></span><span class="logo-ver" id="logo-ver">v4.8.0</span></div>
+      <div class="logo-tag">QA intelligence engine</div>
+    </div>
   </div>
   </div>
   <div style="display:flex;align-items:center;gap:6px;flex-wrap:nowrap;">
@@ -707,7 +740,7 @@
 
 <div class="card">
   <div class="input-zone">
-    <div class="zone-label" style="display:flex;align-items:center;gap:7px;color:#5DCAA5;">
+    <div class="zone-label" style="display:flex;align-items:center;gap:7px;color:#7F77DD;">
       // your content
       <div class="info-badge" tabindex="0">?
         <div class="info-tooltip">
@@ -815,7 +848,7 @@
   </div>
 </div>
 
-<div id="output-section" style="display:none;width:100%;max-width:720px;">
+<div id="output-section" style="display:none;width:100%;max-width:var(--maxw);">
   <div class="div-row"><div class="div-line"></div><div class="div-txt">output</div><div class="div-line"></div></div>
 
   <div class="card" id="title-card" style="background:#0d0d0f;">
@@ -879,10 +912,23 @@
           </div>
         </div>
       </div>
+      <div id="qa-type-footer" style="display:none;">
+        <div class="qa-type-head">
+          <span class="qa-type-head-lbl">GENERATE TESTS FOR</span>
+          <span class="qa-type-head-hint">— leave empty for full coverage</span>
+        </div>
+        <div class="qa-type-chips" id="qa-type-chips">
+          <button type="button" class="qa-type-chip" data-type="regression" onclick="toggleQAType(this)">Regression</button>
+          <button type="button" class="qa-type-chip" data-type="smoke" onclick="toggleQAType(this)">Smoke</button>
+          <button type="button" class="qa-type-chip" data-type="sanity" onclick="toggleQAType(this)">Sanity check</button>
+          <button type="button" class="qa-type-chip" data-type="negative" onclick="toggleQAType(this)">Negative</button>
+          <button type="button" class="qa-type-chip" data-type="functional" onclick="toggleQAType(this)">Functional</button>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div id="qa-btn-wrap" style="display:none;width:100%;max-width:720px;justify-content:center;gap:10px;padding:4px 0 8px;flex-wrap:wrap;">
+  <div id="qa-btn-wrap" style="display:none;width:100%;max-width:var(--maxw);justify-content:center;gap:10px;padding:4px 0 8px;flex-wrap:wrap;">
     <button id="qa-focus-btn" onclick="generateQA()" class="qa-gen-btn">
       <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 5h10M3 8h7M3 11h5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="13" cy="11" r="2.5" stroke="currentColor" stroke-width="1.2"/><path d="M13 10v1.5M12.25 11.75l.75-.75" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></circle></svg>
       Generate QA Focus
@@ -892,7 +938,7 @@
       Code Cross-Check
     </button>
   </div>
-  <div id="cc-setup" style="display:none;width:100%;max-width:720px;margin:0 auto 8px;padding:13px 15px;background:#0d0b06;border:0.5px solid #B4551730;border-radius:9px;">
+  <div id="cc-setup" style="display:none;width:100%;max-width:var(--maxw);margin:0 auto 8px;padding:13px 15px;background:#0d0b06;border:0.5px solid #B4551730;border-radius:9px;">
     <div style="font-size:11px;font-family:'JetBrains Mono',monospace;color:#EF9F27;letter-spacing:.06em;text-transform:uppercase;margin-bottom:9px;">&lt;&gt; Code cross-check setup</div>
     <input id="cc-svn-url" placeholder="SVN branch URL or local checkout folder (required)" spellcheck="false" style="width:100%;background:#111116;border:0.5px solid #252530;border-radius:7px;padding:9px 12px;font-size:12.5px;font-family:'JetBrains Mono',monospace;color:#a0b0c0;outline:none;"/>
     <div style="display:flex;gap:8px;margin-top:8px;">
@@ -975,7 +1021,7 @@
   </div>
   </div>
 
-  <div id="risk-btn-wrap" style="display:none;width:100%;max-width:720px;justify-content:center;padding:8px 0;">
+  <div id="risk-btn-wrap" style="display:none;width:100%;max-width:var(--maxw);justify-content:center;padding:8px 0;">
     <button id="risk-generate-btn" onclick="generateRisk()" class="risk-gen-btn">
       <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 1a7 7 0 1 1 0 14A7 7 0 0 1 8 1z" stroke="currentColor" stroke-width="1.2"/><path d="M8 7v4M8 5v.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
       Generate Risk Scenarios
@@ -1172,7 +1218,7 @@
 </div>
 
 <!-- Download full report button — shown after QA is generated -->
-<div id="full-report-bar" style="display:none;width:100%;max-width:720px;margin-top:4px;">
+<div id="full-report-bar" style="display:none;width:100%;max-width:var(--maxw);margin-top:4px;">
   <button id="full-report-btn" onclick="downloadFullReport(this)">
     <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2v9M4 8l4 4 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
     Download full report as HTML
@@ -2479,6 +2525,10 @@ function clearAll() {
   if (gistBodyEl) gistBodyEl.style.display = 'block';
   var qaBtnWrap = document.getElementById('qa-btn-wrap');
   if (qaBtnWrap) qaBtnWrap.style.display = 'none';
+  qaTypes = [];
+  var qaTypeFooter = document.getElementById('qa-type-footer');
+  if (qaTypeFooter) qaTypeFooter.style.display = 'none';
+  applyQATypesToUI();
   var qaSection = document.getElementById('qa-section');
   if (qaSection) qaSection.style.display = 'none';
   var qaToolbar = document.getElementById('qa-toolbar');
@@ -3110,7 +3160,59 @@ async function runAnalysis() {
   }
 }
 
+// ── QA test-type selection (checkbox footer in the gist card) ──
+var qaTypes = [];
+var QA_TYPE_NAMES = { regression:'Regression', smoke:'Smoke', sanity:'Sanity check', negative:'Negative', functional:'Functional' };
+var QA_TYPE_ORDER = ['regression','functional','smoke','sanity','negative']; // most-critical first
+var QA_TYPE_DIRECTIVES = {
+  regression: 'REGRESSION — focus on existing functionality this change could break: integration points, shared systems, and previously-working flows near the change. Skip new-feature happy paths unless they touch existing behaviour.',
+  smoke: 'SMOKE — broad, shallow pass over the critical end-to-end paths only; one check per critical path, no edge exploration.',
+  sanity: 'SANITY CHECK — narrow, shallow pass on the specific changed area only; confirm the change works and did not obviously break its immediate surroundings.',
+  negative: 'NEGATIVE / ERROR HANDLING — invalid inputs, unauthorised actions, failure responses, and graceful degradation; verify correct error messaging and that the system fails safely.',
+  functional: 'FUNCTIONAL (happy path) — verify each stated requirement and acceptance criterion behaves as specified under normal conditions.'
+};
+
+function toggleQAType(el) {
+  var t = el.dataset.type;
+  var i = qaTypes.indexOf(t);
+  if (i > -1) { qaTypes.splice(i, 1); el.classList.remove('sel'); }
+  else { qaTypes.push(t); el.classList.add('sel'); }
+  updateQAFocusLabel();
+  try { historySnapshot(); } catch(e) {}
+}
+
+function applyQATypesToUI() {
+  var chips = document.querySelectorAll('#qa-type-chips .qa-type-chip');
+  chips.forEach(function(c) { c.classList.toggle('sel', qaTypes.indexOf(c.dataset.type) > -1); });
+  updateQAFocusLabel();
+}
+
+function qaFocusLabelSuffix() {
+  if (!qaTypes.length || qaTypes.length >= QA_TYPE_ORDER.length) return '';
+  var picked = QA_TYPE_ORDER.filter(function(t){ return qaTypes.indexOf(t) > -1; }).map(function(t){ return QA_TYPE_NAMES[t]; });
+  return ' · ' + picked.join(', ');
+}
+
+function updateQAFocusLabel() {
+  var btn = document.getElementById('qa-focus-btn');
+  if (!btn || btn.disabled) return;
+  btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 5h10M3 8h7M3 11h5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg> Generate QA Focus' + qaFocusLabelSuffix();
+}
+
+// Directive injected into the QA prompt based on ticked test types.
+// None ticked OR all ticked → '' (full coverage, unchanged behaviour).
+function buildQaTypeFocus() {
+  if (!qaTypes.length || qaTypes.length >= QA_TYPE_ORDER.length) return '';
+  var lines = QA_TYPE_ORDER.filter(function(t){ return qaTypes.indexOf(t) > -1; })
+    .map(function(t){ return '• ' + QA_TYPE_DIRECTIVES[t]; });
+  return 'TEST FOCUS — generate test cases limited to the following focus' + (lines.length > 1 ? 'es' : '') +
+    ' ONLY; do not produce cases outside these categories: ' + lines.join(' ') + ' ' +
+    'STYLE: objective = one plain line stating what is verified and the expected outcome (no risk essays); ' +
+    'steps = terse, assume an experienced tester (name the path, not a tutorial); expected result = always explicit. ';
+}
+
 function buildQaInstruction(tier) {
+  var typeFocus = buildQaTypeFocus();
   var common =
     'Each item: {"title":"max 70 chars","severity":"high|med|low","originType":"explicit_requirement|derived_acceptance_check|inferred_edge_case|known_team_context","confidence":"high|medium|low","confidenceReason":"max 60 chars","detail":"max 90 chars","sourceEvidence":[{"source":"Jira ticket|Confluence page|Slack thread|screenshot|project context|user input","evidenceType":"direct_quote|paraphrase|context_inference","evidence":"max 80 chars","reason":"max 60 chars"}],"testcase":{"objective":"max 90 chars","preconditions":"max 90 chars","steps":["s1","s2","s3","s4","s5"],"expected":"max 200 chars"}} ' +
     'SHARED RULES: ' +
@@ -3127,7 +3229,7 @@ function buildQaInstruction(tier) {
   var examplesBlock = buildExamplesBlock();
 
   if (tier === 'critical') {
-    return 'Return ONLY a JSON array (no object wrapper) of QA focus test cases covering the CRITICAL, HIGH-PRIORITY scenarios. ' +
+    return typeFocus + 'Return ONLY a JSON array (no object wrapper) of QA focus test cases covering the CRITICAL, HIGH-PRIORITY scenarios. ' +
       'ADAPTIVE COUNT — this is important: decide how many test cases the feature genuinely needs for critical coverage. ' +
       'Do NOT default to a fixed number. A trivial one-line change may need just 1-2 cases. A typical feature needs 3-6. ' +
       'A large, multi-flow feature may need up to 12. Never pad to hit a number; never drop an important critical scenario to stay small. ' +
@@ -3142,7 +3244,7 @@ function buildQaInstruction(tier) {
         qaData.map(function(q){ return '"' + (q.title || '') + '"'; }).join(', ') + '. ';
     }
   } catch(e) {}
-  return 'Return ONLY a JSON array (no object wrapper) of SECONDARY test cases — the lighter coverage layer. ' +
+  return typeFocus + 'Return ONLY a JSON array (no object wrapper) of SECONDARY test cases — the lighter coverage layer. ' +
     'ADAPTIVE COUNT: decide how many secondary checks add real value. If the critical pass already covered everything meaningful, return as few as 1-2, or an empty array [] if there is genuinely nothing useful to add. Typical is 2-6. ' +
     'These are the simple checks, boundary/edge conditions, minor UI states, input validation, and lower-priority verifications that ROUND OUT coverage. ' +
     'They must COMPLEMENT, not repeat, the critical cases.' + alreadyCovered + common;
@@ -3326,6 +3428,7 @@ async function generateQA(tier) {
     if (qaBtn) {
       qaBtn.disabled = false;
       qaBtn.innerHTML = btnLabelHtml;
+      if (!isEdge) updateQAFocusLabel();
     }
   }
 }
@@ -4390,6 +4493,9 @@ function downloadCodeCheckHTML(btn) {
 function showQAButton() {
   var wrap = document.getElementById('qa-btn-wrap');
   if (wrap) wrap.style.display = 'flex';
+  var footer = document.getElementById('qa-type-footer');
+  if (footer) footer.style.display = 'block';
+  applyQATypesToUI();
   var sdWrap = document.getElementById('slack-disc-wrap');
   if (sdWrap) sdWrap.style.display = getSlackChannels().length ? 'block' : 'none';
 }
@@ -7079,11 +7185,22 @@ function histStore(list) {
   }
 }
 
+var NI_SB_KEY = 'ni_sb_collapsed';
 function historyToggle() {
   var sb = document.getElementById('hist-sidebar');
   if (!sb) return;
-  sb.classList.toggle('open');
-  if (sb.classList.contains('open')) renderHistoryList();
+  var collapsed = sb.classList.toggle('collapsed');
+  document.body.classList.toggle('sb-collapsed', collapsed);
+  try { localStorage.setItem(NI_SB_KEY, collapsed ? '1' : '0'); } catch(e) {}
+  if (!collapsed) renderHistoryList();
+}
+function historyInit() {
+  var sb = document.getElementById('hist-sidebar');
+  if (!sb) return;
+  var collapsed = false;
+  try { collapsed = localStorage.getItem(NI_SB_KEY) === '1'; } catch(e) {}
+  sb.classList.toggle('collapsed', collapsed);
+  document.body.classList.toggle('sb-collapsed', collapsed);
 }
 
 function historySnapshot() {
@@ -7104,6 +7221,9 @@ function historySnapshot() {
   entry.qaData = qaData || [];
   entry.riskData = riskData || [];
   entry.textBase = typeof _textBase === 'string' ? _textBase : '';
+  var mi = document.getElementById('main-input');
+  entry.inputText = mi ? mi.value : '';
+  entry.qaTypes = (qaTypes || []).slice();
   histStore(list);
   renderHistoryList();
 }
@@ -7116,6 +7236,9 @@ function historyOpen(id) {
   _textBase = h.textBase || '';
   _msgContent = null;
   window._gistParsed = h.parsed || null;
+  var mi = document.getElementById('main-input');
+  if (mi) { mi.value = h.inputText || ''; if (typeof autoResize === 'function') autoResize(mi); if (typeof checkContentSize === 'function') checkContentSize(mi); }
+  qaTypes = (h.qaTypes || []).slice();
   var outSec = document.getElementById('output-section');
   if (outSec) outSec.style.display = 'block';
   var gistBody = document.getElementById('gist-body');
@@ -7129,6 +7252,7 @@ function historyOpen(id) {
     renderQA(qaData);
     if (qaSec) qaSec.style.display = 'block';
     if (qaToolbar) qaToolbar.style.display = 'flex';
+    if ((h.gistHTML || '').trim()) showQAButton();
   } else {
     if (qaSec) qaSec.style.display = 'none';
     if (_textBase) showQAButton();
@@ -7138,7 +7262,6 @@ function historyOpen(id) {
   if (riskData.length) { renderRisk(riskData); if (riskSec) riskSec.style.display = 'block'; }
   else if (riskSec) riskSec.style.display = 'none';
   renderHistoryList();
-  historyToggle();
   window.scrollTo(0, 0);
 }
 
@@ -7184,9 +7307,9 @@ function renderHistoryList(filter) {
 }
 
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') { var sb = document.getElementById('hist-sidebar'); if (sb) sb.classList.remove('open'); }
+  if (e.key === 'Escape') { var sb = document.getElementById('hist-sidebar'); if (sb && !sb.classList.contains('collapsed')) historyToggle(); }
 });
-window.addEventListener('load', function() { renderHistoryList(); });
+window.addEventListener('load', function() { historyInit(); renderHistoryList(); });
 
 // App bar — shown only in Electron (127.0.0.1), wired to /api/settings
 function abSetProvider(p) {
@@ -7254,7 +7377,7 @@ window.addEventListener('load', function() {
     abSetProvider(s.provider || 'claude');
     setFolderLabel(s.folderPath);
     if (s.jiraUrl) { window._niJiraUrl = s.jiraUrl; var ji = document.getElementById('ab-jira'); if (ji) ji.value = s.jiraUrl; }
-    if (s.appVersion) { var lv = document.getElementById('logo-ver'); if (lv) lv.textContent = 'QA intelligence engine · v' + s.appVersion; }
+    if (s.appVersion) { var lv = document.getElementById('logo-ver'); if (lv) lv.textContent = 'v' + s.appVersion; }
     if (s.repoPath) { window._niRepoPath = s.repoPath; var rf = document.getElementById('ab-repo'); if (rf) { rf.value = s.repoPath; rf.title = s.repoPath; } }
   }).catch(function(){});
 });
