@@ -2470,6 +2470,7 @@ function clearAll() {
   window._ccUnrelatedList = '';
   window._ccPlanInfo = null;
   window._ccChecked = {};
+  window._ccTF = {};
   var ccSec = document.getElementById('codecheck-section');
   if (ccSec) ccSec.style.display = 'none';
   var ccBody = document.getElementById('codecheck-body');
@@ -3500,40 +3501,30 @@ function buildCodeCheckInstruction(requirements, repoUrl) {
       '4. For each acceptance criterion: is it implemented? Cite file:line as evidence.\n' +
       '5. Hunt edge cases: null guards, off-by-one, silent early returns, error handling, undo support, race conditions.\n';
   }
-  return 'You are a senior QA engineer with 10+ years in mobile game testing. This is a QA gap-and-risk analysis, NOT a code review. ' + access +
-    'Your ONE audience is the QA TESTER. You do NOT report code bugs, root causes, or code fixes — the developer covers those in their own review, and duplicating that is noise QA does not want. Your job: compare what the TICKET asked for against what the BRANCH actually changed, surface the GAPS and the RISK-PRONE areas, and turn them into a focused test plan.\n\n' +
+  return 'You are a senior QA engineer with 10+ years in mobile game testing. This is a QA test-focus analysis, NOT a code review. ' + access +
+    'Your ONE audience is the QA TESTER. You do NOT report code bugs, root causes, code fixes, class names, or file:line — the developer covers code in their own review, and QA cannot act on it. Your job: translate what the BRANCH changed (vs its trunk branch-point) into WHERE QA should test — the specific screens / windows / features / UI-UX flows affected, which existing ones need regression-checking, and concrete device steps.\n\n' +
     '--- REQUIREMENTS (ticket / spec / notes) ---\n' + requirements + '\n--- END REQUIREMENTS ---\n\n' +
     method + '\n' +
-    'GAP ANALYSIS — the core of this report, in TWO directions:\n' +
-    '- IN THE TICKET, NOT (fully) IN THE CODE: for each acceptance criterion, is it implemented / partial / missing, with file:line or the gap. A partial or missing AC is a must-test or must-raise item.\n' +
-    '- IN THE CODE, NOT IN THE TICKET: behaviour the change adds or alters that the ticket never mentions. Unspecified behaviour is risk-prone — QA must know to test it. This goes in "discrepancies" as a question QA can raise with the programmer (a question, not a bug report).\n\n' +
-    'THINK LIKE A SENIOR QA — use this to CHOOSE what to test, never to describe code:\n' +
-    '- Follow the data: what state does this touch (save data, configs, server flags, cached assets)? State that survives restarts/updates is high-risk.\n' +
+    'HOW TO THINK (use the code to CHOOSE what to test — NEVER to describe code):\n' +
+    '- Map each change to the player-facing AREA it affects: name the screen / window / feature / flow the way QA knows it (e.g. "Story Map screen — prop rendering", "map-switch flow", "content-update reload"), NEVER by class or file.\n' +
+    '- Follow the data: save data, configs, server flags, cached assets — state that survives restart/update is high-risk. If it touches save data or an SDK/package, it likely needs testing on BOTH iOS and Android.\n' +
     '- Follow the player: interruptions (backgrounding, network loss, force-close), doing things fast, twice, or out of order.\n' +
-    '- Follow the change: what EXISTING behaviour shares code with this change? That is the regression surface — name specific adjacent features, not "test everything".\n\n' +
+    '- Follow the change: what EXISTING behaviour shares code with this change? Those are your REGRESSION areas — name the specific adjacent feature, not "test everything".\n' +
+    '- Tag each area: "new" = behaviour this ticket introduces (test it works); "regression" = existing behaviour that could break as a side effect (confirm still works); "inferred" = you could not fully confirm it from the code shown, so QA must verify on device.\n\n' +
     'RULES:\n' +
-    '- Do NOT report code bugs, null-guard misses, race conditions, or propose code fixes — that is the developer\'s review, out of scope here. If code plainly contradicts an AC, express it as a GAP/discrepancy in QA terms, not as a bug with a root cause.\n' +
-    '- Cite real file:line ONLY as evidence for a gap or a risk area — never invent code. If you cannot find the relevant code, say so in gaps.\n' +
-    '- CHECKLIST LANGUAGE — strict: every item is ONE short sentence a tester can act on with only the device in hand: "Do X — expect Y". Max ~15 words.\n' +
-    '  * NEVER mention class names, method names, variables, files, or any code internals in checklist items. Use code knowledge to CHOOSE the checks, not to describe them.\n' +
-    '  * NEVER add parenthetical rationale. If the reason matters, it belongs in riskAreas.\n' +
-    '  * Use words a new tester knows: open, close, tap, popup, screen, loading, restart. Expected result must be something visible on screen or in the device log — not internal state.\n' +
-    '- CHECKLIST LISTS: smoke = critical happy paths that must work or the build is rejected (3-6). sanity = quick checks around the changed area (2-5). regression = adjacent EXISTING features that share code with the change and could break (2-6). adhoc = exploratory attack ideas: interruptions, abuse, timing, unusual states (3-8).\n' +
-    '- Prefix EVERY checklist item with its priority: "[P0] " run first, blocks sign-off; "[P1] " this pass; "[P2] " time-permitting. Order each list by priority.\n' +
-    '- riskAreas: rank by likelihood. Each names a specific area of the change, why it is risk-prone, and what the player would experience if it breaks. This is where QA focuses first.\n' +
-    '- discrepancies: the "question" field must be a complete, polite, self-contained sentence citing file:line that QA can paste into a Jira comment verbatim. If code and ticket fully match, return an empty array — never pad.\n' +
-    '- TEST COVERAGE: changed files may include unit tests (under UnitTests/ or named *Tests.cs). For EACH acceptance criterion set "tested": yes|partial|no. An AC with no test is a coverage gap — say so in the note. If no test files are present, set "tested":"no" for all.\n' +
-    '- This is static analysis: flag "verify on device" where runtime behaviour matters.\n\n' +
-    'BREVITY — scan-first report, not documentation. Respect every word limit. One idea per field. Never repeat the same fact across sections. File paths appear ONLY in file/note fields, never in verdict, bullets, or checklist.\n\n' +
+    '- NO code talk anywhere in the output: no class/method/variable names, no file paths, no line numbers, no "the code does X". Everything is in player/tester language.\n' +
+    '- Every Test Focus row is an AREA a tester can open and check. verify = what to confirm on device; ifBroken = what the player would see if it fails.\n' +
+    '- priority: P0 = must test / blocks sign-off; P1 = this pass; P2 = time-permitting. Rank the whole list P0 first.\n' +
+    '- CHECKLIST items are ONE short device-action sentence: "Do X — expect Y", max ~15 words, words a new tester knows (open, tap, popup, restart). Prefix each with "[P0]/[P1]/[P2]". Expected result must be visible on screen or in the device log.\n' +
+    '- CHECKLIST LISTS: smoke = critical happy paths that must work or reject the build (3-6). sanity = quick checks around the change (2-5). regression = adjacent existing features that share this code (2-6). adhoc = exploratory attacks: interruptions, abuse, timing, unusual states (3-8).\n' +
+    '- This is static analysis: where you are inferring (behaviour not fully visible in the changed code), set the area tag to "inferred" and lean on "verify on device".\n\n' +
+    'BREVITY — scan-first report. Respect every word limit. One idea per field. Do not repeat a fact across sections.\n\n' +
     'OUTPUT — return ONLY this JSON object, no markdown fences, no prose:\n' +
-    '{"summary":{"match":"yes|partial|no — does the implementation match the ticket","verdict":"max 15 words PLAIN QA LANGUAGE — no code jargon. Does the build do what the ticket promises, and can testing proceed? e.g. Partial — safe to test, but the popup closes differently than the ticket describes","subline":"max 12 words — the FIRST thing QA should test and why, in device actions","forQA":["max 10 words each, max 3 bullets, no file paths — what to test first and why"]},' +
-    '"acStatus":[{"ac":"max 14 words","status":"implemented|partial|missing","tested":"yes|partial|no","note":"file:line or the gap, max 18 words"}],' +
-    '"discrepancies":[{"ticketSays":"max 12 words","codeDoes":"max 12 words","file":"file:line only","question":"one polite self-contained sentence, max 35 words, citing file:line — pasteable to Jira"}],' +
-    '"gaps":["max 15 words each, max 4 items — anything unclear, unspecified, or missing that QA should raise before testing"],' +
-    '"checklist":{"smoke":["[P0] Do X — expect Y"],"sanity":["Do X — expect Y"],"regression":["Do X — expect Y"],"adhoc":["attack idea — what to watch for"]},' +
-    '"riskAreas":[{"area":"max 8 words, no file paths","why":"max 15 words","playerImpact":"max 12 words"}]}\n' +
-    'CAPS: max 4 discrepancies, max 5 riskAreas. Fewer strong items beat many weak ones. Do NOT include a "findings" section — code bugs are out of scope for this report.\n' +
-    'BALANCE: the limits kill padding, never evidence. If a note or question is not actionable within its limit, exceed it by what the evidence needs — never restate context or hedge.';
+    '{"summary":{"match":"yes|partial|no — is the feature built as the ticket describes","verdict":"max 16 words PLAIN QA LANGUAGE, no code — is the build doing what the ticket promises, and what (if anything) is not visibly wired. e.g. Core prop-change works; map-switch and content-reload not visibly wired — verify on device","subline":"max 12 words — the FIRST thing QA should test and why, in device actions"},' +
+    '"testFocus":[{"area":"the screen/window/feature/flow to test, plain QA name, no code — max 9 words","tag":"new|regression|inferred","priority":"P0|P1|P2","platform":"optional — e.g. iOS + Android; omit or empty if not platform-specific","verify":"what to confirm on device, max 18 words","ifBroken":"what the player would see if it fails, max 14 words"}],' +
+    '"checklist":{"smoke":["[P0] Do X — expect Y"],"sanity":["[P1] Do X — expect Y"],"regression":["[P1] Do X — expect Y"],"adhoc":["[P2] attack idea — what to watch for"]}}\n' +
+    'CAPS: max 8 Test Focus areas (rank P0 first, drop weak ones). No "findings", "discrepancies", "acStatus", or "riskAreas" sections — those are gone; everything QA-relevant goes into testFocus + checklist.\n' +
+    'BALANCE: the limits kill padding, never substance. If a verify/ifBroken needs a few more words to be actionable, take them — but never add code detail or hedging.';
 }
 
 // ── Two-stage AC-driven retrieval ─────────────────────────────────────────────
@@ -3559,7 +3550,7 @@ function ccPkgNote(pc) {
   (pc.added || []).forEach(function (a) { lines.push('- + ' + a.name + ': ' + a.version + ' (added)'); });
   (pc.removed || []).forEach(function (r) { lines.push('- − ' + r.name + ': ' + r.version + ' (removed)'); });
   if (!lines.length) return '';
-  return '\nPACKAGE / DEPENDENCY CHANGES (from Packages/manifest.json — no game code, but each is a risk-prone area: add it to riskAreas and a regression check for the system it affects. An SDK major-version bump is high risk):\n' + lines.join('\n') + '\n';
+  return '\nPACKAGE / DEPENDENCY CHANGES (from Packages/manifest.json — no game code, but each is a risk-prone area: add it to testFocus (tag "regression") and a regression checklist item for the system it affects. An SDK major-version bump is high risk / P0):\n' + lines.join('\n') + '\n';
 }
 
 function ccBuildPlanPrompt(requirements, entries, commitLog) {
@@ -3674,7 +3665,7 @@ async function ccTwoStagePrepare(requirements, repoUrl, rev, branchNames, setSta
   if (!plan.acs || !plan.acs.length) throw new Error('empty plan');
   var nonCode = plan.acs.filter(function (a) { return a.codeVerifiable === false && a.ac; });
   if (nonCode.length) {
-    extraReq += '\nNOTE: these acceptance criteria are asset/config/server-driven and cannot be verified from code — set their status honestly and note "verify on device" instead of guessing:\n' +
+    extraReq += '\nNOTE: these acceptance criteria are asset/config/server-driven and cannot be verified from code — include them in testFocus with tag "inferred" and lean on "verify on device":\n' +
       nonCode.map(function (a) { return '- ' + a.ac; }).join('\n') + '\n';
   }
 
@@ -3918,19 +3909,14 @@ async function runCodeCheckGo() {
 }
 
 var CC_TABS = [
-  { k: 'disc', icon: '⚑', lbl: 'Flags', col: '#EF9F27' },
-  { k: 'ac', icon: '✅', lbl: 'Criteria', col: '#5DCAA5' },
-  { k: 'find', icon: '🛠', lbl: 'Findings', col: '#6090d8' },
-  { k: 'checks', icon: '🧪', lbl: 'Checklist', col: '#5DCAA5' },
-  { k: 'bugs', icon: '🎯', lbl: 'Risk areas', col: '#e06060' }
+  { k: 'focus', icon: '🎯', lbl: 'Test Focus', col: '#EF9F27' },
+  { k: 'checks', icon: '🧪', lbl: 'Checklist', col: '#5DCAA5' }
 ];
 
 function ccLegendHtml() {
   var rows = [
-    ['⚑', 'Flags', '#EF9F27', 'In the code but not in the ticket — behaviour the ticket never mentions. Raise these with the programmer.'],
-    ['✅', 'Criteria', '#5DCAA5', 'In the ticket — is each acceptance criterion actually implemented, and is it tested?'],
-    ['🧪', 'Checklist', '#5DCAA5', 'What to test on device, by priority: smoke / sanity / regression / adhoc. Tick as you go, or convert to QA Focus.'],
-    ['🎯', 'Risk areas', '#e06060', 'Where this change is most likely to break, and what the player would see. Test these first.']
+    ['🎯', 'Test Focus', '#EF9F27', 'The screens/features this change affects, ranked. 🆕 new to test · ♻ existing to regression-check · ⚠ inferred (verify on device). Tick areas and convert them into test cases.'],
+    ['🧪', 'Checklist', '#5DCAA5', 'Concrete device steps to run, by priority: smoke / sanity / regression / adhoc. Tick them off as you test.']
   ];
   var inner = rows.map(function (r) {
     return '<div style="display:flex;gap:9px;margin:6px 0;align-items:baseline;">' +
@@ -3972,15 +3958,30 @@ function ccCheckToggle(key) {
 }
 
 function ccProgress() {
-  // In-app the checkbox means "selected for conversion" — "tested" tracking lives in the HTML export
+  // Checklist checkbox = "tested" tick-as-you-go (no conversion; that lives on Test Focus).
   var total = window._ccTotal || 0;
   var done = 0; var c = window._ccChecked || {};
   Object.keys(c).forEach(function (k) { if (c[k]) done++; });
   var bar = document.getElementById('cc-prog-bar'); var lbl = document.getElementById('cc-prog-lbl');
   if (bar) bar.style.width = total ? Math.round(done / total * 100) + '%' : '0%';
-  if (lbl) lbl.textContent = done + ' / ' + total + ' selected';
-  var cbtn = document.getElementById('cc-convert-btn');
-  if (cbtn) { cbtn.textContent = '⇄ Convert ' + done + ' selected → QA Focus'; cbtn.disabled = !done; cbtn.style.opacity = done ? '1' : '.45'; }
+  if (lbl) lbl.textContent = done + ' / ' + total + ' tested';
+}
+
+// Test Focus selection → conversion to test cases.
+function ccTFToggle(i) {
+  window._ccTF = window._ccTF || {};
+  window._ccTF[i] = !window._ccTF[i];
+  var on = window._ccTF[i];
+  var box = document.getElementById('cc-tfbox-' + i);
+  if (box) { box.style.background = on ? '#EF9F27' : 'transparent'; box.style.borderColor = on ? '#EF9F27' : '#4a4230'; box.textContent = on ? '✓' : ''; box.style.color = on ? '#1a1305' : ''; }
+  ccTFCount();
+}
+
+function ccTFCount() {
+  var c = window._ccTF || {}, n = 0;
+  Object.keys(c).forEach(function (k) { if (c[k]) n++; });
+  var b = document.getElementById('cc-tf-convert-btn');
+  if (b) { b.textContent = '⇄ Convert ' + n + ' selected → test cases'; b.disabled = !n; b.style.opacity = n ? '1' : '.45'; }
 }
 
 function ccPrio(t) {
@@ -3989,50 +3990,39 @@ function ccPrio(t) {
   return m ? { p: m[1], col: colMap[m[1]], txt: m[2] } : { p: '', col: '', txt: t };
 }
 
-function copyCCQuestion(i, btn) {
+async function convertTestFocusToQA(btn) {
   var d = window._codeCheckData;
-  if (!d || !d.discrepancies || !d.discrepancies[i]) return;
-  navigator.clipboard.writeText(d.discrepancies[i].question || '').then(function () {
-    var o = btn.textContent; btn.textContent = 'copied ✓';
-    setTimeout(function () { btn.textContent = o; }, 1500);
-  });
-}
-
-async function convertChecklistToQA(btn) {
-  var d = window._codeCheckData;
-  var c = window._ccChecked || {};
-  if (!d || !d.checklist) return;
+  var tf = (d && d.testFocus) || [];
+  var c = window._ccTF || {};
+  if (!tf.length) return;
   var pmap = { P0: 'high', P1: 'med', P2: 'low' };
   var selected = [];
   Object.keys(c).forEach(function (k) {
     if (!c[k]) return;
-    var m = k.match(/^(smoke|sanity|adhoc)-(\d+)$/);
-    if (!m || !d.checklist[m[1]] || d.checklist[m[1]][+m[2]] === undefined) return;
-    var pr = ccPrio(d.checklist[m[1]][+m[2]]);
-    selected.push({ pass: m[1], sev: pmap[pr.p] || 'med', text: pr.txt });
+    var a = tf[+k];
+    if (!a) return;
+    selected.push({ sev: pmap[(a.priority || '').toUpperCase()] || 'med', area: a.area || '', verify: a.verify || '', ifBroken: a.ifBroken || '', tag: a.tag || '', platform: a.platform || '' });
   });
   if (!selected.length) return;
 
   var orig = btn.innerHTML;
   btn.disabled = true;
   btn.innerHTML = '<div class="loading-spinner-sm" style="border-top-color:#5DCAA5;"></div> converting…';
-  setAnalysisStatus('converting ' + selected.length + ' checklist items to test cases…');
+  setAnalysisStatus('converting ' + selected.length + ' focus area' + (selected.length === 1 ? '' : 's') + ' to test cases…');
 
   try {
     var ctx = '';
     if (d.summary && d.summary.verdict) ctx += 'CODE CHECK VERDICT: ' + d.summary.verdict + '\n';
-    if (d.bugSources && d.bugSources.length) ctx += 'LIKELY BUG SOURCES:\n' + d.bugSources.map(function (b) { return '- ' + (b.area || '') + ': ' + (b.why || '') + ' → ' + (b.playerImpact || ''); }).join('\n') + '\n';
-    if (d.discrepancies && d.discrepancies.length) ctx += 'TICKET/CODE DISCREPANCIES:\n' + d.discrepancies.map(function (x) { return '- ticket: ' + (x.ticketSays || '') + ' | code: ' + (x.codeDoes || ''); }).join('\n') + '\n';
     var gistBody = document.getElementById('gist-body');
     var gistText = gistBody ? (gistBody.innerText || '').trim() : '';
     if (gistText) ctx += '\nFEATURE GIST:\n' + gistText.substring(0, 2000) + '\n';
 
-    var prompt = 'A code cross-check produced the QA checklist items below, and the QA engineer selected these to become formal test cases.\n\n' +
-      'CONTEXT FROM THE CODE ANALYSIS:\n' + ctx + '\n' +
-      'SELECTED CHECKLIST ITEMS (severity given per item):\n' +
-      selected.map(function (s, i) { return (i + 1) + '. [' + s.sev + '] (' + s.pass + ') ' + s.text; }).join('\n') + '\n\n' +
-      'Expand EACH item into one test case. Ground steps and expected results in the context above — do not invent behaviour it does not support. Keep the device-action language of the original item.\n' +
-      'Return ONLY a JSON array, one object per item, same order:\n' +
+    var prompt = 'A QA code cross-check produced the TEST FOCUS areas below, and the QA engineer selected these to become formal test cases.\n\n' +
+      'CONTEXT FROM THE ANALYSIS:\n' + ctx + '\n' +
+      'SELECTED TEST FOCUS AREAS (each has: area, what to verify, what a failure looks like, severity, tag):\n' +
+      selected.map(function (s, i) { return (i + 1) + '. [' + s.sev + '] ' + (s.tag ? '(' + s.tag + ') ' : '') + s.area + (s.platform ? ' [' + s.platform + ']' : '') + '\n   verify: ' + s.verify + '\n   if broken: ' + s.ifBroken; }).join('\n') + '\n\n' +
+      'Expand EACH area into one test case. Use its "verify" as the basis for the objective + expected result, and its "if broken" to sharpen what the expected result guards against. Write device-action steps a tester can follow. Ground everything in the area/verify/context above — do not invent behaviour it does not support. No code, class, or file references.\n' +
+      'Return ONLY a JSON array, one object per area, same order:\n' +
       '[{"title":"max 70 chars","severity":"high|med|low (use the given severity)","originType":"derived_acceptance_check","confidence":"high","confidenceReason":"from code cross-check","detail":"max 90 chars — what this verifies and why it matters","testcase":{"objective":"max 90 chars","preconditions":"max 90 chars","steps":["3-6 device steps"],"expected":"max 200 chars"}}]';
 
     var r = await fetch(getApiUrl(), {
@@ -4068,45 +4058,39 @@ async function convertChecklistToQA(btn) {
     var riskBtn = document.getElementById('risk-btn-wrap');
     if (riskBtn) riskBtn.style.display = 'flex';
     btn.innerHTML = '✓ Added ' + arr.length + ' to QA Focus';
-    setTimeout(function () { btn.innerHTML = orig; btn.disabled = false; ccProgress(); }, 2500);
+    setTimeout(function () { btn.innerHTML = orig; btn.disabled = false; ccTFCount(); }, 2500);
     if (qaSec) qaSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
   } catch (err) {
     showErr('Convert failed: ' + (err && err.message ? err.message.substring(0, 100) : 'unknown'));
     btn.innerHTML = orig;
     btn.disabled = false;
-    ccProgress();
+    ccTFCount();
   } finally {
     setAnalysisStatus('');
   }
 }
 
 function renderCodeCheck(d) {
-  var sevCol = { high: '#e06060', med: '#d4a855', low: '#5DCAA5' };
   var html = '';
-  var disc = d.discrepancies || [];
-  var findings = d.findings || [];
-  var acs = d.acStatus || [];
   var cl = d.checklist || {};
-  var bugs = d.riskAreas || d.bugSources || [];
-  var highN = findings.filter(function (f) { return (f.severity || '').toLowerCase() === 'high'; }).length;
-  var medN = findings.filter(function (f) { return (f.severity || '').toLowerCase() === 'med'; }).length;
-  var acDone = acs.filter(function (a) { return (a.status || '').toLowerCase() === 'implemented'; }).length;
+  var tf = d.testFocus || [];
   var checkN = (cl.smoke || []).length + (cl.sanity || []).length + (cl.regression || []).length + (cl.adhoc || []).length;
   var panes = {}, tabMetas = {};
   window._ccChecked = {};
+  window._ccTF = {};
   window._ccTotal = checkN;
-  window._ccHighN = highN;
 
-  // ── Verdict banner — match status drives colour and label ──
+  // ── Verdict banner — "is it built as the ticket describes" ──
   var sum = (d.summary && typeof d.summary === 'object') ? d.summary : { verdict: d.summary || '' };
   var match = (sum.match || '').toLowerCase();
-  if (match !== 'yes' && match !== 'partial' && match !== 'no') match = (!highN && !disc.length) ? 'yes' : 'partial';
+  var p0N = tf.filter(function (a) { return (a.priority || '').toUpperCase() === 'P0'; }).length;
+  if (match !== 'yes' && match !== 'partial' && match !== 'no') match = 'partial';
   var matchCfg = {
-    yes:     { col: '#5DCAA5', bg: '#091812', icon: '✓', chip: 'MATCH',    txt: '#9FE1CB', sub: '#3a7a5a' },
+    yes:     { col: '#5DCAA5', bg: '#091812', icon: '✓', chip: 'BUILT',    txt: '#9FE1CB', sub: '#3a7a5a' },
     partial: { col: '#EF9F27', bg: '#17100a', icon: '⚠', chip: 'PARTIAL',  txt: '#FAC775', sub: '#a8804a' },
-    no:      { col: '#e06060', bg: '#170a0a', icon: '✗', chip: 'MISMATCH', txt: '#F0B5B5', sub: '#a05a5a' }
+    no:      { col: '#e06060', bg: '#170a0a', icon: '✗', chip: 'NOT BUILT', txt: '#F0B5B5', sub: '#a05a5a' }
   }[match];
-  html += '<div style="display:flex;align-items:flex-start;gap:11px;background:' + matchCfg.bg + ';border:0.5px solid ' + matchCfg.col + '30;border-radius:9px;padding:13px 15px;margin-bottom:12px;">' +
+  html += '<div style="display:flex;align-items:flex-start;gap:11px;background:' + matchCfg.bg + ';border:0.5px solid ' + matchCfg.col + '30;border-radius:9px;padding:13px 15px;margin-bottom:14px;">' +
     '<span style="font-size:18px;color:' + matchCfg.col + ';flex-shrink:0;line-height:1.3;">' + matchCfg.icon + '</span><div style="flex:1;">' +
     '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
     '<span style="font-size:10px;font-weight:700;font-family:JetBrains Mono,monospace;letter-spacing:.08em;color:' + matchCfg.col + ';border:0.5px solid ' + matchCfg.col + '50;border-radius:4px;padding:2px 8px;flex-shrink:0;">' + matchCfg.chip + '</span>' +
@@ -4114,81 +4098,33 @@ function renderCodeCheck(d) {
     (sum.subline ? '<div style="font-size:13px;color:' + matchCfg.sub + ';margin-top:5px;line-height:1.55;font-family:Sora,sans-serif;">▸ ' + esc(sum.subline) + '</div>' : '') +
     '</div></div>';
 
-  // ── QA focus bullets (counts live in the tab pills below — no separate stat strip) ──
-  [{ key: 'forQA', label: '🧪 For QA', col: '#5DCAA5' }].forEach(function (g) {
-    var pts = sum[g.key];
-    if (!pts || !pts.length) return;
-    html += '<div style="font-size:11px;font-family:JetBrains Mono,monospace;color:' + g.col + ';letter-spacing:.06em;text-transform:uppercase;margin:10px 0 4px;">' + g.label + '</div>';
-    pts.forEach(function (p) { html += '<div style="display:flex;gap:9px;margin:5px 0;"><span style="color:' + g.col + '80;flex-shrink:0;">–</span><span style="font-size:14px;color:#b0c0cc;line-height:1.65;font-family:Sora,sans-serif;">' + esc(p) + '</span></div>'; });
-  });
-  html += '<div style="height:10px;"></div>';
-
-  // ── Section 1: Flag to programmer (discrepancies) — open by default ──
-  if (disc.length) {
-    var db = '';
-    disc.forEach(function (x, i) {
-      db += '<div style="' + (i ? 'border-top:0.5px solid #1e1e28;' : '') + 'padding:11px 0;">' +
-        '<div style="display:grid;grid-template-columns:82px 1fr;gap:6px 10px;align-items:baseline;">' +
-        '<span style="font-size:11px;font-family:JetBrains Mono,monospace;color:#5DCAA5;text-transform:uppercase;letter-spacing:.05em;">ticket says</span>' +
-        '<span style="font-size:14px;color:#9FE1CB;line-height:1.6;font-family:Sora,sans-serif;">' + esc(x.ticketSays || '') + '</span>' +
-        '<span style="font-size:11px;font-family:JetBrains Mono,monospace;color:#e06060;text-transform:uppercase;letter-spacing:.05em;">code does</span>' +
-        '<span style="font-size:14px;color:#F0B5B5;line-height:1.6;font-family:Sora,sans-serif;">' + esc(x.codeDoes || '') + '</span></div>' +
-        (x.file ? '<div style="font-size:11.5px;font-family:JetBrains Mono,monospace;color:#5a6a7a;margin-top:6px;">' + esc(x.file) + '</div>' : '') +
-        (x.question ? '<div style="display:flex;gap:8px;align-items:flex-start;margin-top:8px;background:#0a0f16;border:0.5px solid #1c2430;border-radius:6px;padding:9px 12px;">' +
-          '<span style="font-size:13px;color:#9aacb8;line-height:1.65;flex:1;font-family:Sora,sans-serif;">' + esc(x.question) + '</span>' +
-          '<button onclick="copyCCQuestion(' + i + ',this)" style="flex-shrink:0;background:transparent;border:0.5px solid #2a3a4a;border-radius:5px;color:#6090d8;font-size:10.5px;font-family:JetBrains Mono,monospace;padding:3px 10px;cursor:pointer;">copy</button></div>' : '') +
+  // ── Test Focus — the merged ranked area view (impact + regression + risk) ──
+  if (tf.length) {
+    var tagCfg = { 'new': ['🆕 new', '#5DCAA5'], regression: ['♻ regression', '#EF9F27'], inferred: ['⚠ inferred', '#8a97a2'] };
+    var priCol = { P0: '#e06060', P1: '#d4a855', P2: '#7F77DD' };
+    var fb = '';
+    tf.forEach(function (a, i) {
+      var tg = tagCfg[(a.tag || '').toLowerCase()];
+      var pr = (a.priority || '').toUpperCase(); var pc = priCol[pr] || '#7a7a86';
+      fb += '<div style="border:0.5px solid #252530;border-radius:10px;background:#0d1412;padding:13px 14px;margin-bottom:9px;">' +
+        '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">' +
+        '<span id="cc-tfbox-' + i + '" onclick="ccTFToggle(' + i + ')" title="select to convert into a test case" style="width:15px;height:15px;border-radius:4px;border:0.5px solid #4a4230;font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-family:JetBrains Mono,monospace;"></span>' +
+        (pr ? '<span style="font-size:10px;font-weight:700;font-family:JetBrains Mono,monospace;color:' + pc + ';border:0.5px solid ' + pc + '40;border-radius:4px;padding:1px 7px;flex-shrink:0;">' + pr + '</span>' : '') +
+        (tg ? '<span style="font-size:10.5px;font-family:JetBrains Mono,monospace;color:' + tg[1] + ';border:0.5px solid ' + tg[1] + '40;border-radius:4px;padding:1px 7px;flex-shrink:0;">' + tg[0] + '</span>' : '') +
+        (a.platform ? '<span style="font-size:10.5px;font-family:JetBrains Mono,monospace;color:#8898a8;margin-left:auto;">📱 ' + esc(a.platform) + '</span>' : '') +
+        '</div>' +
+        '<div style="font-size:15px;color:#e8eef4;font-weight:600;font-family:Sora,sans-serif;line-height:1.4;margin-bottom:6px;">' + esc(a.area || '') + '</div>' +
+        (a.verify ? '<div style="display:flex;gap:9px;margin:4px 0;"><span style="font-size:11px;font-family:JetBrains Mono,monospace;color:#5DCAA5;text-transform:uppercase;letter-spacing:.04em;flex-shrink:0;min-width:56px;padding-top:2px;">verify</span><span style="font-size:13.5px;color:#c8d4dc;line-height:1.6;font-family:Sora,sans-serif;">' + esc(a.verify) + '</span></div>' : '') +
+        (a.ifBroken ? '<div style="display:flex;gap:9px;margin:4px 0;"><span style="font-size:11px;font-family:JetBrains Mono,monospace;color:#c08a8a;text-transform:uppercase;letter-spacing:.04em;flex-shrink:0;min-width:56px;padding-top:2px;">if broken</span><span style="font-size:13.5px;color:#c0a0a0;line-height:1.6;font-family:Sora,sans-serif;">' + esc(a.ifBroken) + '</span></div>' : '') +
         '</div>';
     });
-    panes.disc = db; tabMetas.disc = disc.length;
+    fb += '<div style="margin-top:14px;padding-top:12px;border-top:0.5px solid #1e1e28;">' +
+      '<button id="cc-tf-convert-btn" onclick="convertTestFocusToQA(this)" disabled style="opacity:.45;display:flex;align-items:center;gap:7px;padding:8px 16px;background:#17100a;border:0.5px solid #B45517;border-radius:8px;font-size:12px;color:#EF9F27;cursor:pointer;font-family:JetBrains Mono,monospace;">⇄ Convert 0 selected → test cases</button>' +
+      '<div style="font-size:11px;color:#5a5240;margin-top:6px;font-family:Sora,sans-serif;">Tick the areas you want as formal test cases, convert them, then push to Jira from the QA Focus section.</div></div>';
+    panes.focus = fb; tabMetas.focus = tf.length;
   }
 
-  // ── Section 2: Code findings ──
-  if (findings.length) {
-    var fb = '';
-    findings.forEach(function (f, i) {
-      var col = sevCol[(f.severity || '').toLowerCase()] || '#607080';
-      fb += '<div style="' + (i ? 'border-top:0.5px solid #1e1e28;' : '') + 'padding:11px 0;">' +
-        '<div style="display:flex;align-items:baseline;gap:9px;margin-bottom:6px;">' +
-        '<span style="font-size:10px;font-weight:700;text-transform:uppercase;font-family:JetBrains Mono,monospace;padding:2px 8px;border-radius:4px;border:0.5px solid ' + col + '40;color:' + col + ';flex-shrink:0;">' + esc(f.severity || '?') + '</span>' +
-        '<span style="font-size:14.5px;font-weight:500;color:#d0dce8;font-family:Sora,sans-serif;">' + esc(f.title || '') + '</span></div>';
-      if (f.repro && f.repro.length) fb += '<div style="font-size:11px;font-family:JetBrains Mono,monospace;color:#5a6a7a;margin:7px 0 3px;letter-spacing:.05em;">REPRO</div>' + f.repro.map(function (st, n) { return '<div style="font-size:13.5px;color:#88b8ac;line-height:1.65;padding-left:8px;font-family:Sora,sans-serif;">' + (n + 1) + '. ' + esc(st) + '</div>'; }).join('');
-      if (f.observed) fb += '<div style="font-size:11px;font-family:JetBrains Mono,monospace;color:#5a6a7a;margin:8px 0 3px;letter-spacing:.05em;">OBSERVED</div><div style="font-size:13.5px;color:#c0a0a0;line-height:1.65;padding-left:8px;font-family:Sora,sans-serif;">' + esc(f.observed) + '</div>';
-      if (f.rootCause) fb += '<div style="font-size:11px;font-family:JetBrains Mono,monospace;color:#5a6a7a;margin:8px 0 3px;letter-spacing:.05em;">ROOT CAUSE</div><div style="font-size:13px;font-family:JetBrains Mono,monospace;color:#9aacb8;line-height:1.7;background:#0a0f16;border:0.5px solid #1c2430;border-radius:6px;padding:9px 12px;">' + esc(f.rootCause) + '</div>';
-      if (f.proposedFix) fb += '<div style="font-size:11px;font-family:JetBrains Mono,monospace;color:#5a6a7a;margin:8px 0 3px;letter-spacing:.05em;">PROPOSED FIX</div><div style="font-size:13.5px;color:#88b8ac;line-height:1.65;padding-left:8px;font-family:Sora,sans-serif;">' + esc(f.proposedFix) + '</div>';
-      fb += '</div>';
-    });
-    panes.find = fb; tabMetas.find = findings.length;
-  }
-
-  // ── Section 3: Acceptance criteria ──
-  if (acs.length) {
-    var stIcon = { implemented: '✅', partial: '⚠️', missing: '❌' };
-    var testChip = function (t) {
-      t = (t || '').toLowerCase();
-      var cfg = { yes: ['✓ test', '#5DCAA5'], partial: ['~ test', '#d4a855'], no: ['no test', '#e06060'] }[t];
-      if (!cfg) return '';
-      return '<span style="font-size:10px;font-family:JetBrains Mono,monospace;color:' + cfg[1] + ';border:0.5px solid ' + cfg[1] + '40;border-radius:3px;padding:1px 6px;margin-left:7px;flex-shrink:0;">' + cfg[0] + '</span>';
-    };
-    var noTest = acs.filter(function (a) { return (a.tested || '').toLowerCase() === 'no'; }).length;
-    var ab = '';
-    acs.forEach(function (a) {
-      ab += '<div style="display:flex;gap:9px;margin:9px 0;align-items:baseline;"><span style="flex-shrink:0;">' + (stIcon[(a.status || '').toLowerCase()] || '·') + '</span>' +
-        '<div style="flex:1;"><div style="font-size:14px;color:#b0c0cc;line-height:1.6;font-family:Sora,sans-serif;">' + esc(a.ac || '') + testChip(a.tested) + '</div>' +
-        (a.note ? '<div style="font-size:12px;font-family:JetBrains Mono,monospace;color:#5a6a7a;margin-top:3px;">' + esc(a.note) + '</div>' : '') + '</div></div>';
-    });
-    if (noTest) ab = '<div style="font-size:11.5px;color:#e06060;font-family:JetBrains Mono,monospace;margin-bottom:8px;">⚠ ' + noTest + ' of ' + acs.length + ' criteria have no test coverage</div>' + ab;
-    panes.ac = ab; tabMetas.ac = acDone + '/' + acs.length;
-  }
-
-  // ── Section 4: Gap analysis ──
-  if (d.gaps && d.gaps.length) {
-    var gb = '';
-    d.gaps.forEach(function (g) { gb += '<div style="display:flex;gap:9px;margin:6px 0;"><span style="color:#7F77DD;flex-shrink:0;">–</span><span style="font-size:14px;color:#a8a0cc;line-height:1.65;font-family:Sora,sans-serif;">' + esc(g) + '</span></div>'; });
-    panes.ac = (panes.ac || '') + '<div style="font-size:11px;font-family:JetBrains Mono,monospace;color:#7F77DD;letter-spacing:.06em;text-transform:uppercase;margin:14px 0 5px;">◈ Gap analysis</div>' + gb;
-    if (!tabMetas.ac) tabMetas.ac = d.gaps.length + ' gaps';
-  }
-
-  // ── Section 5: QA checklist ──
+  // ── Checklist — executable device steps, tick-as-you-go (no convert here) ──
   var passes = [
     { key: 'smoke', label: 'Smoke — must pass or reject build', col: '#e06060' },
     { key: 'sanity', label: 'Sanity — quick checks around the change', col: '#d4a855' },
@@ -4212,23 +4148,8 @@ function renderCodeCheck(d) {
           '<span id="cc-txt-' + key + '" style="font-size:14px;color:#b0c0cc;font-family:Sora,sans-serif;line-height:1.55;">' + esc(pr.txt) + '</span></div>';
       });
     });
-    cb += '<div style="margin-top:14px;padding-top:12px;border-top:0.5px solid #1e1e28;">' +
-      '<button id="cc-convert-btn" onclick="convertChecklistToQA(this)" disabled style="opacity:.45;display:flex;align-items:center;gap:7px;padding:8px 16px;background:#091812;border:0.5px solid #1a4a3a;border-radius:8px;font-size:12px;color:#5DCAA5;cursor:pointer;font-family:JetBrains Mono,monospace;">⇄ Convert 0 selected → QA Focus</button>' +
-      '<div style="font-size:11px;color:#4a5a56;margin-top:6px;font-family:Sora,sans-serif;">Tick items above, convert them to full test cases, then push to Jira from the QA Focus section.</div></div>';
+    cb += '<div style="font-size:11px;color:#4a5a56;margin-top:12px;font-family:Sora,sans-serif;">Tick items as you test. To turn scenarios into formal test cases, use the Test Focus tab.</div>';
     panes.checks = cb; tabMetas.checks = checkN;
-  }
-
-  // ── Section 6: Likely bug sources ──
-  if (bugs.length) {
-    var bb = '';
-    bugs.forEach(function (b, i) {
-      bb += '<div style="' + (i ? 'border-top:0.5px solid #1e1e28;' : '') + 'padding:10px 0;">' +
-        '<div style="font-size:14.5px;font-weight:500;color:#d0dce8;margin-bottom:4px;font-family:Sora,sans-serif;">' + (i + 1) + '. ' + esc(b.area || '') + '</div>' +
-        (b.why ? '<div style="font-size:13.5px;color:#8898a8;line-height:1.65;padding-left:16px;font-family:Sora,sans-serif;">Why: ' + esc(b.why) + '</div>' : '') +
-        (b.playerImpact ? '<div style="font-size:13.5px;color:#c0a0a0;line-height:1.65;padding-left:16px;font-family:Sora,sans-serif;">Player sees: ' + esc(b.playerImpact) + '</div>' : '') +
-        '</div>';
-    });
-    panes.bugs = bb; tabMetas.bugs = bugs.length;
   }
 
   // ── Tab bar + panes — single line, counts double as the at-a-glance stats ──
@@ -4238,9 +4159,8 @@ function renderCodeCheck(d) {
     html += '<div style="display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;margin-bottom:14px;padding-bottom:2px;">';
     avail.forEach(function (t) {
       var on = t.k === active;
-      // Findings badge turns red when there are high-severity findings — keeps the urgency the old stat strip carried
-      var badgeCol = (t.k === 'find' && highN) ? '#e06060' : (on ? t.col : '#7a7a86');
-      var badgeBg = (t.k === 'find' && highN) ? '#e0606022' : (on ? t.col + '33' : '#1e1e28');
+      var badgeCol = on ? t.col : '#7a7a86';
+      var badgeBg = on ? t.col + '33' : '#1e1e28';
       html += '<button id="cc-tab-' + t.k + '" onclick="ccTab(\'' + t.k + '\')" style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-family:Sora,sans-serif;color:' + (on ? t.col : '#8a97a2') + ';background:' + (on ? t.col + '1e' : 'transparent') + ';border:0.5px solid ' + (on ? t.col + '70' : '#2a2a34') + ';border-radius:8px;padding:7px 11px;cursor:pointer;white-space:nowrap;transition:all .12s;flex-shrink:0;">' +
         '<span style="font-size:12px;">' + t.icon + '</span>' + t.lbl +
         '<span class="cc-tab-n" style="font-size:11px;font-family:JetBrains Mono,monospace;background:' + badgeBg + ';color:' + badgeCol + ';border-radius:10px;padding:1px 7px;">' + tabMetas[t.k] + '</span></button>';
@@ -4261,8 +4181,9 @@ function renderCodeCheck(d) {
       (u.cost != null ? ' · $' + Number(u.cost).toFixed(3) : '') + '</div>';
   }
 
-  document.getElementById('codecheck-body').innerHTML = html || '<div style="font-size:13px;color:#607070;">No findings returned.</div>';
+  document.getElementById('codecheck-body').innerHTML = html || '<div style="font-size:13px;color:#607070;">No test focus returned.</div>';
   ccProgress();
+  ccTFCount();
 }
 
 // Build a searchable title/filename for code-check exports: ticket key + feature.
@@ -4295,19 +4216,17 @@ function downloadCodeCheckMD(btn) {
   } else {
     md += (d.summary || '') + '\n';
   }
-  if (d.acStatus && d.acStatus.length) {
-    md += '\n---\n\n## Gap Analysis — Ticket vs Code\n\n### Acceptance criteria (in the ticket)\n\n| AC | Status | Test | Note |\n|----|--------|------|------|\n';
-    d.acStatus.forEach(function (a) { md += '| ' + (a.ac || '') + ' | ' + (a.status || '') + ' | ' + (a.tested || '') + ' | ' + (a.note || '') + ' |\n'; });
-  }
-  if (d.discrepancies && d.discrepancies.length) {
-    md += '\n### In the code, not in the ticket — raise with the programmer\n\n';
-    d.discrepancies.forEach(function (x, i) {
-      md += (i + 1) + '. **Ticket says**: ' + (x.ticketSays || '') + '\n   **Code does**: ' + (x.codeDoes || '') + '\n' +
-        (x.file ? '   **Evidence**: `' + x.file + '`\n' : '') +
-        (x.question ? '   **Question for programmer**: ' + x.question + '\n' : '') + '\n';
+  var mdTf = d.testFocus || [];
+  if (mdTf.length) {
+    md += '\n---\n\n## Test Focus — where to test & why\n\n';
+    mdTf.forEach(function (a, i) {
+      var tagTxt = { 'new': '🆕 new', regression: '♻ regression', inferred: '⚠ inferred' }[(a.tag || '').toLowerCase()] || (a.tag || '');
+      md += '### ' + (i + 1) + '. ' + (a.area || '') + '\n' +
+        '- ' + ((a.priority || '').toUpperCase() || '—') + (tagTxt ? ' · ' + tagTxt : '') + (a.platform ? ' · ' + a.platform : '') + '\n' +
+        (a.verify ? '- **Verify:** ' + a.verify + '\n' : '') +
+        (a.ifBroken ? '- **If broken:** ' + a.ifBroken + '\n' : '') + '\n';
     });
   }
-  if (d.gaps && d.gaps.length) md += '\n### Open questions / unclear before testing\n\n' + d.gaps.map(function (g) { return '- ' + g; }).join('\n') + '\n';
   var cl = d.checklist || {};
   if ((cl.smoke && cl.smoke.length) || (cl.sanity && cl.sanity.length) || (cl.regression && cl.regression.length) || (cl.adhoc && cl.adhoc.length)) {
     md += '\n---\n\n## Test Checklist\n';
@@ -4316,14 +4235,7 @@ function downloadCodeCheckMD(btn) {
     if (cl.regression && cl.regression.length) md += '\n### Regression — adjacent features that share this code\n\n' + cl.regression.map(function (t) { return '- [ ] ' + t; }).join('\n') + '\n';
     if (cl.adhoc && cl.adhoc.length) md += '\n### Adhoc — exploratory attack ideas\n\n' + cl.adhoc.map(function (t) { return '- [ ] ' + t; }).join('\n') + '\n';
   }
-  var mdRisk = d.riskAreas || d.bugSources || [];
-  if (mdRisk.length) {
-    md += '\n## Risk-Prone Areas — where QA focuses first\n\n';
-    mdRisk.forEach(function (b, i) {
-      md += (i + 1) + '. **' + (b.area || '') + '**\n   - Why: ' + (b.why || '') + '\n   - Player sees: ' + (b.playerImpact || '') + '\n';
-    });
-  }
-  if (d.testFocus && d.testFocus.length) md += '\n## Verify on Device\n\n' + d.testFocus.map(function (t, i) { return (i + 1) + '. ' + t; }).join('\n') + '\n';
+  md += '\n---\n*Static analysis — verify on device. Code-level review is handled separately by the developer.*\n';
   var blob = new Blob([md], { type: 'text/markdown' });
   var url = URL.createObjectURL(blob);
   var a = document.createElement('a');
@@ -4341,73 +4253,35 @@ function downloadCodeCheckHTML(btn) {
   var h = '';
   var secHd = function (label, col) { return '<div style="border-left:3px solid ' + col + ';padding:4px 10px;margin:22px 0 9px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:' + col + ';font-family:monospace;">' + esc(label) + '</div>'; };
 
-  var xDisc = d.discrepancies || [], xFind = d.findings || [], xAcs = d.acStatus || [], xCl = d.checklist || {};
-  var xHighN = xFind.filter(function (f) { return (f.severity || '').toLowerCase() === 'high'; }).length;
-  var xAcDone = xAcs.filter(function (a) { return (a.status || '').toLowerCase() === 'implemented'; }).length;
+  var xCl = d.checklist || {};
+  var xTf = d.testFocus || [];
   var xCheckN = (xCl.smoke || []).length + (xCl.sanity || []).length + (xCl.regression || []).length + (xCl.adhoc || []).length;
-  var xRisk = d.riskAreas || d.bugSources || [];
   var xm = (sum.match || '').toLowerCase();
-  if (xm !== 'yes' && xm !== 'partial' && xm !== 'no') xm = (!xHighN && !xDisc.length) ? 'yes' : 'partial';
-  var xCfg = { yes: { col: '#5DCAA5', bg: '#091812', icon: '✓', chip: 'MATCH', txt: '#9FE1CB', sub: '#3a7a5a' },
+  if (xm !== 'yes' && xm !== 'partial' && xm !== 'no') xm = 'partial';
+  var xCfg = { yes: { col: '#5DCAA5', bg: '#091812', icon: '✓', chip: 'BUILT', txt: '#9FE1CB', sub: '#3a7a5a' },
     partial: { col: '#EF9F27', bg: '#17100a', icon: '⚠', chip: 'PARTIAL', txt: '#FAC775', sub: '#a8804a' },
-    no: { col: '#e06060', bg: '#170a0a', icon: '✗', chip: 'MISMATCH', txt: '#F0B5B5', sub: '#a05a5a' } }[xm];
-  if (sum.verdict) h += '<div style="display:flex;align-items:flex-start;gap:11px;background:' + xCfg.bg + ';border:0.5px solid ' + xCfg.col + '30;border-radius:9px;padding:13px 15px;margin-bottom:12px;">' +
+    no: { col: '#e06060', bg: '#170a0a', icon: '✗', chip: 'NOT BUILT', txt: '#F0B5B5', sub: '#a05a5a' } }[xm];
+  if (sum.verdict) h += '<div style="display:flex;align-items:flex-start;gap:11px;background:' + xCfg.bg + ';border:0.5px solid ' + xCfg.col + '30;border-radius:9px;padding:13px 15px;margin-bottom:14px;">' +
     '<span style="font-size:18px;color:' + xCfg.col + ';">' + xCfg.icon + '</span><div>' +
     '<div><span style="font-size:10px;font-family:monospace;letter-spacing:.08em;color:' + xCfg.col + ';border:0.5px solid ' + xCfg.col + '50;border-radius:4px;padding:2px 8px;margin-right:8px;">' + xCfg.chip + '</span>' +
     '<span style="font-size:14.5px;color:' + xCfg.txt + ';line-height:1.55;">' + esc(sum.verdict) + '</span></div>' +
     (sum.subline ? '<div style="font-size:13px;color:' + xCfg.sub + ';margin-top:5px;">▸ ' + esc(sum.subline) + '</div>' : '') + '</div></div>';
-  [{ key: 'forQA', label: '🧪 For QA', col: '#5DCAA5' }].forEach(function (g) {
-    var pts = sum[g.key];
-    if (!pts || !pts.length) return;
-    h += '<div style="font-size:11px;font-family:monospace;color:' + g.col + ';letter-spacing:.08em;text-transform:uppercase;margin:12px 0 5px;">' + g.label + '</div>';
-    pts.forEach(function (p) { h += '<div style="display:flex;gap:9px;margin:5px 0;"><span style="color:' + g.col + '99;">–</span><span style="font-size:14px;color:#b0c0cc;line-height:1.7;">' + esc(p) + '</span></div>'; });
-  });
 
-  if (d.discrepancies && d.discrepancies.length) {
-    h += '<!--SPLIT:disc-->';
-    d.discrepancies.forEach(function (x) {
-      h += '<div style="border:0.5px solid #252530;border-radius:8px;padding:12px 14px;margin-bottom:9px;">' +
-        '<div style="font-size:13.5px;line-height:1.7;"><span style="color:#5DCAA5;font-family:monospace;font-size:10.5px;text-transform:uppercase;">ticket says </span><span style="color:#9FE1CB;">' + esc(x.ticketSays || '') + '</span></div>' +
-        '<div style="font-size:13.5px;line-height:1.7;"><span style="color:#e06060;font-family:monospace;font-size:10.5px;text-transform:uppercase;">code does </span><span style="color:#F0B5B5;">' + esc(x.codeDoes || '') + '</span></div>' +
-        (x.file ? '<div style="font-size:11.5px;font-family:monospace;color:#5a6a7a;margin-top:5px;">' + esc(x.file) + '</div>' : '') +
-        (x.question ? '<div style="font-size:13px;color:#9aacb8;line-height:1.7;margin-top:8px;background:#0a0f16;border:0.5px solid #1c2430;border-radius:6px;padding:9px 12px;">' + esc(x.question) + '</div>' : '') + '</div>';
+  if (xTf.length) {
+    h += '<!--SPLIT:focus-->';
+    var xTagCfg = { 'new': ['🆕 new', '#5DCAA5'], regression: ['♻ regression', '#EF9F27'], inferred: ['⚠ inferred', '#8a97a2'] };
+    var xPriCol = { P0: '#e06060', P1: '#d4a855', P2: '#7F77DD' };
+    xTf.forEach(function (a) {
+      var tg = xTagCfg[(a.tag || '').toLowerCase()]; var pr = (a.priority || '').toUpperCase(); var pc = xPriCol[pr] || '#7a7a86';
+      h += '<div style="border:0.5px solid #252530;border-radius:10px;background:#0d1412;padding:12px 14px;margin-bottom:9px;">' +
+        '<div style="margin-bottom:7px;">' +
+        (pr ? '<span style="font-size:10px;font-weight:700;font-family:monospace;color:' + pc + ';border:0.5px solid ' + pc + '40;border-radius:4px;padding:1px 7px;margin-right:6px;">' + pr + '</span>' : '') +
+        (tg ? '<span style="font-size:10.5px;font-family:monospace;color:' + tg[1] + ';border:0.5px solid ' + tg[1] + '40;border-radius:4px;padding:1px 7px;margin-right:6px;">' + tg[0] + '</span>' : '') +
+        (a.platform ? '<span style="font-size:10.5px;font-family:monospace;color:#8898a8;">📱 ' + esc(a.platform) + '</span>' : '') + '</div>' +
+        '<div style="font-size:15px;color:#e8eef4;font-weight:600;line-height:1.4;margin-bottom:6px;">' + esc(a.area || '') + '</div>' +
+        (a.verify ? '<div style="font-size:13.5px;color:#c8d4dc;line-height:1.6;margin:3px 0;"><span style="color:#5DCAA5;font-family:monospace;font-size:10.5px;text-transform:uppercase;">verify </span>' + esc(a.verify) + '</div>' : '') +
+        (a.ifBroken ? '<div style="font-size:13.5px;color:#c0a0a0;line-height:1.6;margin:3px 0;"><span style="color:#c08a8a;font-family:monospace;font-size:10.5px;text-transform:uppercase;">if broken </span>' + esc(a.ifBroken) + '</div>' : '') + '</div>';
     });
-  }
-
-  if (d.findings && d.findings.length) {
-    h += '<!--SPLIT:find-->';
-    d.findings.forEach(function (f) {
-      var col = sevCol[(f.severity || '').toLowerCase()] || '#607080';
-      h += '<div style="border-top:0.5px solid #1e1e28;padding:13px 0;">' +
-        '<div style="margin-bottom:6px;"><span style="font-size:10px;text-transform:uppercase;font-family:monospace;padding:2px 8px;border-radius:4px;border:0.5px solid ' + col + '40;color:' + col + ';margin-right:9px;">' + esc(f.severity || '?') + '</span><span style="font-size:15px;color:#d0dce8;">' + esc(f.title || '') + '</span></div>' +
-        (f.repro && f.repro.length ? '<div style="font-size:10.5px;font-family:monospace;color:#5a6a7a;margin:7px 0 3px;">REPRO</div>' + f.repro.map(function (st, n) { return '<div style="font-size:13.5px;color:#88b8ac;line-height:1.7;padding-left:8px;">' + (n + 1) + '. ' + esc(st) + '</div>'; }).join('') : '') +
-        (f.observed ? '<div style="font-size:10.5px;font-family:monospace;color:#5a6a7a;margin:7px 0 3px;">OBSERVED</div><div style="font-size:13.5px;color:#c0a0a0;line-height:1.7;padding-left:8px;">' + esc(f.observed) + '</div>' : '') +
-        (f.rootCause ? '<div style="font-size:10.5px;font-family:monospace;color:#5a6a7a;margin:7px 0 3px;">ROOT CAUSE</div><div style="font-size:13px;font-family:monospace;color:#9aacb8;line-height:1.7;background:#0a0f16;border:0.5px solid #1c2430;border-radius:6px;padding:9px 12px;">' + esc(f.rootCause) + '</div>' : '') +
-        (f.proposedFix ? '<div style="font-size:10.5px;font-family:monospace;color:#5a6a7a;margin:7px 0 3px;">PROPOSED FIX</div><div style="font-size:13.5px;color:#88b8ac;line-height:1.7;padding-left:8px;">' + esc(f.proposedFix) + '</div>' : '') + '</div>';
-    });
-  }
-
-  if (d.acStatus && d.acStatus.length) {
-    var stIcon = { implemented: '✅', partial: '⚠️', missing: '❌' };
-    var xTestChip = function (t) {
-      t = (t || '').toLowerCase();
-      var cfg = { yes: ['✓ test', '#5DCAA5'], partial: ['~ test', '#d4a855'], no: ['no test', '#e06060'] }[t];
-      return cfg ? '<span style="font-size:10px;font-family:monospace;color:' + cfg[1] + ';border:0.5px solid ' + cfg[1] + '40;border-radius:3px;padding:1px 6px;margin-left:7px;">' + cfg[0] + '</span>' : '';
-    };
-    h += '<!--SPLIT:ac-->';
-    var xNoTest = d.acStatus.filter(function (a) { return (a.tested || '').toLowerCase() === 'no'; }).length;
-    if (xNoTest) h += '<div style="font-size:11.5px;color:#e06060;font-family:monospace;margin-bottom:8px;">⚠ ' + xNoTest + ' of ' + d.acStatus.length + ' criteria have no test coverage</div>';
-    d.acStatus.forEach(function (a) {
-      h += '<div style="display:flex;gap:10px;margin:8px 0;align-items:baseline;"><span>' + (stIcon[(a.status || '').toLowerCase()] || '·') + '</span><div>' +
-        '<div style="font-size:14px;color:#b0c0cc;line-height:1.6;">' + esc(a.ac || '') + xTestChip(a.tested) + '</div>' +
-        (a.note ? '<div style="font-size:12px;font-family:monospace;color:#5a6a7a;margin-top:2px;">' + esc(a.note) + '</div>' : '') + '</div></div>';
-    });
-  }
-
-  if (d.gaps && d.gaps.length) {
-    if (!(d.acStatus && d.acStatus.length)) h += '<!--SPLIT:ac-->';
-    h += '<div style="font-size:11px;font-family:monospace;color:#7F77DD;letter-spacing:.08em;text-transform:uppercase;margin:16px 0 5px;">◈ Gap analysis</div>';
-    d.gaps.forEach(function (g) { h += '<div style="display:flex;gap:9px;margin:6px 0;"><span style="color:#7F77DD;">–</span><span style="font-size:14px;color:#a8a0cc;line-height:1.7;">' + esc(g) + '</span></div>'; });
   }
 
   var cl2 = d.checklist || {};
@@ -4429,37 +4303,23 @@ function downloadCodeCheckHTML(btn) {
     });
   }
 
-  if (xRisk.length) {
-    h += '<!--SPLIT:bugs-->';
-    xRisk.forEach(function (b, i) {
-      h += '<div style="border-top:0.5px solid #1e1e28;padding:10px 0;">' +
-        '<div style="font-size:14.5px;color:#d0dce8;margin-bottom:3px;">' + (i + 1) + '. ' + esc(b.area || '') + '</div>' +
-        (b.why ? '<div style="font-size:13px;color:#8898a8;line-height:1.7;padding-left:16px;">Why: ' + esc(b.why) + '</div>' : '') +
-        (b.playerImpact ? '<div style="font-size:13px;color:#c0a0a0;line-height:1.7;padding-left:16px;">Player sees: ' + esc(b.playerImpact) + '</div>' : '') + '</div>';
-    });
-  }
-
   // Split accumulated sections into tab panes on the SPLIT markers
   var xparts = h.split(/<!--SPLIT:(\w+)-->/);
   var xhead = xparts[0];
   var xpanes = {};
   for (var xi = 1; xi < xparts.length; xi += 2) { xpanes[xparts[xi]] = (xpanes[xparts[xi]] || '') + xparts[xi + 1]; }
   var xtabs = [
-    ['disc', '⚑ Flags', '#EF9F27', xDisc.length],
-    ['ac', '✅ Criteria', '#5DCAA5', xAcs.length ? xAcDone + '/' + xAcs.length : (d.gaps || []).length],
-    ['find', '🛠 Findings', '#6090d8', xFind.length],
-    ['checks', '🧪 Checklist', '#5DCAA5', xCheckN],
-    ['bugs', '🎯 Risk areas', '#e06060', xRisk.length]
+    ['focus', '🎯 Test Focus', '#EF9F27', xTf.length],
+    ['checks', '🧪 Checklist', '#5DCAA5', xCheckN]
   ].filter(function (t) { return xpanes[t[0]]; });
   var xbody = xhead;
   if (xtabs.length) {
     xbody += '<div style="display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;margin:6px 0 14px;padding-bottom:2px;">';
     xtabs.forEach(function (t, i) {
       var on = i === 0;
-      var fr = (t[0] === 'find' && xHighN);
-      var bBg = fr ? '#e0606022' : (on ? t[2] + '33' : '#1e1e28');
-      var bCol = fr ? '#e06060' : (on ? t[2] : '#7a7a86');
-      xbody += '<button class="xtab" data-k="' + t[0] + '" data-c="' + t[2] + '" data-n="' + t[3] + '"' + (fr ? ' data-hi="1"' : '') + ' style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-family:\'Sora\',sans-serif;color:' + (on ? t[2] : '#8a97a2') + ';background:' + (on ? t[2] + '1e' : 'transparent') + ';border:0.5px solid ' + (on ? t[2] + '70' : '#2a2a34') + ';border-radius:8px;padding:7px 11px;cursor:pointer;white-space:nowrap;flex-shrink:0;">' + t[1] +
+      var bBg = on ? t[2] + '33' : '#1e1e28';
+      var bCol = on ? t[2] : '#7a7a86';
+      xbody += '<button class="xtab" data-k="' + t[0] + '" data-c="' + t[2] + '" data-n="' + t[3] + '" style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-family:\'Sora\',sans-serif;color:' + (on ? t[2] : '#8a97a2') + ';background:' + (on ? t[2] + '1e' : 'transparent') + ';border:0.5px solid ' + (on ? t[2] + '70' : '#2a2a34') + ';border-radius:8px;padding:7px 11px;cursor:pointer;white-space:nowrap;flex-shrink:0;">' + t[1] +
         '<span class="xtab-n" style="font-size:11px;font-family:monospace;background:' + bBg + ';color:' + bCol + ';border-radius:10px;padding:1px 7px;">' + t[3] + '</span></button>';
     });
     xbody += '</div>';
