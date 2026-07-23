@@ -643,6 +643,10 @@
       </button>
     </div>
     <div class="topbar-sep" style="flex-shrink:0;"></div>
+    <button class="key-icon-btn" onclick="showIntro()" title="How it works">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M6.3 6.1a1.7 1.7 0 1 1 2.3 1.6c-.5.2-.8.5-.8 1v.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="8" cy="11.4" r="0.7" fill="currentColor"/></svg>
+    </button>
+    <div class="topbar-sep" style="flex-shrink:0;"></div>
     <button class="key-icon-btn" onclick="openKeyModal()" title="API key settings">
       <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M11 1a4 4 0 1 1 0 8 4 4 0 0 1 0-8zM7.5 7.5L2 13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M2 13v2h2v-2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
@@ -653,6 +657,21 @@
     </button>
   </div>
 </div>
+
+  <div id="intro-card" style="display:none;width:100%;max-width:var(--maxw);background:#0c0f12;border:1px solid #2a3a44;border-radius:14px;margin-bottom:12px;padding:16px 18px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+      <span style="font-size:11px;letter-spacing:.12em;color:#5DCAA5;font-family:'JetBrains Mono',monospace;">HOW IT WORKS</span>
+      <span style="font-size:11px;color:#6a7a86;font-family:'Sora',sans-serif;">— turn raw inputs into QA test cases in a few steps</span>
+      <button onclick="dismissIntro()" title="Got it — don't show again" style="margin-left:auto;background:none;border:none;color:#5a6a76;cursor:pointer;font-size:16px;line-height:1;padding:2px 6px;">&times;</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;">
+      <div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;width:20px;height:20px;border-radius:50%;background:#0e1a15;border:0.5px solid #245244;color:#5DCAA5;font-size:11px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;">1</span><div><div style="font-size:13px;color:#cdd2d8;font-weight:500;">Add your input</div><div style="font-size:12px;color:#8a94a0;line-height:1.5;margin-top:2px;">Paste notes, or attach a Jira / Confluence / Slack source or screenshot.</div></div></div>
+      <div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;width:20px;height:20px;border-radius:50%;background:#0e1a15;border:0.5px solid #245244;color:#5DCAA5;font-size:11px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;">2</span><div><div style="font-size:13px;color:#cdd2d8;font-weight:500;">Analyse</div><div style="font-size:12px;color:#8a94a0;line-height:1.5;margin-top:2px;">Get a gist, acceptance criteria, and open questions.</div></div></div>
+      <div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;width:20px;height:20px;border-radius:50%;background:#0e1a15;border:0.5px solid #245244;color:#5DCAA5;font-size:11px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;">3</span><div><div style="font-size:13px;color:#cdd2d8;font-weight:500;">Generate QA Focus</div><div style="font-size:12px;color:#8a94a0;line-height:1.5;margin-top:2px;">Pick test types (Regression, Sanity…) and turn them into test cases.</div></div></div>
+      <div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;width:20px;height:20px;border-radius:50%;background:#0e1a15;border:0.5px solid #245244;color:#5DCAA5;font-size:11px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;">4</span><div><div style="font-size:13px;color:#cdd2d8;font-weight:500;">Push or export</div><div style="font-size:12px;color:#8a94a0;line-height:1.5;margin-top:2px;">Send subtasks to Jira, or download the plan.</div></div></div>
+    </div>
+    <div style="margin-top:12px;padding-top:10px;border-top:0.5px solid #1c2630;font-size:11.5px;color:#6a7a86;font-family:'Sora',sans-serif;">Reopen this guide anytime via the <span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;border:0.5px solid #245244;color:#5DCAA5;font-size:10px;line-height:1;vertical-align:middle;">?</span> in the top bar.</div>
+  </div>
 
   <div class="card" id="context-card" style="margin-bottom:12px;">
   <div class="context-zone">
@@ -2470,6 +2489,7 @@ function clearAll() {
   window._ccUnrelatedList = '';
   window._ccPlanInfo = null;
   window._ccChecked = {};
+  window._ccNA = {};
   window._ccTF = {};
   var ccSec = document.getElementById('codecheck-section');
   if (ccSec) ccSec.style.display = 'none';
@@ -3947,24 +3967,45 @@ function ccTab(key) {
 }
 
 function ccCheckToggle(key) {
+  if ((window._ccNA || {})[key]) return; // not-applicable items can't be ticked
   window._ccChecked = window._ccChecked || {};
   window._ccChecked[key] = !window._ccChecked[key];
   var on = window._ccChecked[key];
   var box = document.getElementById('cc-box-' + key);
   var txt = document.getElementById('cc-txt-' + key);
   if (box) { box.style.background = on ? '#5DCAA5' : 'transparent'; box.style.borderColor = on ? '#5DCAA5' : '#3a4a3a'; box.textContent = on ? '✓' : ''; }
-  if (txt) { txt.style.color = on ? '#9FE1CB' : '#b0c0cc'; }
+  if (txt) { txt.style.color = on ? '#9FE1CB' : '#9c9caa'; }
+  ccProgress();
+}
+
+// Mark a checklist item "not applicable": struck through, dropped from the tested
+// count, and excluded from the exported plan. Reversible.
+function ccNAToggle(key) {
+  window._ccNA = window._ccNA || {};
+  window._ccNA[key] = !window._ccNA[key];
+  var na = window._ccNA[key];
+  if (na && window._ccChecked) window._ccChecked[key] = false; // untick if it was ticked
+  var txt = document.getElementById('cc-txt-' + key);
+  var box = document.getElementById('cc-box-' + key);
+  var btn = document.getElementById('cc-na-' + key);
+  if (txt) { txt.style.textDecoration = na ? 'line-through' : 'none'; txt.style.color = na ? '#55555f' : '#9c9caa'; }
+  if (box) { box.style.opacity = na ? '.3' : '1'; box.style.pointerEvents = na ? 'none' : 'auto'; if (na) { box.style.background = 'transparent'; box.style.borderColor = '#3a4a3a'; box.textContent = ''; } }
+  if (btn) { btn.style.color = na ? '#EF9F27' : '#5a5a66'; btn.title = na ? 'restore (mark applicable)' : 'mark not applicable'; }
   ccProgress();
 }
 
 function ccProgress() {
   // Checklist checkbox = "tested" tick-as-you-go (no conversion; that lives on Test Focus).
+  // Not-applicable items drop out of the denominator so completion reflects real work.
   var total = window._ccTotal || 0;
+  var na = window._ccNA || {}; var naCount = 0;
+  Object.keys(na).forEach(function (k) { if (na[k]) naCount++; });
+  var applicable = Math.max(0, total - naCount);
   var done = 0; var c = window._ccChecked || {};
-  Object.keys(c).forEach(function (k) { if (c[k]) done++; });
+  Object.keys(c).forEach(function (k) { if (c[k] && !na[k]) done++; });
   var bar = document.getElementById('cc-prog-bar'); var lbl = document.getElementById('cc-prog-lbl');
-  if (bar) bar.style.width = total ? Math.round(done / total * 100) + '%' : '0%';
-  if (lbl) lbl.textContent = done + ' / ' + total + ' tested';
+  if (bar) bar.style.width = applicable ? Math.round(done / applicable * 100) + '%' : '0%';
+  if (lbl) lbl.textContent = done + ' / ' + applicable + ' tested';
 }
 
 // Test Focus selection → conversion to test cases.
@@ -4077,6 +4118,7 @@ function renderCodeCheck(d) {
   var checkN = (cl.smoke || []).length + (cl.sanity || []).length + (cl.regression || []).length + (cl.adhoc || []).length;
   var panes = {}, tabMetas = {};
   window._ccChecked = {};
+  window._ccNA = {};
   window._ccTF = {};
   window._ccTotal = checkN;
 
@@ -4106,16 +4148,16 @@ function renderCodeCheck(d) {
     tf.forEach(function (a, i) {
       var tg = tagCfg[(a.tag || '').toLowerCase()];
       var pr = (a.priority || '').toUpperCase(); var pc = priCol[pr] || '#7a7a86';
-      fb += '<div style="border:0.5px solid #252530;border-radius:10px;background:#0d1412;padding:13px 14px;margin-bottom:9px;">' +
+      fb += '<div style="border:0.5px solid #252530;border-radius:10px;background:#0d0d0f;padding:13px 14px;margin-bottom:9px;">' +
         '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">' +
         '<span id="cc-tfbox-' + i + '" onclick="ccTFToggle(' + i + ')" title="select to convert into a test case" style="width:15px;height:15px;border-radius:4px;border:0.5px solid #4a4230;font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-family:JetBrains Mono,monospace;"></span>' +
         (pr ? '<span style="font-size:10px;font-weight:700;font-family:JetBrains Mono,monospace;color:' + pc + ';border:0.5px solid ' + pc + '40;border-radius:4px;padding:1px 7px;flex-shrink:0;">' + pr + '</span>' : '') +
         (tg ? '<span style="font-size:10.5px;font-family:JetBrains Mono,monospace;color:' + tg[1] + ';border:0.5px solid ' + tg[1] + '40;border-radius:4px;padding:1px 7px;flex-shrink:0;">' + tg[0] + '</span>' : '') +
         (a.platform ? '<span style="font-size:10.5px;font-family:JetBrains Mono,monospace;color:#8898a8;margin-left:auto;">📱 ' + esc(a.platform) + '</span>' : '') +
         '</div>' +
-        '<div style="font-size:15px;color:#e8eef4;font-weight:600;font-family:Sora,sans-serif;line-height:1.4;margin-bottom:6px;">' + esc(a.area || '') + '</div>' +
-        (a.verify ? '<div style="display:flex;gap:9px;margin:4px 0;"><span style="font-size:11px;font-family:JetBrains Mono,monospace;color:#5DCAA5;text-transform:uppercase;letter-spacing:.04em;flex-shrink:0;min-width:56px;padding-top:2px;">verify</span><span style="font-size:13.5px;color:#c8d4dc;line-height:1.6;font-family:Sora,sans-serif;">' + esc(a.verify) + '</span></div>' : '') +
-        (a.ifBroken ? '<div style="display:flex;gap:9px;margin:4px 0;"><span style="font-size:11px;font-family:JetBrains Mono,monospace;color:#c08a8a;text-transform:uppercase;letter-spacing:.04em;flex-shrink:0;min-width:56px;padding-top:2px;">if broken</span><span style="font-size:13.5px;color:#c0a0a0;line-height:1.6;font-family:Sora,sans-serif;">' + esc(a.ifBroken) + '</span></div>' : '') +
+        '<div style="font-size:15px;color:#b6b6c6;font-weight:500;font-family:Sora,sans-serif;line-height:1.4;margin-bottom:6px;">' + esc(a.area || '') + '</div>' +
+        (a.verify ? '<div style="display:flex;gap:9px;margin:4px 0;"><span style="font-size:11px;font-family:JetBrains Mono,monospace;color:#5DCAA5;text-transform:uppercase;letter-spacing:.04em;flex-shrink:0;min-width:56px;padding-top:2px;">verify</span><span style="font-size:13.5px;color:#a2a2b2;line-height:1.6;font-family:Sora,sans-serif;">' + esc(a.verify) + '</span></div>' : '') +
+        (a.ifBroken ? '<div style="display:flex;gap:9px;margin:4px 0;"><span style="font-size:11px;font-family:JetBrains Mono,monospace;color:#c08a8a;text-transform:uppercase;letter-spacing:.04em;flex-shrink:0;min-width:56px;padding-top:2px;">if broken</span><span style="font-size:13.5px;color:#9c8c94;line-height:1.6;font-family:Sora,sans-serif;">' + esc(a.ifBroken) + '</span></div>' : '') +
         '</div>';
     });
     fb += '<div style="margin-top:14px;padding-top:12px;border-top:0.5px solid #1e1e28;">' +
@@ -4142,10 +4184,11 @@ function renderCodeCheck(d) {
       items.forEach(function (t, i) {
         var key = p.key + '-' + i;
         var pr = ccPrio(t);
-        cb += '<div style="display:flex;align-items:center;gap:9px;padding:6px 2px;">' +
+        cb += '<div id="cc-row-' + key + '" style="display:flex;align-items:center;gap:9px;padding:6px 2px;">' +
           '<span id="cc-box-' + key + '" onclick="ccCheckToggle(\'' + key + '\')" style="width:15px;height:15px;border-radius:4px;border:0.5px solid #3a4a3a;color:#04342C;font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-family:JetBrains Mono,monospace;"></span>' +
           (pr.p ? '<span style="font-size:10px;color:' + pr.col + ';border:0.5px solid ' + pr.col + '40;border-radius:3px;padding:1px 6px;font-family:JetBrains Mono,monospace;flex-shrink:0;">' + pr.p + '</span>' : '') +
-          '<span id="cc-txt-' + key + '" style="font-size:14px;color:#b0c0cc;font-family:Sora,sans-serif;line-height:1.55;">' + esc(pr.txt) + '</span></div>';
+          '<span id="cc-txt-' + key + '" style="font-size:14px;color:#9c9caa;font-family:Sora,sans-serif;line-height:1.55;">' + esc(pr.txt) + '</span>' +
+          '<span id="cc-na-' + key + '" onclick="ccNAToggle(\'' + key + '\')" title="mark not applicable" style="margin-left:auto;color:#5a5a66;cursor:pointer;font-size:15px;line-height:1;flex-shrink:0;padding:0 4px;">&times;</span></div>';
       });
     });
     cb += '<div style="font-size:11px;color:#4a5a56;margin-top:12px;font-family:Sora,sans-serif;">Tick items as you test. To turn scenarios into formal test cases, use the Test Focus tab.</div>';
@@ -4228,12 +4271,15 @@ function downloadCodeCheckMD(btn) {
     });
   }
   var cl = d.checklist || {};
-  if ((cl.smoke && cl.smoke.length) || (cl.sanity && cl.sanity.length) || (cl.regression && cl.regression.length) || (cl.adhoc && cl.adhoc.length)) {
+  var _mdNA = window._ccNA || {};
+  var ccApp = function (passKey, items) { return (items || []).filter(function (t, i) { return !_mdNA[passKey + '-' + i]; }); };
+  var mdSmoke = ccApp('smoke', cl.smoke), mdSanity = ccApp('sanity', cl.sanity), mdReg = ccApp('regression', cl.regression), mdAdhoc = ccApp('adhoc', cl.adhoc);
+  if (mdSmoke.length || mdSanity.length || mdReg.length || mdAdhoc.length) {
     md += '\n---\n\n## Test Checklist\n';
-    if (cl.smoke && cl.smoke.length) md += '\n### Smoke — must pass or reject build\n\n' + cl.smoke.map(function (t) { return '- [ ] ' + t; }).join('\n') + '\n';
-    if (cl.sanity && cl.sanity.length) md += '\n### Sanity — quick checks around the change\n\n' + cl.sanity.map(function (t) { return '- [ ] ' + t; }).join('\n') + '\n';
-    if (cl.regression && cl.regression.length) md += '\n### Regression — adjacent features that share this code\n\n' + cl.regression.map(function (t) { return '- [ ] ' + t; }).join('\n') + '\n';
-    if (cl.adhoc && cl.adhoc.length) md += '\n### Adhoc — exploratory attack ideas\n\n' + cl.adhoc.map(function (t) { return '- [ ] ' + t; }).join('\n') + '\n';
+    if (mdSmoke.length) md += '\n### Smoke — must pass or reject build\n\n' + mdSmoke.map(function (t) { return '- [ ] ' + t; }).join('\n') + '\n';
+    if (mdSanity.length) md += '\n### Sanity — quick checks around the change\n\n' + mdSanity.map(function (t) { return '- [ ] ' + t; }).join('\n') + '\n';
+    if (mdReg.length) md += '\n### Regression — adjacent features that share this code\n\n' + mdReg.map(function (t) { return '- [ ] ' + t; }).join('\n') + '\n';
+    if (mdAdhoc.length) md += '\n### Adhoc — exploratory attack ideas\n\n' + mdAdhoc.map(function (t) { return '- [ ] ' + t; }).join('\n') + '\n';
   }
   md += '\n---\n*Static analysis — verify on device. Code-level review is handled separately by the developer.*\n';
   var blob = new Blob([md], { type: 'text/markdown' });
@@ -4255,7 +4301,9 @@ function downloadCodeCheckHTML(btn) {
 
   var xCl = d.checklist || {};
   var xTf = d.testFocus || [];
-  var xCheckN = (xCl.smoke || []).length + (xCl.sanity || []).length + (xCl.regression || []).length + (xCl.adhoc || []).length;
+  var _xNA = window._ccNA || {};
+  var ccAppX = function (passKey, items) { return (items || []).filter(function (t, i) { return !_xNA[passKey + '-' + i]; }); };
+  var xCheckN = ccAppX('smoke', xCl.smoke).length + ccAppX('sanity', xCl.sanity).length + ccAppX('regression', xCl.regression).length + ccAppX('adhoc', xCl.adhoc).length;
   var xm = (sum.match || '').toLowerCase();
   if (xm !== 'yes' && xm !== 'partial' && xm !== 'no') xm = 'partial';
   var xCfg = { yes: { col: '#5DCAA5', bg: '#091812', icon: '✓', chip: 'BUILT', txt: '#9FE1CB', sub: '#3a7a5a' },
@@ -4273,24 +4321,24 @@ function downloadCodeCheckHTML(btn) {
     var xPriCol = { P0: '#e06060', P1: '#d4a855', P2: '#7F77DD' };
     xTf.forEach(function (a) {
       var tg = xTagCfg[(a.tag || '').toLowerCase()]; var pr = (a.priority || '').toUpperCase(); var pc = xPriCol[pr] || '#7a7a86';
-      h += '<div style="border:0.5px solid #252530;border-radius:10px;background:#0d1412;padding:12px 14px;margin-bottom:9px;">' +
+      h += '<div style="border:0.5px solid #252530;border-radius:10px;background:#0d0d0f;padding:12px 14px;margin-bottom:9px;">' +
         '<div style="margin-bottom:7px;">' +
         (pr ? '<span style="font-size:10px;font-weight:700;font-family:monospace;color:' + pc + ';border:0.5px solid ' + pc + '40;border-radius:4px;padding:1px 7px;margin-right:6px;">' + pr + '</span>' : '') +
         (tg ? '<span style="font-size:10.5px;font-family:monospace;color:' + tg[1] + ';border:0.5px solid ' + tg[1] + '40;border-radius:4px;padding:1px 7px;margin-right:6px;">' + tg[0] + '</span>' : '') +
         (a.platform ? '<span style="font-size:10.5px;font-family:monospace;color:#8898a8;">📱 ' + esc(a.platform) + '</span>' : '') + '</div>' +
-        '<div style="font-size:15px;color:#e8eef4;font-weight:600;line-height:1.4;margin-bottom:6px;">' + esc(a.area || '') + '</div>' +
-        (a.verify ? '<div style="font-size:13.5px;color:#c8d4dc;line-height:1.6;margin:3px 0;"><span style="color:#5DCAA5;font-family:monospace;font-size:10.5px;text-transform:uppercase;">verify </span>' + esc(a.verify) + '</div>' : '') +
-        (a.ifBroken ? '<div style="font-size:13.5px;color:#c0a0a0;line-height:1.6;margin:3px 0;"><span style="color:#c08a8a;font-family:monospace;font-size:10.5px;text-transform:uppercase;">if broken </span>' + esc(a.ifBroken) + '</div>' : '') + '</div>';
+        '<div style="font-size:15px;color:#b6b6c6;font-weight:500;line-height:1.4;margin-bottom:6px;">' + esc(a.area || '') + '</div>' +
+        (a.verify ? '<div style="font-size:13.5px;color:#a2a2b2;line-height:1.6;margin:3px 0;"><span style="color:#5DCAA5;font-family:monospace;font-size:10.5px;text-transform:uppercase;">verify </span>' + esc(a.verify) + '</div>' : '') +
+        (a.ifBroken ? '<div style="font-size:13.5px;color:#9c8c94;line-height:1.6;margin:3px 0;"><span style="color:#c08a8a;font-family:monospace;font-size:10.5px;text-transform:uppercase;">if broken </span>' + esc(a.ifBroken) + '</div>' : '') + '</div>';
     });
   }
 
   var cl2 = d.checklist || {};
   var passDefs = [['smoke', 'Smoke — must pass or reject build', '#e06060'], ['sanity', 'Sanity — quick checks around the change', '#d4a855'], ['regression', 'Regression — adjacent features that share this code', '#5DCAA5'], ['adhoc', 'Adhoc — exploratory attack ideas', '#7F77DD']];
-  if (passDefs.some(function (p) { return (cl2[p[0]] || []).length; })) {
+  if (passDefs.some(function (p) { return ccAppX(p[0], cl2[p[0]]).length; })) {
     h += '<!--SPLIT:checks-->';
     h += '<div style="display:flex;align-items:center;gap:10px;margin:8px 0 12px;"><div style="flex:1;height:5px;background:#151517;border-radius:3px;overflow:hidden;"><div id="xprog" style="width:0%;height:100%;background:#5DCAA5;transition:width .2s;"></div></div><span id="xprogl" style="font-size:11.5px;color:#5DCAA5;font-family:monospace;">0 / ' + xCheckN + ' tested</span></div>';
     passDefs.forEach(function (p) {
-      var items = cl2[p[0]];
+      var items = ccAppX(p[0], cl2[p[0]]);
       if (!items || !items.length) return;
       h += '<div style="font-size:11px;font-family:monospace;color:' + p[2] + ';letter-spacing:.08em;text-transform:uppercase;margin:12px 0 5px;">' + p[1] + '</div>';
       items.forEach(function (t) {
@@ -7173,7 +7221,12 @@ function renderHistoryList(filter) {
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') { var sb = document.getElementById('hist-sidebar'); if (sb && !sb.classList.contains('collapsed')) historyToggle(); }
 });
-window.addEventListener('load', function() { historyInit(); renderHistoryList(); });
+// ── First-run "How it works" intro ──
+var NI_INTRO_KEY = 'ni_seen_intro';
+function showIntro() { var c = document.getElementById('intro-card'); if (c) { c.style.display = 'block'; c.scrollIntoView({ block: 'nearest' }); } }
+function dismissIntro() { var c = document.getElementById('intro-card'); if (c) c.style.display = 'none'; try { localStorage.setItem(NI_INTRO_KEY, '1'); } catch(e) {} }
+function introInit() { var seen = false; try { seen = localStorage.getItem(NI_INTRO_KEY) === '1'; } catch(e) {} if (!seen) showIntro(); }
+window.addEventListener('load', function() { historyInit(); introInit(); renderHistoryList(); });
 
 // App bar — shown only in Electron (127.0.0.1), wired to /api/settings
 function abSetProvider(p) {
