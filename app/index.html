@@ -767,6 +767,15 @@
           <label class="ctx-label">TC Style &amp; Standards <span style="color:#5a5470;text-transform:none;letter-spacing:0;font-size:10px;">— standing rules injected into every QA generation</span></label>
           <textarea class="ctx-input ctx-textarea" id="ctx-tc-style" oninput="autoResize(this);saveContext()" placeholder="e.g. Steps must be device-action level (tap, swipe, wait). Always test Android first. Preconditions must name build/branch. Expected result must reference both UI state and server response." rows="3"></textarea>
         </div>
+        <div class="ctx-field" style="margin-top:10px;">
+          <label class="ctx-label">Cheat commands <span style="color:#5a5470;text-transform:none;letter-spacing:0;font-size:10px;margin-left:4px;">— command-sheet.md from the build you are testing; only the commands for the feature under test are used</span></label>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap;">
+            <button class="ctx-clear-btn" onclick="document.getElementById('cheat-sheet-input').click()">↑ load command-sheet.md</button>
+            <input type="file" id="cheat-sheet-input" accept=".md,.txt" onchange="handleCheatSheet(this)" style="display:none;"/>
+            <span id="cheat-sheet-status" style="font-size:11px;color:#6a6a88;font-family:'JetBrains Mono',monospace;"></span>
+            <button class="ctx-clear-btn" id="cheat-clear-btn" onclick="clearCheatSheet()" style="display:none;">clear</button>
+          </div>
+        </div>
         <div class="ctx-field" style="margin-top:6px;">
           <label class="ctx-label">Examples that shape your test cases <span class="ex-count" id="ex-count"></span></label>
           <div id="style-auto-note" style="font-size:11px;color:#6a6a88;font-family:'Sora',sans-serif;margin:4px 0 8px;line-height:1.6;"></div>
@@ -1575,6 +1584,7 @@ function loadContext() {
     if (saved.extra) { document.getElementById('ctx-extra').value = saved.extra; autoResize(document.getElementById('ctx-extra')); }
     if (saved.tcStyle) { var tcs = document.getElementById('ctx-tc-style'); if (tcs) { tcs.value = saved.tcStyle; autoResize(tcs); } }
     renderExampleBank();
+    try { renderCheatStatus(); } catch(e) {}
     updateContextStatus();
   } catch(e) {}
 }
@@ -3402,7 +3412,9 @@ function buildQaTypeFocus() {
     return 'E2E HAPPY PATH — RETURN EXACTLY ONE TEST CASE. This overrides any other guidance about how many cases to produce: the array must contain exactly 1 item, never 2 or more. ' +
       'That single case covers the MAIN SUCCESSFUL JOURNEY through this feature from start to finish, in the order a player performs it, using the real screen and control names. ' +
       'HAPPY PATH ONLY: no negative, error, edge, boundary, interruption, permission or failure scenarios, and no alternate branches — assume everything behaves correctly. ' +
-      'Steps are sequential device-level actions covering the whole flow (up to 8 entries are allowed here); "expected" states the end-to-end outcome plus the key checkpoints along the way, separated by semicolons. ' +
+      'LENGTH — this type overrides the shared limits: the steps array may hold UP TO 30 entries, and "expected" may run to 800 characters. Use that room: a release-testing E2E case is expected to be long and thorough, not a summary. ' +
+      'Steps are sequential device-level actions covering the whole flow in the order a tester performs them. A step may bundle one action with the checks that belong to it ("Note the reward, complete the album, verify the item increased and the celebration plays") — do not split those into separate steps, and do not compress a 25-step journey into 8. ' +
+      '"expected" states the end-to-end outcome plus the key checkpoints along the way, separated by semicolons. ' +
       'Preconditions: only what is genuinely needed to start the flow. ';
   }
   if (!qaTypes.length || qaTypes.length >= QA_TYPE_ORDER.length) return '';
@@ -3426,7 +3438,7 @@ function buildQaInstruction(tier) {
     '- PRECONDITIONS: if the input mentions a test build, branch, or APK, include it explicitly (e.g. "Build: CTS branch r4821 on device · flag enabled"). ' +
     '- FLOW-AWARE: if multiple checks belong to one user flow, COMBINE into a single test case with sequential steps and semicolon-separated expected results. Never split a coherent flow just to add more cases. ' +
     '- Each item must cover a DISTINCT area — no overlapping verification points. ' +
-    '- Order by severity desc. Steps array up to 5 entries. Output the JSON array only — no markdown, no commentary.' +
+    '- Order by severity desc. Steps array up to 5 entries unless a test type above raises that limit. Output the JSON array only — no markdown, no commentary.' +
     examplesBlock;
 
   var examplesBlock = buildExamplesBlock();
@@ -3519,6 +3531,17 @@ async function generateQA(tier) {
 
   try {
     var qaInstruction = buildQaInstruction(tier);
+    // Cheats matched to the feature under test (title + content + gist). Nothing is
+    // added when the loaded sheet has no commands for it.
+    var cheatBlock = '';
+    try {
+      var _cheatSrc = [
+        (document.getElementById('title-input')||{}).value || '',
+        (document.getElementById('main-input')||{}).value || '',
+        ((document.getElementById('gist-body')||{}).innerText || '')
+      ].join(' ');
+      cheatBlock = cheatCommandsFor(_cheatSrc);
+    } catch(e) { cheatBlock = ''; }
     // ── CALL 2: QA Focus (compact JSON) ──
     // include edited gist if user has modified it
     var gistBody = document.getElementById('gist-body');
@@ -3543,6 +3566,7 @@ async function generateQA(tier) {
     if (attachedLinks.some(function(l){ return l.pmItemKey; })) qaServers.push({ type: 'url', url: 'https://pm-mcp.tactilews.com/mcp', name: 'pm-mcp' });
     }
 
+    qaInstruction = cheatBlock + qaInstruction;
     var qaPrompt = (_msgContent && typeof _msgContent !== 'string')
       ? [..._msgContent, { type: 'text', text: gistAddendum + qaInstruction }]
       : _textBase + gistAddendum + '\n\n' + qaInstruction;
@@ -8240,6 +8264,85 @@ function bvEsc(s){ return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
 function bvLn(html){ return '<div class="bv-ln">' + (html === '' ? '<br>' : html) + '</div>'; }
 function bvLbl(label, rest, cls){
   return bvLn('<span class="' + (cls || 'bv-lbl') + '">' + bvEsc(label) + '</span>' + (rest ? ' ' + bvEsc(rest) : ''));
+}
+
+/* ════════════ Cheat command sheet (command-sheet.md from a test build) ════════════
+   The full sheet is ~68 kB / 860 commands — far too big to put in every prompt. It is
+   stored once, then sliced to the namespaces that match the feature under test, which
+   is typically ~3 kB. Commands are namespaced (Expeditions.*, Gacha.*), so the slice
+   is both cheap and more accurate than handing over the whole list.
+   The sheet is BUILD-SPECIFIC: a branch build only carries its own feature's commands. */
+var _NI_CHEAT_KEY = 'ni_cheat_sheet', _NI_CHEAT_NAME_KEY = 'ni_cheat_sheet_name';
+
+function getCheatSheet(){ try { return localStorage.getItem(_NI_CHEAT_KEY) || ''; } catch(e){ return ''; } }
+function getCheatSheetName(){ try { return localStorage.getItem(_NI_CHEAT_NAME_KEY) || ''; } catch(e){ return ''; } }
+
+function handleCheatSheet(input){
+  var file = input.files[0];
+  input.value = '';
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e){
+    var txt = String(e.target.result || '');
+    var lines = txt.split('\n').filter(function(l){ return l.indexOf('|') > -1 && /^[A-Za-z][\w]*\./.test(l.trim()); });
+    if (!lines.length){
+      alert('That file does not look like a command sheet — expected lines of "Namespace.Command | Description".');
+      return;
+    }
+    try {
+      localStorage.setItem(_NI_CHEAT_KEY, txt);
+      localStorage.setItem(_NI_CHEAT_NAME_KEY, file.name);
+    } catch(ex){ alert('Could not save the sheet (too large for local storage).'); return; }
+    renderCheatStatus();
+  };
+  reader.readAsText(file);
+}
+
+function clearCheatSheet(){
+  try { localStorage.removeItem(_NI_CHEAT_KEY); localStorage.removeItem(_NI_CHEAT_NAME_KEY); } catch(e){}
+  renderCheatStatus();
+}
+
+function renderCheatStatus(){
+  var el = document.getElementById('cheat-sheet-status');
+  var clr = document.getElementById('cheat-clear-btn');
+  if (!el) return;
+  var name = getCheatSheetName(), sheet = getCheatSheet();
+  if (!sheet){ el.textContent = 'none loaded'; el.style.color = '#6a6a88'; if (clr) clr.style.display = 'none'; return; }
+  var n = sheet.split('\n').filter(function(l){ return /^[A-Za-z][\w]*\..*\|/.test(l.trim()); }).length;
+  el.textContent = '✓ ' + n + ' commands · ' + name;
+  el.style.color = '#5DCAA5';
+  if (clr) clr.style.display = '';
+}
+
+// Namespaces that match the feature being tested. "Card Collection" -> CardCollection,
+// "expedition" -> Expeditions: compare with spaces/case/trailing-s removed.
+function cheatCommandsFor(text){
+  var sheet = getCheatSheet();
+  if (!sheet || !text) return '';
+  var rows = sheet.split('\n').filter(function(l){ return /^[A-Za-z][\w]*\..*\|/.test(l.trim()); });
+  if (!rows.length) return '';
+  var norm = function(s){ return String(s).toLowerCase().replace(/[^a-z0-9]/g, '').replace(/s$/, ''); };
+  var hay = norm(text);
+  var seen = {}, namespaces = [];
+  rows.forEach(function(r){
+    var ns = r.trim().split('.')[0];
+    if (!seen[ns]){ seen[ns] = true; namespaces.push(ns); }
+  });
+  var hits = namespaces.filter(function(ns){
+    var n = norm(ns);
+    return n.length > 3 && hay.indexOf(n) > -1;
+  });
+  if (!hits.length) return '';
+  var picked = rows.filter(function(r){
+    var ns = r.trim().split('.')[0];
+    return hits.indexOf(ns) > -1;
+  });
+  if (picked.length > 120) picked = picked.slice(0, 120); // safety cap
+  return 'CHEAT COMMANDS available in this build (' + getCheatSheetName() + ') for ' + hits.join(', ') + ':\n' +
+    picked.join('\n') + '\n' +
+    'USE THESE IN THE STEPS where they save a tester time — reaching a state, granting an item, completing a stage, forcing a condition. Write them exactly as listed (e.g. "Use the cheat Expeditions.CompleteAll"), and follow the parameter usage described in the command\'s description.\n' +
+    'NEVER INVENT A COMMAND. Only use a command that appears verbatim in the list above. If no listed command fits a step, write the step as a normal manual action instead — a made-up cheat wastes a tester\'s time mid-release.\n\n';
 }
 
 // Raw debug-overlay text -> team convention.
