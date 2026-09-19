@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'; frame-ancestors 'self';">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Meeting Notes</title>
+<style>@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Sora:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+ --bg:#0d0d0f;--bg2:#111116;--border:#3a3a48;--border2:#454556;--line:#1e1e28;
+ --teal:#5DCAA5;--teal-dark:#04342C;--amber:#EF9F27;--blue:#378ADD;--purple:#AFA9EC;--red:#F09595;
+ --muted:#7a7a8c;--text:#d2d2dd;--text2:#a2a2b2;--text3:#868698;
+ --maxw:1180px;
+}
+html{background:#080809;min-height:100vh;}
+body{font-family:'Sora',sans-serif;color:var(--text);background:#080809;display:flex;flex-direction:row;align-items:stretch;min-height:100vh;}
+.sidebar{width:224px;flex-shrink:0;background:#0b0b0e;border-right:0.5px solid #1c1c24;display:flex;flex-direction:column;height:100vh;position:sticky;top:0;}
+.sb-hd{padding:16px 15px 12px;border-bottom:0.5px solid #1c1c24;}
+.sb-title{font-size:11px;font-family:'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);}
+.sb-new{margin-top:11px;width:100%;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;border-radius:8px;border:0.5px dashed #2f5a49;background:#0a1410;color:var(--teal);font-size:12px;cursor:pointer;font-family:'Sora',sans-serif;transition:all .13s;}
+.sb-new:hover{border-color:var(--teal);background:#0d1c15;}
+.sb-list{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:6px;}
+.sb-empty{font-size:11.5px;color:#4a4a54;font-family:'JetBrains Mono',monospace;text-align:center;padding:22px 8px;line-height:1.6;}
+.draft{border:0.5px solid #22222c;border-radius:9px;padding:9px 11px;cursor:pointer;position:relative;transition:all .13s;background:#101014;}
+.draft:hover{border-color:#33333f;background:#14141a;}
+.draft.active{border-color:#1D9E7560;background:#0d1a15;}
+.draft-name{font-size:12.5px;color:#d2d2dd;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:16px;}
+.draft-meta{font-size:10px;color:#6a6a76;font-family:'JetBrains Mono',monospace;margin-top:3px;}
+.draft-del{position:absolute;top:7px;right:7px;color:#3a3a44;cursor:pointer;font-size:14px;line-height:1;padding:2px;border-radius:4px;}
+.draft-del:hover{color:var(--red);}
+.main{flex:1;min-width:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;align-items:center;padding:22px 16px 80px;}
+.topbar{width:100%;max-width:var(--maxw);display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.logo{display:flex;align-items:center;gap:13px;}
+.logo-icon{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#0f2a1e,#04342C);border:0.5px solid #1D9E7540;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.logo-div{width:0.5px;height:26px;background:#2a2a34;}
+.logo-name{font-size:16px;font-weight:600;color:#edeef2;letter-spacing:.04em;}
+.logo-dot{width:4px;height:4px;border-radius:50%;background:var(--teal);}
+.logo-ver{font-size:9.5px;color:var(--text3);font-family:'JetBrains Mono',monospace;}
+.logo-tag{font-size:10px;color:#5a5a64;font-family:'JetBrains Mono',monospace;letter-spacing:.02em;margin-top:3px;}
+.top-actions{display:flex;gap:8px;}
+.top-btn{display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:8px;border:0.5px solid var(--border);background:var(--bg2);font-size:12px;color:var(--text2);cursor:pointer;font-family:'Sora',sans-serif;transition:all .15s;}
+.top-btn:hover{border-color:var(--border2);color:var(--text);}
+.top-btn.danger:hover{border-color:#A32D2D50;color:var(--red);}
+.wrap{width:100%;max-width:var(--maxw);display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;}
+@media(max-width:1000px){.wrap{grid-template-columns:1fr;}}
+.col{display:flex;flex-direction:column;gap:14px;}
+.col.sticky-col{position:sticky;top:16px;}
+@media(max-width:1000px){.col.sticky-col{position:static;}}
+.card{width:100%;background:var(--bg);border-radius:14px;border:1px solid #33333f;overflow:hidden;}
+.card.ai{border-color:#1D9E7540;}
+.card-hd{display:flex;align-items:center;gap:8px;padding:13px 18px;border-bottom:0.5px solid var(--line);}
+.pip{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.card-title{font-size:11px;font-family:'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);}
+.card-note{margin-left:auto;font-size:10px;font-family:'JetBrains Mono',monospace;color:#55555f;}
+.card-note.warn{color:var(--amber);}
+.card-body{padding:16px 18px;display:flex;flex-direction:column;gap:14px;}
+.field{display:flex;flex-direction:column;gap:6px;}
+.flabel{font-size:10.5px;font-family:'JetBrains Mono',monospace;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;}
+.fhint{font-size:10.5px;color:#5a5a66;font-family:'JetBrains Mono',monospace;line-height:1.5;}
+.inp,.ta{background:var(--bg2);border:0.5px solid var(--border);border-radius:8px;padding:9px 13px;font-size:14px;font-family:'Sora',sans-serif;color:var(--text);outline:none;width:100%;transition:border-color .15s;}
+.inp:focus,.ta:focus{border-color:#1D9E7560;}
+.inp::placeholder,.ta::placeholder{color:var(--muted);}
+.ta{line-height:1.6;min-height:70px;resize:vertical;white-space:pre-wrap;word-break:break-word;}
+.ta.raw{min-height:210px;font-size:13.5px;}
+.repta{resize:none;overflow:hidden;line-height:1.5;min-height:34px;white-space:pre-wrap;word-break:break-word;font-family:'Sora',sans-serif;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:520px){.row2{grid-template-columns:1fr;}}
+.rep{display:flex;flex-direction:column;gap:8px;}
+.rep-row{display:flex;gap:7px;align-items:flex-start;}
+.rm-btn{flex-shrink:0;width:30px;height:34px;border-radius:7px;border:0.5px solid var(--border);background:transparent;color:#5a5a66;cursor:pointer;font-size:15px;line-height:1;transition:all .15s;display:flex;align-items:center;justify-content:center;}
+.rm-btn:hover{border-color:#A32D2D50;color:var(--red);}
+.add-btn{align-self:flex-start;display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:7px;border:0.5px dashed #383848;background:transparent;font-size:12px;color:var(--text3);cursor:pointer;font-family:'Sora',sans-serif;transition:all .15s;}
+.add-btn:hover{border-color:var(--teal);color:var(--teal);}
+.one-grid{display:grid;grid-template-columns:1fr 30px;gap:7px;align-items:start;}
+.action-grid{display:grid;grid-template-columns:1fr 130px 120px 30px;gap:7px;align-items:start;}
+@media(max-width:560px){.action-grid{grid-template-columns:1fr;}}
+.mini-lbl-row{display:grid;grid-template-columns:1fr 130px 120px 30px;gap:7px;margin-bottom:-2px;}
+@media(max-width:560px){.mini-lbl-row{display:none;}}
+.mini-lbl{font-size:9px;font-family:'JetBrains Mono',monospace;color:#55555f;letter-spacing:.06em;text-transform:uppercase;}
+.inp.unassigned{border-color:#7a5a1e;}
+.seg{display:flex;gap:2px;background:var(--bg2);border-radius:8px;padding:3px;border:0.5px solid var(--line);width:fit-content;}
+.seg button{font-size:11px;padding:5px 11px;border-radius:5px;border:none;color:var(--text3);font-family:'JetBrains Mono',monospace;cursor:pointer;transition:all .15s;background:transparent;}
+.seg button:hover{color:var(--text2);}
+.seg button.on{color:var(--teal);background:#0f1a15;font-weight:500;}
+.meter{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.meter-txt{font-size:10.5px;font-family:'JetBrains Mono',monospace;color:#55555f;}
+.meter-txt.warn{color:var(--amber);}
+.ai-btn{width:100%;padding:11px;border-radius:9px;border:none;background:var(--teal);color:var(--teal-dark);font-size:13.5px;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .15s;}
+.ai-btn:hover{opacity:.9;}
+.ai-btn:disabled{opacity:.45;cursor:not-allowed;}
+.spinner{width:14px;height:14px;border:2px solid var(--teal-dark);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ai-status{font-size:11.5px;font-family:'JetBrains Mono',monospace;color:var(--text3);min-height:14px;}
+.ai-status.err{color:var(--red);}
+.ai-status.ok{color:var(--teal);}
+.pv-tabs{display:flex;gap:2px;background:var(--bg2);border-radius:9px;padding:3px;border:0.5px solid var(--line);width:fit-content;}
+.pv-tab{font-size:11.5px;padding:6px 13px;border-radius:6px;border:none;color:var(--text3);font-family:'JetBrains Mono',monospace;cursor:pointer;transition:all .15s;background:transparent;}
+.pv-tab:hover{color:var(--text2);}
+.pv-tab.on{color:var(--teal);background:#0f1a15;font-weight:500;}
+.pv-panel{display:none;}
+.pv-panel.on{display:block;}
+.slack-pv{background:#0a0a0d;border:0.5px solid var(--line);border-radius:10px;padding:16px 18px;font-size:13.5px;line-height:1.7;white-space:pre-wrap;word-break:break-word;color:#c4c4d0;min-height:120px;max-height:calc(100vh - 240px);overflow-y:auto;}
+.slack-pv b{color:#e6e6ee;font-weight:600;}
+.slack-pv a{color:var(--teal);text-decoration:none;}
+.slack-pv div{min-height:1px;}
+.cortex-pv{background:#0a0a0d;border:0.5px solid var(--line);border-radius:10px;padding:18px 20px;min-height:120px;max-height:calc(100vh - 240px);overflow-y:auto;color:#c4c4d0;}
+.cortex-pv h1{font-size:18px;color:#f0f0f6;font-weight:600;margin-bottom:4px;}
+.cortex-pv h3{font-size:13px;color:#e6e6ee;font-weight:600;margin:15px 0 6px;font-family:'JetBrains Mono',monospace;letter-spacing:.03em;text-transform:uppercase;}
+.cortex-pv p{font-size:13.5px;line-height:1.7;margin:4px 0;color:#bcbcc8;}
+.cortex-pv ul{margin:4px 0 4px 20px;}
+.cortex-pv li{font-size:13.5px;line-height:1.7;color:#bcbcc8;margin:2px 0;}
+.cortex-pv a{color:var(--teal);text-decoration:none;}
+.cortex-pv .meta{font-size:11.5px;font-family:'JetBrains Mono',monospace;color:#6a6a76;margin-bottom:2px;}
+.cortex-pv .noowner{color:var(--amber);}
+.empty-note{font-size:12.5px;color:#55555f;font-style:italic;}
+.cp-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.cp-btn{display:flex;align-items:center;gap:7px;padding:8px 15px;border-radius:8px;border:0.5px solid #1D9E7540;background:#0a1a14;font-size:12.5px;color:var(--teal);cursor:pointer;font-family:'Sora',sans-serif;transition:all .15s;}
+.cp-btn:hover{background:#0f2a1e;border-color:var(--teal);}
+.cp-btn.ghost{background:transparent;border-color:var(--border);color:var(--text2);}
+.cp-btn.ghost:hover{border-color:var(--border2);color:var(--text);background:var(--bg2);}
+.cp-btn.ok{background:#0f2a1e;border-color:var(--teal);color:var(--teal);}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#0f2a1e;border:0.5px solid var(--teal);color:var(--teal);padding:11px 22px;border-radius:10px;font-size:13px;z-index:2000;opacity:0;transition:all .3s ease;box-shadow:0 8px 30px rgba(0,0,0,.5);}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+.toast.warn{background:#2a1e0d;border-color:var(--amber);color:var(--amber);}
+svg{display:block;}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sb-hd">
+    <div class="sb-title">Saved meetings</div>
+    <button class="sb-new" onclick="newDraft()">+ New meeting</button>
+  </div>
+  <div class="sb-list" id="draftList"></div>
+</div>
+
+<div class="main">
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-icon">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5DCAA5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 10h10M4 14h13M4 18h7"/></svg>
+    </div>
+    <div class="logo-div"></div>
+    <div>
+      <div style="display:flex;align-items:center;gap:9px;"><span class="logo-name">Meeting Notes</span><span class="logo-dot"></span><span class="logo-ver">v1.0</span></div>
+      <div class="logo-tag">rough notes in · meeting notes &amp; action items out</div>
+    </div>
+  </div>
+  <div class="top-actions">
+    <a class="top-btn" href="/home.html" style="text-decoration:none;">← Home</a>
+    <button class="top-btn" onclick="saveDraft()">Save meeting</button>
+    <button class="top-btn danger" onclick="clearForm()">Clear</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="col">
+
+    <div class="card ai">
+      <div class="card-hd"><span class="pip" style="background:var(--teal)"></span><span class="card-title">Raw notes</span><span class="card-note" id="modeChip"></span></div>
+      <div class="card-body">
+        <div class="row2">
+          <div class="field"><span class="flabel">Meeting</span><input class="inp" id="f_title" placeholder="e.g. Bug triage / Release sync"/></div>
+          <div class="field"><span class="flabel">Date</span><input class="inp" id="f_date" placeholder="e.g. 7 Sep 2026"/></div>
+        </div>
+        <div class="field"><span class="flabel">Attendees <span style="color:#5a5a64;text-transform:none;letter-spacing:0;">(optional)</span></span><input class="inp" id="f_attendees" placeholder="Comma separated — leave empty and the AI will pull names it finds"/></div>
+        <div class="field">
+          <span class="flabel">Paste your notes</span>
+          <textarea class="ta raw" id="raw" placeholder="Paste anything — your own shorthand bullets, or a full Teams / Zoom / Meet transcript.&#10;&#10;e.g.&#10;- build 3.81 blocked, ANR on boot, Mikkel looking at it&#10;- agreed we skip the gacha test this sprint&#10;- I need to redo the smoke pack by fri&#10;- open q: do we still support android 9?"></textarea>
+          <div class="meter">
+            <span class="meter-txt" id="sizeInfo"></span>
+            <div class="seg" id="modeSeg">
+              <button class="on" data-mode="auto" onclick="setMode('auto')">auto</button>
+              <button data-mode="short" onclick="setMode('short')">shorthand</button>
+              <button data-mode="transcript" onclick="setMode('transcript')">transcript</button>
+            </div>
+          </div>
+        </div>
+        <button class="ai-btn" id="convBtn" onclick="convert()">✨ Convert to notes &amp; actions</button>
+        <div class="ai-status" id="aiStatus"></div>
+        <div class="fhint">Only what's in your text is used — no invented topics, owners or dates. Review and edit below, then copy.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hd"><span class="pip" style="background:var(--blue)"></span><span class="card-title">Discussion</span></div>
+      <div class="card-body">
+        <div class="field">
+          <span class="fhint">One point per row. Write as <b style="color:var(--text2)">Topic: what was said</b> — same topics group together in the output.</span>
+          <div class="rep" id="r_topics"></div>
+          <button class="add-btn" onclick="addOne('r_topics','Topic: what was said')">+ Add point</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hd"><span class="pip" style="background:var(--purple)"></span><span class="card-title">Decisions &amp; open questions</span></div>
+      <div class="card-body">
+        <div class="field">
+          <span class="flabel">Decisions</span>
+          <span class="fhint">What was actually settled — the part people re-read later</span>
+          <div class="rep" id="r_decisions"></div>
+          <button class="add-btn" onclick="addOne('r_decisions','Decision made')">+ Add decision</button>
+        </div>
+        <div class="field">
+          <span class="flabel">Open questions</span>
+          <span class="fhint">Raised but not answered — the parking lot</span>
+          <div class="rep" id="r_questions"></div>
+          <button class="add-btn" onclick="addOne('r_questions','Question left open')">+ Add open question</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hd"><span class="pip" style="background:var(--amber)"></span><span class="card-title">Action items</span><span class="card-note" id="ownerWarn"></span></div>
+      <div class="card-body">
+        <div class="field">
+          <span class="fhint">Owner is left blank when nobody was named — it shows as <b style="color:var(--amber)">?</b> so it can't go silent. Hover an action to see the line it came from.</span>
+          <div class="mini-lbl-row"><span class="mini-lbl">Action</span><span class="mini-lbl">Owner</span><span class="mini-lbl">Due</span><span></span></div>
+          <div class="rep" id="r_actions"></div>
+          <button class="add-btn" onclick="addAction()">+ Add action</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col sticky-col">
+    <div class="card">
+      <div class="card-hd" style="justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:8px;"><span class="pip" style="background:var(--teal)"></span><span class="card-title">Live Preview</span></div>
+        <div class="pv-tabs">
+          <button class="pv-tab on" id="tab_notes" onclick="switchTab('notes')">Notes</button>
+          <button class="pv-tab" id="tab_slack" onclick="switchTab('slack')">Slack</button>
+          <button class="pv-tab" id="tab_actions" onclick="switchTab('actions')">Actions</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="pv-panel on" id="panel_notes">
+          <div class="cortex-pv" id="notesPreview"></div>
+          <div class="cp-row">
+            <button class="cp-btn" id="cpRich" onclick="copyNotesRich(this)">Copy notes (formatted)</button>
+            <button class="cp-btn ghost" id="cpMd" onclick="copyNotesMd(this)">Copy as Markdown</button>
+          </div>
+          <p class="fhint" style="margin-top:10px;">Try <b style="color:var(--text2)">formatted</b> first — paste into Cortex keeping headings &amp; bullets. If messy, use <b style="color:var(--text2)">Markdown</b>.</p>
+        </div>
+        <div class="pv-panel" id="panel_slack">
+          <div class="slack-pv" id="slackPreview"></div>
+          <div class="cp-row"><button class="cp-btn" id="cpSlack" onclick="copySlack(this)">Copy Slack message</button></div>
+          <p class="fhint" style="margin-top:10px;">Slack gets decisions, actions and open questions — not the full discussion. The notes carry the detail.</p>
+        </div>
+        <div class="pv-panel" id="panel_actions">
+          <div class="slack-pv" id="actionsPreview"></div>
+          <div class="cp-row"><button class="cp-btn" id="cpActions" onclick="copyActions(this)">Copy action list</button></div>
+          <p class="fhint" style="margin-top:10px;">Markdown checkboxes — drops straight into a Jira description, a Cortex page or a to-do list.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+function el(t,c){const e=document.createElement(t);if(c)e.className=c;return e;}
+function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function autogrow(t){t.style.height='auto';t.style.height=t.scrollHeight+'px';}
+function mkTA(ph){const t=el('textarea','inp repta');t.placeholder=ph||'';t.rows=1;t.addEventListener('input',()=>{autogrow(t);render();});return t;}
+function mkInp(ph){const i=el('input','inp');i.placeholder=ph||'';i.addEventListener('input',render);return i;}
+function rmBtn(row){const b=el('button','rm-btn');b.textContent='×';b.title='Remove';b.onclick=()=>{row.remove();render();};return b;}
+function addOne(id,ph,v){const c=document.getElementById(id);const row=el('div','rep-row one-grid');const i=mkTA(ph);if(v)i.value=v;row.appendChild(i);row.appendChild(rmBtn(row));c.appendChild(row);autogrow(i);render();}
+/* An action row carries the source line it came from (dataset.src), surfaced as a tooltip
+   so every generated action stays checkable against the raw notes. */
+function addAction(a,o,d,src){
+  const c=document.getElementById('r_actions');const row=el('div','rep-row action-grid');
+  const i1=mkTA('Action'),i2=mkInp('Owner'),i3=mkInp('Due');
+  if(a)i1.value=a;if(o)i2.value=o;if(d)i3.value=d;
+  if(src){row.dataset.src=src;i1.title='From your notes: “'+src+'”';}
+  i2.addEventListener('input',()=>i2.classList.toggle('unassigned',!i2.value.trim()));
+  i2.classList.toggle('unassigned',!i2.value.trim());
+  row.appendChild(i1);row.appendChild(i2);row.appendChild(i3);row.appendChild(rmBtn(row));
+  c.appendChild(row);autogrow(i1);render();
+}
+function readOne(id){return [...document.getElementById(id).querySelectorAll('input,textarea')].map(i=>i.value.trim()).filter(Boolean);}
+function readActions(){
+  return [...document.getElementById('r_actions').querySelectorAll('.rep-row')].map(r=>{
+    const f=[...r.querySelectorAll('input,textarea')].map(i=>i.value.trim());
+    return {action:f[0]||'',owner:f[1]||'',due:f[2]||'',src:r.dataset.src||''};
+  }).filter(a=>a.action);
+}
+function val(id){return (document.getElementById(id).value||'').trim();}
+function gather(){return{
+  title:val('f_title'),date:val('f_date'),attendees:val('f_attendees'),
+  topics:readOne('r_topics'),decisions:readOne('r_decisions'),
+  questions:readOne('r_questions'),actions:readActions()
+};}
+function titleStr(d){return d.title||'Meeting notes';}
+function metaStr(d){return [d.date,d.attendees].filter(Boolean).join(' · ');}
+
+/* ---------- grouping: "Topic: point" rows collapse under one heading ---------- */
+function linkify(s){return esc(s).replace(/(https?:\/\/[^\s]+)/g,'<a href="$1">$1</a>');}
+function groupItems(arr){
+  const groups=[],map={};
+  (arr||[]).forEach(it=>{
+    const s=String(it).trim();if(!s)return;
+    const idx=s.indexOf(':');
+    if(idx>0 && idx<40){
+      const topic=s.slice(0,idx).trim();
+      const parts=s.slice(idx+1).split(';').map(x=>x.trim()).filter(Boolean);
+      if(!map[topic]){map[topic]={topic,points:[]};groups.push(map[topic]);}
+      parts.forEach(p=>map[topic].points.push(p));
+    } else { groups.push({topic:null,points:[s]}); }
+  });
+  return groups;
+}
+function groupedHTML(arr){
+  const groups=groupItems(arr);let html='',pending=[];
+  const flush=()=>{if(pending.length){html+='<ul>'+pending.map(x=>'<li>'+x+'</li>').join('')+'</ul>';pending=[];}};
+  groups.forEach(g=>{
+    if(g.topic&&g.points.length>1){flush();
+      html+='<div style="margin:5px 0 7px;"><b style="color:#dfe0ea;">'+esc(g.topic)+'</b><ul>'+g.points.map(p=>'<li>'+linkify(p)+'</li>').join('')+'</ul></div>';
+    } else { pending.push(g.topic?('<b style="color:#cfd0da;">'+esc(g.topic)+':</b> '+linkify(g.points[0])):linkify(g.points[0])); }
+  });
+  flush();return html;
+}
+function groupedMdLines(arr){
+  const out=[];
+  groupItems(arr).forEach(g=>{
+    if(g.topic&&g.points.length>1){out.push('**'+g.topic+'**');g.points.forEach(p=>out.push('  • '+p));}
+    else out.push('• '+(g.topic?g.topic+': '+g.points[0]:g.points[0]));
+  });
+  return out;
+}
+/* An action never loses its owner silently — no owner renders as "?" */
+function actionParts(a){return [a.action,a.owner||'?',a.due].filter(Boolean);}
+function actionLine(a){return actionParts(a).join(' — ');}
+function actionHTML(a){
+  const own=a.owner?esc(a.owner):'<span class="noowner">?</span>';
+  return linkify(a.action)+' — '+own+(a.due?' — '+esc(a.due):'');
+}
+
+/* ---------- notes (Cortex) ---------- */
+function buildNotesHTML(d){
+  let h='<h1>'+esc(titleStr(d))+'</h1>';
+  if(metaStr(d))h+='<div class="meta">'+esc(metaStr(d))+'</div>';
+  if(d.topics.length){h+='<h3>Discussion</h3>'+groupedHTML(d.topics);}
+  if(d.decisions.length){h+='<h3>Decisions</h3>'+groupedHTML(d.decisions);}
+  if(d.actions.length){h+='<h3>Action items</h3><ul>'+d.actions.map(a=>'<li>'+actionHTML(a)+'</li>').join('')+'</ul>';}
+  if(d.questions.length){h+='<h3>Open questions</h3>'+groupedHTML(d.questions);}
+  if(!d.topics.length&&!d.decisions.length&&!d.actions.length&&!d.questions.length)
+    h+='<p><span class="empty-note">Paste your notes above and hit Convert.</span></p>';
+  return h;
+}
+function buildNotesMd(d){
+  const L=['# '+titleStr(d)];
+  if(metaStr(d))L.push(metaStr(d));
+  if(d.topics.length){L.push('');L.push('### Discussion');groupedMdLines(d.topics).forEach(x=>L.push(x));}
+  if(d.decisions.length){L.push('');L.push('### Decisions');groupedMdLines(d.decisions).forEach(x=>L.push(x));}
+  if(d.actions.length){L.push('');L.push('### Action items');d.actions.forEach(a=>L.push('• '+actionLine(a)));}
+  if(d.questions.length){L.push('');L.push('### Open questions');groupedMdLines(d.questions).forEach(x=>L.push(x));}
+  return L.join('\n');
+}
+/* ---------- slack ---------- */
+function buildSlack(d){
+  const L=['🗒 '+titleStr(d)];
+  if(metaStr(d))L.push(metaStr(d));
+  if(d.decisions.length){L.push('');L.push('Decisions');d.decisions.forEach(x=>L.push('• '+x));}
+  if(d.actions.length){L.push('');L.push('Action items');d.actions.forEach(a=>L.push('• '+actionLine(a)));}
+  if(d.questions.length){L.push('');L.push('Open questions');d.questions.forEach(x=>L.push('• '+x));}
+  return L.join('\n');
+}
+function buildSlackHTML(d){
+  const rows=[];const t=s=>rows.push(s);
+  t('🗒 <b>'+esc(titleStr(d))+'</b>');
+  if(metaStr(d))t(esc(metaStr(d)));
+  if(d.decisions.length){t('');t('<b>Decisions</b>');d.decisions.forEach(x=>t('• '+linkify(x)));}
+  if(d.actions.length){t('');t('<b>Action items</b>');d.actions.forEach(a=>t('• '+actionHTML(a)));}
+  if(d.questions.length){t('');t('<b>Open questions</b>');d.questions.forEach(x=>t('• '+linkify(x)));}
+  return rows.map(r=>r===''?'<div><br></div>':'<div>'+r+'</div>').join('');
+}
+/* ---------- actions only (markdown checkboxes) ---------- */
+function buildActionsMd(d){
+  if(!d.actions.length)return '';
+  return d.actions.map(a=>'- [ ] '+actionLine(a)).join('\n');
+}
+function buildActionsHTML(d){
+  if(!d.actions.length)return '<span class="empty-note">No action items yet.</span>';
+  return d.actions.map(a=>'<div>☐ '+actionHTML(a)+'</div>').join('');
+}
+
+let _slack='',_slackHTML='',_md='',_actionsMd='';
+function render(){
+  const d=gather();
+  _slack=buildSlack(d);_slackHTML=buildSlackHTML(d);_md=buildNotesMd(d);_actionsMd=buildActionsMd(d);
+  document.getElementById('notesPreview').innerHTML=buildNotesHTML(d);
+  document.getElementById('slackPreview').innerHTML=_slackHTML;
+  document.getElementById('actionsPreview').innerHTML=buildActionsHTML(d);
+  const n=d.actions.filter(a=>!a.owner).length;
+  const w=document.getElementById('ownerWarn');
+  w.textContent=n?(n+' without an owner'):'';
+  w.className='card-note'+(n?' warn':'');
+}
+function switchTab(w){
+  ['notes','slack','actions'].forEach(k=>{
+    document.getElementById('tab_'+k).classList.toggle('on',k===w);
+    document.getElementById('panel_'+k).classList.toggle('on',k===w);
+  });
+}
+function toast(m,warn){const t=document.getElementById('toast');t.textContent=m;t.className='toast show'+(warn?' warn':'');setTimeout(()=>t.className='toast',2200);}
+function flash(b,l){const o=b.textContent;b.classList.add('ok');b.textContent='✓ '+l;setTimeout(()=>{b.classList.remove('ok');b.textContent=o;},1500);}
+function richCopy(b,html,plain,label){
+  if(navigator.clipboard&&window.ClipboardItem){
+    navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([html],{type:'text/html'}),'text/plain':new Blob([plain],{type:'text/plain'})})])
+      .then(()=>{flash(b,'Copied');toast(label+' copied');})
+      .catch(()=>{navigator.clipboard.writeText(plain);toast('Copied as text',true);});
+  } else {navigator.clipboard.writeText(plain).then(()=>{flash(b,'Copied');toast(label+' copied');});}
+}
+function copySlack(b){richCopy(b,_slackHTML,_slack,'Slack message');}
+function copyNotesRich(b){richCopy(b,document.getElementById('notesPreview').innerHTML,_md,'Formatted notes');}
+function copyNotesMd(b){navigator.clipboard.writeText(_md).then(()=>{flash(b,'Copied');toast('Markdown copied');});}
+function copyActions(b){
+  if(!_actionsMd){toast('No action items to copy',true);return;}
+  navigator.clipboard.writeText(_actionsMd).then(()=>{flash(b,'Copied');toast('Action list copied');});
+}
+
+/* ---------- input mode: shorthand vs auto-transcript ---------- */
+let _mode='auto';
+function setMode(m){
+  _mode=m;
+  [...document.querySelectorAll('#modeSeg button')].forEach(b=>b.classList.toggle('on',b.dataset.mode===m));
+  updateMeter();
+}
+/* A transcript looks different from shorthand: speaker prefixes and/or timestamps on
+   many lines, and it is long. Either signal alone is weak, so both feed one score. */
+function detectMode(txt){
+  const lines=txt.split(/\n/).map(s=>s.trim()).filter(Boolean);
+  if(lines.length<12)return 'short';
+  let speaker=0,stamp=0;
+  lines.forEach(l=>{
+    if(/^\[?\d{1,2}:\d{2}(:\d{2})?\]?/.test(l))stamp++;
+    if(/^[A-Za-zÀ-ÿ][\wÀ-ÿ .'’-]{1,30}:\s/.test(l))speaker++;
+  });
+  const ratio=(speaker+stamp)/lines.length;
+  return (ratio>0.4||(ratio>0.2&&txt.length>4000)||txt.length>12000)?'transcript':'short';
+}
+function effectiveMode(){const t=val('raw');return _mode==='auto'?detectMode(t):_mode;}
+function updateMeter(){
+  const t=val('raw');
+  const lines=t?t.split(/\n/).filter(s=>s.trim()).length:0;
+  const info=document.getElementById('sizeInfo');
+  const chip=document.getElementById('modeChip');
+  if(!t){info.textContent='';info.className='meter-txt';chip.textContent='';chip.className='card-note';return;}
+  const big=t.length>100000;
+  info.textContent=lines+' lines · '+t.length.toLocaleString()+' chars'+(big?' · very long, this will be slow':'');
+  info.className='meter-txt'+(big?' warn':'');
+  const m=effectiveMode();
+  chip.textContent=(m==='transcript'?'transcript':'shorthand')+(_mode==='auto'?' (detected)':' (set)');
+  chip.className='card-note';
+}
+
+/* ---------- convert (POST /api/claude) ---------- */
+const AI_SYSTEM = "You turn a person's raw meeting notes into structured meeting notes and action items. "
+ + "Use ONLY what is in the text you are given. Never invent, assume, infer or embellish. "
+ + "If something is not there, leave it out — an empty array or an empty string. "
+ + "Respond with a SINGLE valid JSON object and NOTHING else — no prose, no markdown, no code fences.";
+
+function todayStr(){
+  try{return new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}catch(e){return '';}
+}
+function modeRule(mode){
+  return mode==='transcript'
+   ? "THE INPUT IS A RAW AUTO-TRANSCRIPT (Teams / Zoom / Meet / Otter).\n"
+     + "• Collapse repetition: the same point restated five times is ONE point.\n"
+     + "• Drop filler, greetings, small talk, thinking-out-loud and speech-recogniser garble.\n"
+     + "• Never quote long stretches — write the point, not the dialogue.\n"
+     + "• Attribute an action to a person only where a speaker label makes the owner clear.\n"
+     + "• A topic someone merely mentioned in passing is not a discussion topic.\n"
+   : "THE INPUT IS THE NOTE-TAKER'S OWN SHORTHAND — terse, abbreviated, possibly mixed languages.\n"
+     + "• Tidy grammar and expand obvious abbreviations. Nothing more.\n"
+     + "• A fragment stays a fragment: never pad it into an explanation you cannot support from the text.\n"
+     + "• First person (\"I need to…\") is the note-taker; leave the owner empty unless they named themselves.\n";
+}
+function userPrompt(raw,mode,d){
+  return "Produce a JSON object with EXACTLY these keys:\n"
+   + "{\n"
+   + '  "title": string,        // what this meeting was, if stated or obvious from the text; else ""\n'
+   + '  "date": string,         // meeting date if stated in the text; else ""\n'
+   + '  "attendees": string[],  // people named as present; [] if none are\n'
+   + '  "topics": string[],     // what was discussed, as "Topic: what was said". Reuse the SAME topic wording for related points so they group.\n'
+   + '  "decisions": string[],  // what was actually settled or agreed\n'
+   + '  "questions": string[],  // raised but left unanswered\n'
+   + '  "actions": [ { "action": string, "owner": string, "due": string, "source": string } ]\n'
+   + "}\n\n"
+   + modeRule(mode) + "\n"
+   + "RULES:\n"
+   + "• NEVER INVENT. No topic, decision, question, attendee, owner or date that is not in the text.\n"
+   + "• NEVER GUESS AN OWNER. If nobody was named for an action, owner is \"\". An empty owner is correct; a guessed one is a bug.\n"
+   + "• Keep names, numbers, ticket keys, version numbers, feature names and error text VERBATIM, in their original language.\n"
+   + "• An ACTION is something a person committed to do. A decision is not an action. A discussion point is not an action.\n"
+   + "• \"source\" is the shortest VERBATIM snippet from the input that this action came from (max ~12 words). It must appear in the input.\n"
+   + "• DUE DATES: today is " + todayStr() + ". Resolve relative dates (\"friday\", \"next week\", \"eod\") to a real date as \"D Mon YYYY\". If no time was given, due is \"\".\n"
+   + "• A DECISION is not also a topic — put each point in one place only.\n"
+   + "BUDGET (keep it tight — this is a summary, not a rewrite):\n"
+   + "• topics: at most 8 entries, each point at most ~14 words.\n"
+   + "• decisions: at most 6. questions: at most 5.\n"
+   + "• No filler, no hedging (\"it seems\", \"it was mentioned that\"), no restating the meeting title.\n\n"
+   + (d.title?("The note-taker already titled this meeting \""+d.title+"\" — keep title as \"\" unless the text names it differently.\n\n"):"")
+   + "=== RAW NOTES ===\n" + raw;
+}
+function extractJSON(text){
+  if(!text)return null;
+  let t=text.trim().replace(/^```(?:json)?/i,'').replace(/```$/,'').trim();
+  const s=t.indexOf('{'),e=t.lastIndexOf('}');
+  if(s<0||e<0||e<s)return null;
+  try{return JSON.parse(t.slice(s,e+1));}catch(err){return null;}
+}
+function setStatus(msg,cls){const s=document.getElementById('aiStatus');s.textContent=msg||'';s.className='ai-status'+(cls?' '+cls:'');}
+function convert(){
+  const raw=val('raw');
+  if(!raw){setStatus('Paste your notes first.','err');return;}
+  const mode=effectiveMode();
+  const btn=document.getElementById('convBtn');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Reading…';
+  setStatus(mode==='transcript'?'Reading the transcript — this takes longer…':'Sorting your notes…');
+  const bodyReq={
+    model:'sonnet',stream:false,system:AI_SYSTEM,
+    messages:[{role:'user',content:[{type:'text',text:userPrompt(raw,mode,gather())}]}]
+  };
+  fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(bodyReq)})
+    .then(r=>r.json())
+    .then(j=>{
+      if(j.error){setStatus((typeof j.error==='string'?j.error:(j.message||'AI request failed')).slice(0,160),'err');return;}
+      const text=(j.content||[]).map(b=>b.text||'').join('');
+      const data=extractJSON(text);
+      if(!data){setStatus('AI replied but not in the expected format — try again.','err');return;}
+      applyAI(data);
+      const n=readActions().filter(a=>!a.owner).length;
+      setStatus('✓ Done'+(n?(' — '+n+' action'+(n>1?'s':'')+' need an owner.'):' — review and tweak below.'),'ok');
+      toast('Notes ready');
+    })
+    .catch(()=>setStatus('Could not reach the AI engine.','err'))
+    .finally(()=>{btn.disabled=false;btn.innerHTML='✨ Convert to notes &amp; actions';});
+}
+function applyAI(d){
+  if(d.title&&!val('f_title'))document.getElementById('f_title').value=d.title;
+  if(d.date&&!val('f_date'))document.getElementById('f_date').value=d.date;
+  if(Array.isArray(d.attendees)&&d.attendees.length&&!val('f_attendees'))
+    document.getElementById('f_attendees').value=d.attendees.join(', ');
+  const fill=(id,arr)=>{document.getElementById(id).innerHTML='';(arr||[]).forEach(x=>{if(x&&String(x).trim())addOne(id,'',String(x).trim());});};
+  fill('r_topics',d.topics);
+  fill('r_decisions',d.decisions);
+  fill('r_questions',d.questions);
+  document.getElementById('r_actions').innerHTML='';
+  (d.actions||[]).forEach(a=>{if(a&&(a.action||'').trim())addAction((a.action||'').trim(),(a.owner||'').trim(),(a.due||'').trim(),(a.source||'').trim());});
+  render();
+}
+
+/* ---------- saved meetings (side panel) ---------- */
+const DKEY='notesIntel_meetingNotes_v1';
+let _activeDraftId=null;
+function collect(){const d=gather();return{title:d.title,date:d.date,attendees:d.attendees,raw:val('raw'),topics:d.topics,decisions:d.decisions,questions:d.questions,actions:d.actions};}
+function loadAll(){try{return JSON.parse(localStorage.getItem(DKEY))||[];}catch(e){return [];}}
+function saveAll(a){try{localStorage.setItem(DKEY,JSON.stringify(a));}catch(e){toast('Could not save (storage full?)',true);}}
+function draftTitle(d){return [d.title,d.date].filter(Boolean).join(' — ')||'Untitled meeting';}
+function fmtTime(ts){try{const dt=new Date(ts);return dt.toLocaleDateString(undefined,{month:'short',day:'numeric'})+' · '+dt.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});}catch(e){return '';}}
+function applyData(d){
+  ['title','date','attendees'].forEach(k=>{const e=document.getElementById('f_'+k);if(e)e.value=d[k]||'';});
+  document.getElementById('raw').value=d.raw||'';
+  ['r_topics','r_decisions','r_questions','r_actions'].forEach(id=>document.getElementById(id).innerHTML='');
+  (d.topics||[]).forEach(x=>addOne('r_topics','',x));
+  (d.decisions||[]).forEach(x=>addOne('r_decisions','',x));
+  (d.questions||[]).forEach(x=>addOne('r_questions','',x));
+  (d.actions||[]).forEach(a=>addAction(a.action,a.owner,a.due,a.src));
+  updateMeter();render();
+}
+function saveDraft(){
+  const data=collect();const all=loadAll();const now=Date.now();
+  const ex=_activeDraftId&&all.find(x=>x.id===_activeDraftId);
+  if(ex){ex.data=data;ex.title=draftTitle(data);ex.savedAt=now;}
+  else {_activeDraftId='m'+now+Math.random().toString(36).slice(2,6);all.unshift({id:_activeDraftId,title:draftTitle(data),savedAt:now,data});}
+  saveAll(all);renderDrafts();toast('Meeting saved');
+}
+function openDraft(id){
+  const d=loadAll().find(x=>x.id===id);if(!d)return;
+  _activeDraftId=id;applyData(d.data);setStatus('');renderDrafts();toast('Meeting loaded');
+}
+function deleteDraft(id){
+  if(!confirm('Delete this saved meeting? This cannot be undone.'))return;
+  saveAll(loadAll().filter(x=>x.id!==id));
+  if(_activeDraftId===id)_activeDraftId=null;
+  renderDrafts();toast('Meeting deleted');
+}
+function renderDrafts(){
+  const list=document.getElementById('draftList');if(!list)return;
+  const all=loadAll().sort((a,b)=>(b.savedAt||0)-(a.savedAt||0));
+  if(!all.length){list.innerHTML='<div class="sb-empty">No saved meetings yet.<br>Convert your notes and hit Save meeting.</div>';return;}
+  list.innerHTML='';
+  all.forEach(d=>{
+    const row=el('div','draft'+(d.id===_activeDraftId?' active':''));
+    row.innerHTML='<div class="draft-name">'+esc(d.title||'Untitled meeting')+'</div><div class="draft-meta">'+fmtTime(d.savedAt)+'</div><span class="draft-del" title="Delete">×</span>';
+    row.addEventListener('click',e=>{if(e.target.classList.contains('draft-del'))return;openDraft(d.id);});
+    row.querySelector('.draft-del').addEventListener('click',e=>{e.stopPropagation();deleteDraft(d.id);});
+    list.appendChild(row);
+  });
+}
+function resetForm(){
+  _activeDraftId=null;
+  ['f_title','f_date','f_attendees','raw'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['r_topics','r_decisions','r_questions','r_actions'].forEach(id=>document.getElementById(id).innerHTML='');
+  document.getElementById('f_date').value=todayStr();
+  setMode('auto');setStatus('');updateMeter();render();renderDrafts();
+}
+function newDraft(){resetForm();toast('New meeting started');}
+function clearForm(){if(!confirm('Clear the form? Your saved meetings in the side panel are kept.'))return;resetForm();toast('Form cleared');}
+
+['f_title','f_date','f_attendees'].forEach(id=>document.getElementById(id).addEventListener('input',render));
+document.getElementById('raw').addEventListener('input',updateMeter);
+document.getElementById('f_date').value=todayStr();
+updateMeter();render();renderDrafts();
+</script>
+</body>
+</html>

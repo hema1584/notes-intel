@@ -6,6 +6,142 @@ const net  = require('node:net');
 const os   = require('node:os');
 const path = require('node:path');
 const { spawn, execFile } = require('node:child_process');
+const zlib = require('node:zlib');
+
+// Bundled ffmpeg (ffmpeg-static). In a packaged asar build the binary is unpacked
+// to app.asar.unpacked — rewrite the path so execFile can find the real file.
+let ffmpegPath = '';
+try {
+  ffmpegPath = require('ffmpeg-static') || '';
+  if (ffmpegPath) ffmpegPath = ffmpegPath.replace('app.asar', 'app.asar.unpacked');
+} catch (e) { /* resolved lazily; route reports if missing */ }
+
+// ---------------------------------------------------------------------------
+// Video → frames (BugReport from Video). Codec-independent: uses bundled ffmpeg,
+// not the renderer's <video> element (Electron ships without H.264 in some builds).
+// ---------------------------------------------------------------------------
+function runFfmpeg(args, timeoutMs) {
+  return new Promise((resolve, reject) => {
+    execFile(ffmpegPath, args, { timeout: timeoutMs || 60000, windowsHide: true, maxBuffer: 8 * 1024 * 1024 },
+      (err, stdout, stderr) => {
+        // ffmpeg writes info (incl. "Duration:") to stderr and returns non-zero for -i probes; caller decides.
+        resolve({ err, stdout: stdout || '', stderr: (stderr || '').toString() });
+      });
+  });
+}
+
+// A near-black top strip means the Android notification shade is pulled down
+// (clock + toggle circles + red "Recording screen" card) — an editing artifact
+// that must NOT be sent to the model. Gameplay always has a bright HUD/sky strip
+// up top (luma ~150-210); a mildly dark strip (~60) is the real viewport-shift bug
+// and is kept. Threshold sits between the shade (~8) and everything worth keeping.
+const BV_SHADE_LUMA = 35;
+
+// Timestamps where the picture changes materially (new screen, popup, transition).
+// De-clustered so one animation doesn't contribute five near-identical frames.
+async function detectSceneTimes(inFile, threshold, minGap) {
+  const r = await runFfmpeg(['-i', inFile, '-vf', `select='gt(scene,${threshold})',showinfo`, '-f', 'null', '-'], 90000);
+  const times = [];
+  const re = /pts_time:([0-9.]+)/g;
+  let m;
+  while ((m = re.exec(r.stderr)) !== null) times.push(parseFloat(m[1]));
+  const out = [];
+  for (const t of times.sort((a, b) => a - b)) {
+    if (!out.length || t - out[out.length - 1] >= minGap) out.push(t);
+  }
+  return out;
+}
+
+async function extractVideoFrames(buf, opts) {
+  if (!ffmpegPath || !fs.existsSync(ffmpegPath)) throw new Error('Video engine (ffmpeg) is not available in this build.');
+  const dense  = !!(opts && opts.dense);
+  const scenes = !!(opts && opts.scenes);
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ni-bugvid-'));
+  const inFile = path.join(dir, 'in.mp4');
+  try {
+    fs.writeFileSync(inFile, buf);
+
+    // 1) Probe duration from ffmpeg stderr.
+    const probe = await runFfmpeg(['-i', inFile], 30000);
+    const m = probe.stderr.match(/Duration:\s*(\d+):(\d+):(\d+\.\d+)/);
+    if (!m) throw new Error('Could not read the video (no duration). Try re-exporting as MP4.');
+    const dur = (+m[1]) * 3600 + (+m[2]) * 60 + parseFloat(m[3]);
+    if (!dur || !isFinite(dur)) throw new Error('Video has no readable duration.');
+
+    // 2) OVERSAMPLE at 480px, and in the SAME ffmpeg pass grab a 1px top-strip
+    //    luminance. Drop notification-shade candidates. Fast-interactions mode
+    //    samples ~1 frame / 0.6s (vs 1.3s) so quick taps don't fall between frames.
+    // Walkthrough mode samples SCREEN CHANGES instead of a uniform grid: far fewer frames
+    // (each a distinct state) — cheaper to send and better source material for test steps.
+    let times = null;
+    if (scenes) {
+      const sc = await detectSceneTimes(inFile, 0.3, 1.2);
+      times = [Math.min(0.5, dur / 2)].concat(sc.filter(t => t > 1.0 && t < dur - 0.2));
+      if (times.length < 6) { // sparse/static recording — top up with a uniform pass
+        const need = 8;
+        for (let i = 0; i < need; i++) {
+          const t = dur * (i + 0.5) / need;
+          if (!times.some(x => Math.abs(x - t) < 1.2)) times.push(t);
+        }
+        times.sort((a, b) => a - b);
+      }
+      if (times.length > 14) { // keep a spread, never a burst from one animation
+        const pick = [];
+        for (let i = 0; i < 14; i++) pick.push(times[Math.floor(i * times.length / 14)]);
+        times = pick;
+      }
+    }
+
+    const perSec = dense ? 0.6 : 1.3;
+    const capM   = dense ? 80 : 40;
+    const M = times ? times.length : Math.max(12, Math.min(capM, Math.round(dur / perSec)));
+    const kept = []; // { t, jpg }
+    let shadeCount = 0;
+    for (let i = 0; i < M; i++) {
+      const t = times ? times[i] : dur * (i + 0.5) / M;
+      const jpg = path.join(dir, `c${i}.jpg`);
+      const lum = path.join(dir, `c${i}.raw`);
+      await runFfmpeg(['-y', '-ss', t.toFixed(3), '-i', inFile,
+        '-frames:v', '1', '-vf', 'scale=480:-2', '-q:v', '6', jpg,
+        '-frames:v', '1', '-vf', 'crop=iw:ih*0.13:0:0,scale=1:1,format=gray', '-f', 'rawvideo', lum], 30000);
+      if (!fs.existsSync(jpg)) continue;
+      let luma = 255;
+      try { const lb = fs.readFileSync(lum); if (lb.length) luma = lb[0]; } catch (e) { /* keep by default */ }
+      if (luma < BV_SHADE_LUMA) { shadeCount++; continue; } // notification shade — skip
+      kept.push({ t: t, jpg: jpg });
+    }
+    if (!kept.length) throw new Error('Every sampled frame was obscured (notification shade pulled down). Re-record without opening the notification panel.');
+
+    // 3) Downsample evenly to a target set. Fast-interactions mode keeps more
+    //    frames so a quick tap captured in only one frame survives.
+    const sendCap = dense ? 32 : 20;
+    let picks = kept;
+    if (kept.length > sendCap) {
+      picks = [];
+      for (let i = 0; i < sendCap; i++) picks.push(kept[Math.floor(i * kept.length / sendCap)]);
+    }
+
+    // 4) Build payload; first & last kept frames re-grabbed full-res for version-overlay OCR.
+    const frames = [];
+    for (let i = 0; i < picks.length; i++) {
+      const p = picks[i];
+      // Full-res costs ~7x a standard frame; one is enough to OCR the version overlay.
+      const full = scenes ? (i === 0) : (i === 0 || i === picks.length - 1);
+      let b64;
+      if (full) {
+        const fj = path.join(dir, `full${i}.jpg`);
+        await runFfmpeg(['-y', '-ss', p.t.toFixed(3), '-i', inFile, '-frames:v', '1', '-vf', 'scale=1280:-2', '-q:v', '3', fj], 30000);
+        b64 = (fs.existsSync(fj) ? fs.readFileSync(fj) : fs.readFileSync(p.jpg)).toString('base64');
+      } else {
+        b64 = fs.readFileSync(p.jpg).toString('base64');
+      }
+      frames.push({ t: p.t, base64: b64 });
+    }
+    return { frames, duration: dur, sampled: M, dropped: shadeCount };
+  } finally {
+    try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) { /* best effort */ }
+  }
+}
 
 let mainWindow     = null;
 let settingsWindow = null;
@@ -24,6 +160,96 @@ let appSettings = { provider: 'claude', openaiKey: '', folderPath: '' };
 
 function loadSettings() {
   try { Object.assign(appSettings, JSON.parse(fs.readFileSync(settingsFile, 'utf8'))); } catch { }
+}
+
+// ---------------------------------------------------------------------------
+// Persistent key/value store for the renderer.
+// The proxy port changes every launch, so the page origin changes, so Chromium
+// hands the UI a brand-new empty localStorage each time (25 stranded origins were
+// found on the dev machine). Anything that must survive a restart lives here instead.
+// ---------------------------------------------------------------------------
+const storeFile = path.join(path.dirname(settingsFile), 'ni-store.json');
+let _store = null, _storeTimer = null;
+
+function loadStore() {
+  if (_store) return _store;
+  try { _store = JSON.parse(fs.readFileSync(storeFile, 'utf8')); }
+  catch { _store = {}; }
+  return _store;
+}
+
+// Friendlier names for the raw ni_* keys in the readable companion file.
+const STORE_LABELS = {
+  ni_project_context: 'Project context',
+  ni_tc_examples: 'Your approved test cases (gold examples)',
+  ni_ref_examples: 'Team reference test cases',
+  ni_bugvid_glossary: 'Video smart words',
+  ni_bugvid_feature: 'Feature under test (last used)',
+  ni_bugvid_project: 'Jira target (last used)',
+  ni_ctx_games: 'Saved games',
+  ni_qa_style: 'Generation style',
+  ni_history: 'Analysis history',
+  ni_issue_type_cache: 'Jira issue-type cache',
+  ni_seen_intro: 'Intro card dismissed',
+  ni_sb_collapsed: 'Sidebar collapsed'
+};
+
+// Cached HTML blobs (gistHTML, qaHTML…) and very long strings make the readable file
+// useless to skim. Drop the markup, trim the rest — the JSON store keeps the originals.
+function stripNoise(v) {
+  if (Array.isArray(v)) return v.map(stripNoise);
+  if (v && typeof v === 'object') {
+    const o = {};
+    Object.keys(v).forEach(k => {
+      if (/html$/i.test(k)) { o[k] = '[HTML omitted]'; return; }
+      o[k] = stripNoise(v[k]);
+    });
+    return o;
+  }
+  if (typeof v === 'string') {
+    if (/^\s*<[a-z!]/i.test(v) && v.length > 200) return '[HTML omitted]';
+    if (v.length > 600) return v.slice(0, 600) + ' …[trimmed]';
+  }
+  return v;
+}
+
+// Values are themselves JSON strings, so the raw file is full of \" escaping and is
+// effectively unreadable. Decode one level and pretty-print into a .txt alongside it.
+function writeReadableStore() {
+  try {
+    const out = [];
+    out.push('Notes Intel — saved data');
+    out.push('Written ' + new Date().toLocaleString());
+    out.push('This file is generated for reading only. Editing it changes nothing —');
+    out.push('ni-store.json is the real store.');
+    const s = _store || {};
+    Object.keys(s).sort().forEach(k => {
+      out.push('');
+      out.push('='.repeat(70));
+      out.push((STORE_LABELS[k] || k) + '   [' + k + ']');
+      out.push('='.repeat(70));
+      let v = s[k];
+      try { v = JSON.stringify(stripNoise(JSON.parse(v)), null, 2); } catch { /* plain string */ }
+      out.push(v);
+    });
+    if (!Object.keys(s).length) out.push('\n(nothing saved yet)');
+    fs.writeFileSync(path.join(path.dirname(storeFile), 'ni-store-readable.txt'), out.join('\n'), 'utf8');
+  } catch (e) { log(`readable store write error: ${e.message}`); }
+}
+
+function flushStore() {
+  _storeTimer = null;
+  try {
+    fs.mkdirSync(path.dirname(storeFile), { recursive: true });
+    fs.writeFileSync(storeFile, JSON.stringify(_store || {}, null, 2), 'utf8');
+    writeReadableStore();
+  } catch (e) { log(`store write error: ${e.message}`); }
+}
+
+// Debounced — the UI autosaves on keystrokes; no need to hit disk each time.
+function queueStoreSave() {
+  if (_storeTimer) clearTimeout(_storeTimer);
+  _storeTimer = setTimeout(flushStore, 400);
 }
 
 function saveSettings() {
@@ -93,10 +319,17 @@ function buildPrompt(body) {
         tempFiles.push(imgPath);
         // Use forward slashes — Claude CLI handles them on Windows and avoids escape issues
         const imgPathFwd = imgPath.replace(/\\/g, '/');
-        parts.push(
-          'A screenshot is attached. FIRST use the Read tool to view the image file at this path: ' + imgPathFwd + '\n' +
-          'Everything visible in the image is primary input content. Describe it fully and base your analysis on it.'
-        );
+        if (body.frameMode === true) {
+          // Video-frame mode (BugReport from Video): many frames per request. Keep this terse —
+          // the single-screenshot wording below ("describe it fully") repeated 20x makes the
+          // model narrate HUD trivia of every frame instead of comparing frames.
+          parts.push('Image file for this frame (view it with the Read tool): ' + imgPathFwd);
+        } else {
+          parts.push(
+            'A screenshot is attached. FIRST use the Read tool to view the image file at this path: ' + imgPathFwd + '\n' +
+            'Everything visible in the image is primary input content. Describe it fully and base your analysis on it.'
+          );
+        }
       }
     }
   }
@@ -664,6 +897,63 @@ function handleClaudeRequest(req, res) {
 
 const MIME_TYPES = { '.html': 'text/html', '.css': 'text/css', '.js': 'application/javascript', '.png': 'image/png', '.ico': 'image/x-icon' };
 
+// Dependency-free .pptx text extractor (used by Sprint Review). A .pptx is a ZIP
+// of XML — we parse the ZIP central directory, inflate each ppt/slides/slideN.xml,
+// and pull the <a:t> text runs in slide order. No external library required.
+function extractPptxText(buf) {
+  let eocd = -1;
+  for (let i = buf.length - 22; i >= 0 && i >= buf.length - 22 - 65536; i--) {
+    if (buf.readUInt32LE(i) === 0x06054b50) { eocd = i; break; }
+  }
+  if (eocd < 0) throw new Error('not a valid .pptx (no ZIP end-of-directory)');
+  const cdCount  = buf.readUInt16LE(eocd + 10);
+  const cdOffset = buf.readUInt32LE(eocd + 16);
+
+  const entries = [];
+  let p = cdOffset;
+  for (let n = 0; n < cdCount; n++) {
+    if (p + 46 > buf.length || buf.readUInt32LE(p) !== 0x02014b50) break;
+    const method   = buf.readUInt16LE(p + 10);
+    const compSize = buf.readUInt32LE(p + 20);
+    const nameLen  = buf.readUInt16LE(p + 28);
+    const extraLen = buf.readUInt16LE(p + 30);
+    const cmtLen   = buf.readUInt16LE(p + 32);
+    const localOff = buf.readUInt32LE(p + 42);
+    const name     = buf.toString('utf8', p + 46, p + 46 + nameLen);
+    entries.push({ name, method, compSize, localOff });
+    p += 46 + nameLen + extraLen + cmtLen;
+  }
+
+  const slideEntries = entries
+    .filter(e => /^ppt\/slides\/slide\d+\.xml$/.test(e.name))
+    .sort((a, b) => (+a.name.match(/(\d+)/)[1]) - (+b.name.match(/(\d+)/)[1]));
+
+  const out = [];
+  slideEntries.forEach((e, idx) => {
+    const lo = e.localOff;
+    if (lo + 30 > buf.length || buf.readUInt32LE(lo) !== 0x04034b50) return;
+    const lNameLen  = buf.readUInt16LE(lo + 26);
+    const lExtraLen = buf.readUInt16LE(lo + 28);
+    const dataStart = lo + 30 + lNameLen + lExtraLen;
+    const raw = buf.subarray(dataStart, dataStart + e.compSize);
+    let xml;
+    try {
+      if (e.method === 0) xml = raw.toString('utf8');
+      else if (e.method === 8) xml = zlib.inflateRawSync(raw).toString('utf8');
+      else return;
+    } catch { return; }
+    const texts = [];
+    const re = /<a:t>([\s\S]*?)<\/a:t>/g;
+    let m;
+    while ((m = re.exec(xml)) !== null) {
+      const t = m[1].replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').trim();
+      if (t) texts.push(t);
+    }
+    if (texts.length) out.push(`[Slide ${idx + 1}]\n${texts.join('\n')}`);
+  });
+  return { slides: slideEntries.length, text: out.join('\n\n') };
+}
+
 async function startServer() {
   proxyPort = await getFreePort();
   const appDir = path.join(app.getAppPath(), 'app');
@@ -675,6 +965,163 @@ async function startServer() {
     }
     if (req.method === 'POST' && req.url === '/api/claude') {
       handleClaudeRequest(req, res); return;
+    }
+    if (req.method === 'POST' && req.url === '/api/gslides-extract') {
+      // Body is JSON { link } — a Google Slides URL. We export it as .pptx server-side
+      // (works only if the deck is link-viewable / public) and extract slide text.
+      let raw = '';
+      req.on('data', c => { raw += c; });
+      req.on('end', async () => {
+        let b; try { b = JSON.parse(raw); } catch { res.writeHead(400, { 'Content-Type': 'application/json' }); res.end('{"error":"bad json"}'); return; }
+        const link = (b.link || '').trim();
+        const m = link.match(/presentation\/d\/([a-zA-Z0-9_-]+)/);
+        if (!m) { res.writeHead(400, { 'Content-Type': 'application/json' }); res.end('{"error":"That doesn\'t look like a Google Slides link"}'); return; }
+        const exportUrl = `https://docs.google.com/presentation/d/${m[1]}/export/pptx`;
+        try {
+          log(`gslides-extract: ${exportUrl}`);
+          const resp = await fetch(exportUrl, { redirect: 'follow' });
+          const ctype = (resp.headers.get('content-type') || '').toLowerCase();
+          const buf = Buffer.from(await resp.arrayBuffer());
+          // A real export starts with the ZIP signature "PK". A login/HTML page does not.
+          if (!resp.ok || buf.length < 4 || buf[0] !== 0x50 || buf[1] !== 0x4b || ctype.includes('text/html')) {
+            res.writeHead(403, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: "Couldn't open this deck — set link sharing to 'anyone with the link can view', or download it as .pptx and drop it here." }));
+            return;
+          }
+          const r = extractPptxText(buf);
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ slides: r.slides, filename: 'google-slides.pptx', text: r.text, sourceLink: link }));
+        } catch (e) {
+          log(`gslides-extract error: ${e.message}`);
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: (e.message || 'could not fetch the deck').slice(0, 160) }));
+        }
+      });
+      return;
+    }
+    if (req.method === 'POST' && req.url === '/api/sheet-fetch') {
+      // Body is JSON { link } — a Google Sheets URL. We export the tab as CSV
+      // server-side (works only if the sheet is link-viewable or published to the
+      // web). The renderer cannot do this itself: its CSP is connect-src 'self'.
+      let raw = '';
+      req.on('data', c => { raw += c; });
+      req.on('end', async () => {
+        let b; try { b = JSON.parse(raw); } catch { res.writeHead(400, { 'Content-Type': 'application/json' }); res.end('{"error":"bad json"}'); return; }
+        const link = (b.link || '').trim();
+        if (!link) { res.writeHead(400, { 'Content-Type': 'application/json' }); res.end('{"error":"no link"}'); return; }
+        let csvUrl = null, tab = '';
+        const gidM = link.match(/[#&?]gid=([0-9]+)/);
+        if (gidM) tab = gidM[1];
+        if (/[?&](output|format)=csv/i.test(link)) {
+          csvUrl = link;                                  // already a CSV endpoint
+        } else {
+          const pub = link.match(/spreadsheets\/d\/e\/([a-zA-Z0-9_-]+)/);
+          const doc = link.match(/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+          if (pub) {
+            csvUrl = `https://docs.google.com/spreadsheets/d/e/${pub[1]}/pub?output=csv${tab ? `&gid=${tab}` : ''}`;
+          } else if (doc) {
+            csvUrl = `https://docs.google.com/spreadsheets/d/${doc[1]}/export?format=csv${tab ? `&gid=${tab}` : ''}`;
+          }
+        }
+        if (!csvUrl) { res.writeHead(400, { 'Content-Type': 'application/json' }); res.end('{"error":"That does not look like a Google Sheets link"}'); return; }
+        try {
+          log(`sheet-fetch: ${csvUrl}`);
+          const resp = await fetch(csvUrl, { redirect: 'follow' });
+          const ctype = (resp.headers.get('content-type') || '').toLowerCase();
+          const text = await resp.text();
+          // A real export is text/csv. A login or permission page is HTML.
+          if (!resp.ok || ctype.includes('text/html') || /^\s*<(!doctype|html)/i.test(text)) {
+            res.writeHead(403, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: "Couldn't read this sheet — set link sharing to 'anyone with the link can view', or use File > Share > Publish to web." }));
+            return;
+          }
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ csv: text, tab: tab, sourceLink: link }));
+        } catch (e) {
+          log(`sheet-fetch error: ${e.message}`);
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: (e.message || 'could not fetch the sheet').slice(0, 160) }));
+        }
+      });
+      return;
+    }
+    if (req.method === 'POST' && req.url === '/api/pptx-extract') {
+      // Body is JSON { filename, dataB64 } — the renderer base64-encodes the .pptx
+      // (avoids multipart parsing). We decode and extract slide text here in Node.
+      let raw = '';
+      req.on('data', c => { raw += c; });
+      req.on('end', () => {
+        let b; try { b = JSON.parse(raw); } catch { res.writeHead(400, { 'Content-Type': 'application/json' }); res.end('{"error":"bad json"}'); return; }
+        try {
+          const buf = Buffer.from(b.dataB64 || '', 'base64');
+          if (!buf.length) { res.writeHead(400, { 'Content-Type': 'application/json' }); res.end('{"error":"empty file"}'); return; }
+          const r = extractPptxText(buf);
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ slides: r.slides, filename: b.filename || 'deck.pptx', text: r.text }));
+        } catch (e) {
+          log(`pptx-extract error: ${e.message}`);
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: (e.message || 'could not read .pptx').slice(0, 160) }));
+        }
+      });
+      return;
+    }
+    if (req.url === '/api/open-store-folder' && req.method === 'GET') {
+      try { flushStore(); shell.showItemInFolder(storeFile); }
+      catch (e) { log(`open-store-folder error: ${e.message}`); }
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end('{"ok":true}');
+      return;
+    }
+    if (req.url === '/api/store' && req.method === 'GET') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(loadStore()));
+      return;
+    }
+    if (req.url === '/api/store' && req.method === 'POST') {
+      let raw = '';
+      req.on('data', c => { raw += c; });
+      req.on('end', () => {
+        try {
+          const b = JSON.parse(raw);
+          const store = loadStore();
+          if (b && typeof b.key === 'string') {
+            if (b.value === null || b.value === undefined) delete store[b.key];
+            else store[b.key] = String(b.value);
+            queueStoreSave();
+          } else if (b && b.bulk && typeof b.bulk === 'object') {
+            Object.keys(b.bulk).forEach(k => { store[k] = String(b.bulk[k]); });
+            queueStoreSave();
+          }
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end('{"ok":true}');
+        } catch (e) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end('{"error":"bad json"}');
+        }
+      });
+      return;
+    }
+    if (req.method === 'POST' && req.url === '/api/video-frames') {
+      // Body is JSON { dataB64 } — renderer base64-encodes the video. We decode and
+      // sample frames with bundled ffmpeg (codec-independent), returning base64 JPEGs.
+      let raw = '';
+      req.on('data', c => { raw += c; });
+      req.on('end', async () => {
+        let b; try { b = JSON.parse(raw); } catch { res.writeHead(400, { 'Content-Type': 'application/json' }); res.end('{"error":"bad json"}'); return; }
+        try {
+          const buf = Buffer.from(b.dataB64 || '', 'base64');
+          if (!buf.length) { res.writeHead(400, { 'Content-Type': 'application/json' }); res.end('{"error":"empty file"}'); return; }
+          const r = await extractVideoFrames(buf, { dense: !!b.dense, scenes: !!b.scenes });
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify(r));
+        } catch (e) {
+          log(`video-frames error: ${e.message}`);
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: (e.message || 'could not read the video').slice(0, 200) }));
+        }
+      });
+      return;
     }
     if (req.url.startsWith('/api/job/') && req.method === 'GET') {
       const jid = req.url.slice('/api/job/'.length);
@@ -861,11 +1308,26 @@ function openSettingsWindow() {
   settingsWindow.loadURL(`http://127.0.0.1:${proxyPort}/settings.html`);
 }
 
+// Navigate the main window to a page served by the local proxy (Home / a tool).
+// Both tools are separate pages; the launcher (home.html) and this navigation are
+// standalone-only — the shared Notes Intel page (index.html) is never modified.
+function navMain(pagePath) {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.loadURL(`http://127.0.0.1:${proxyPort}${pagePath}`);
+  }
+}
+
 function setupAppMenu() {
   const menu = Menu.buildFromTemplate([
     {
       label: 'Notes Intel',
       submenu: [
+        { label: 'Home', accelerator: 'CmdOrCtrl+Shift+H', click: () => navMain('/home.html') },
+        { label: 'Notes Intel', click: () => navMain('/index.html') },
+        { label: 'Sprint Review', accelerator: 'CmdOrCtrl+R', click: () => navMain('/sprint-review.html') },
+        { label: 'Meeting Notes', accelerator: 'CmdOrCtrl+Shift+M', click: () => navMain('/meeting-notes.html') },
+        { label: 'Sprint Goals', accelerator: 'CmdOrCtrl+Shift+G', click: () => navMain('/sprint-goals.html') },
+        { type: 'separator' },
         { label: 'Settings…', accelerator: 'CmdOrCtrl+,', click: openSettingsWindow },
         { type: 'separator' },
         { label: 'Quit Notes Intel', accelerator: 'CmdOrCtrl+Q', click: () => app.quit() },
@@ -888,12 +1350,12 @@ function setupAppMenu() {
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 820,
+    width: 1160,
     height: 900,
-    minWidth: 680,
+    minWidth: 760,
     minHeight: 600,
     show: false,
-    title: 'Notes Intel',
+    title: "Hema's Dashboard",
     backgroundColor: '#080809',
     icon: path.join(__dirname, '..', 'electron-resources', 'icon.ico'),
     webPreferences: {
@@ -905,7 +1367,7 @@ function createWindow() {
 
   mainWindow.once('ready-to-show', () => mainWindow.show());
   mainWindow.webContents.setWindowOpenHandler(({ url }) => { shell.openExternal(url); return { action: 'deny' }; });
-  mainWindow.loadURL(`http://127.0.0.1:${proxyPort}`);
+  mainWindow.loadURL(`http://127.0.0.1:${proxyPort}/home.html`);
 }
 
 // ---------------------------------------------------------------------------

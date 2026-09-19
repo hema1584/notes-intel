@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'; frame-ancestors 'self';">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sprint Goals</title>
+<style>@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Sora:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+ --bg:#0d0d0f;--bg2:#111116;--border:#3a3a48;--border2:#454556;--line:#1e1e28;
+ --teal:#5DCAA5;--teal-dark:#04342C;--amber:#EF9F27;--blue:#378ADD;--purple:#AFA9EC;--red:#F09595;
+ --muted:#7a7a8c;--text:#d2d2dd;--text2:#a2a2b2;--text3:#868698;
+ --maxw:1460px;
+}
+html{background:#080809;min-height:100vh;}
+body{font-family:'Sora',sans-serif;color:var(--text);background:#080809;display:flex;flex-direction:row;align-items:stretch;min-height:100vh;}
+
+/* ── sidebar ─────────────────────────────────────────────── */
+.sidebar{width:264px;flex-shrink:0;background:#0b0b0e;border-right:0.5px solid #1c1c24;display:flex;flex-direction:column;height:100vh;position:sticky;top:0;overflow-y:auto;}
+.sb-hd{padding:16px 15px 12px;border-bottom:0.5px solid #1c1c24;}
+.sb-title{font-size:11px;font-family:'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);}
+.sb-sub{font-size:10.5px;color:#5a5a66;font-family:'JetBrains Mono',monospace;margin-top:5px;line-height:1.5;}
+.sb-body{padding:14px 15px 26px;display:flex;flex-direction:column;gap:18px;}
+.sb-group{display:flex;flex-direction:column;gap:8px;}
+.sb-glabel{font-size:10px;font-family:'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);display:flex;align-items:center;gap:6px;}
+.sb-glabel .pip{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.fhint{font-size:10.5px;color:#5a5a66;font-family:'JetBrains Mono',monospace;line-height:1.55;}
+.inp,.ta,select{background:var(--bg2);border:0.5px solid var(--border);border-radius:8px;padding:8px 11px;font-size:12.5px;font-family:'Sora',sans-serif;color:var(--text);outline:none;width:100%;transition:border-color .15s;}
+.inp:focus,.ta:focus,select:focus{border-color:#1D9E7560;}
+.inp::placeholder,.ta::placeholder{color:var(--muted);}
+.inp.mono{font-family:'JetBrains Mono',monospace;font-size:11px;}
+.ta{line-height:1.6;min-height:104px;resize:vertical;font-family:'JetBrains Mono',monospace;font-size:11px;white-space:pre;overflow-wrap:normal;overflow-x:auto;}
+.btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 13px;border-radius:8px;border:0.5px solid var(--border);background:var(--bg2);font-size:12px;color:var(--text2);cursor:pointer;font-family:'Sora',sans-serif;transition:all .15s;width:100%;}
+.btn:hover{border-color:var(--border2);color:var(--text);}
+.btn.go{border-color:#1D9E7560;color:var(--teal);}
+.btn.go:hover{background:#0f1c18;border-color:var(--teal);}
+.btn:disabled{opacity:.45;cursor:default;}
+.btn-row{display:flex;gap:7px;}
+.toggle{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--text2);cursor:pointer;user-select:none;}
+.toggle input{accent-color:var(--teal);width:13px;height:13px;cursor:pointer;}
+.seg{display:flex;border:0.5px solid var(--border);border-radius:8px;overflow:hidden;}
+.seg button{flex:1;padding:6px 4px;background:transparent;border:0;border-right:0.5px solid var(--border);font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--text3);cursor:pointer;transition:all .15s;}
+.seg button:last-child{border-right:0;}
+.seg button.on{background:#141c19;color:var(--teal);}
+.synced{font-size:10px;font-family:'JetBrains Mono',monospace;color:#5a5a66;line-height:1.5;}
+.synced b{color:var(--teal);font-weight:400;}
+.synced.err b{color:var(--red);}
+.maprow{display:grid;grid-template-columns:66px 1fr;gap:6px;align-items:center;}
+.maprow span{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;}
+.maprow select{padding:5px 7px;font-size:11px;font-family:'JetBrains Mono',monospace;}
+
+/* ── main ────────────────────────────────────────────────── */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;padding:20px 20px 70px;}
+.mwrap{width:100%;max-width:var(--maxw);display:flex;flex-direction:column;gap:14px;}
+.topbar{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap;}
+.tb-left{display:flex;flex-direction:column;gap:3px;}
+.tb-eyebrow{font-size:10px;font-family:'JetBrains Mono',monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--amber);}
+h1{font-size:21px;font-weight:600;color:#edeef2;letter-spacing:.01em;}
+.tb-right{display:flex;align-items:flex-end;gap:9px;}
+.sprint-fld{display:flex;flex-direction:column;gap:4px;}
+.sprint-fld label{font-size:9.5px;font-family:'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);}
+.sprint-fld input{width:132px;background:var(--bg2);border:0.5px solid var(--border);border-radius:8px;padding:7px 11px;font-size:13px;font-family:'Sora',sans-serif;font-weight:500;color:var(--text);outline:none;}
+.sprint-fld input:focus{border-color:#1D9E7560;}
+.tb-btn{padding:8px 13px;border-radius:8px;border:0.5px solid var(--border);background:var(--bg2);font-size:12px;color:var(--text2);cursor:pointer;font-family:'Sora',sans-serif;transition:all .15s;white-space:nowrap;}
+.tb-btn:hover{border-color:var(--border2);color:var(--text);}
+.tb-btn.pri{border-color:#1D9E7560;color:var(--teal);}
+.tb-btn.pri:hover{background:#0f1c18;border-color:var(--teal);}
+
+/* ── rollup ──────────────────────────────────────────────── */
+.rollup{display:flex;flex-wrap:wrap;background:var(--bg);border:1px solid #33333f;border-radius:12px;overflow:hidden;}
+.stat{flex:1 1 108px;padding:10px 14px 11px;border-right:0.5px solid var(--line);}
+.stat:last-child{border-right:0;}
+.stat b{display:block;font-family:'JetBrains Mono',monospace;font-size:19px;font-weight:500;line-height:1.2;font-variant-numeric:tabular-nums;color:var(--text);}
+.stat span{font-size:10.5px;color:var(--text3);}
+.stat.done b{color:var(--teal);}
+.stat.act b{color:var(--amber);}
+.stat.risk b{color:var(--red);}
+.stat.blue b{color:var(--blue);}
+
+/* ── notices ─────────────────────────────────────────────── */
+.notices{display:flex;flex-direction:column;gap:6px;}
+.notice{display:flex;gap:9px;align-items:baseline;padding:8px 13px;border-radius:9px;font-size:12px;background:var(--bg);border:0.5px solid var(--border);border-left:2px solid var(--amber);line-height:1.5;}
+.notice.bad{border-left-color:var(--red);}
+.notice.ok{border-left-color:var(--teal);}
+.notice .tag{font-size:9.5px;font-family:'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);white-space:nowrap;padding-top:1px;}
+.notice em{font-style:normal;color:#edeef2;}
+
+/* ── board ───────────────────────────────────────────────── */
+.board-wrap{background:var(--bg);border:1px solid #33333f;border-radius:12px;overflow:hidden;}
+.board-scroll{overflow-x:auto;}
+.board{min-width:900px;}
+.bhead,.grow{display:grid;grid-template-columns:minmax(210px,1.1fr) 158px minmax(400px,2.5fr);}
+.bhead{position:sticky;top:0;z-index:3;background:#101014;border-bottom:1px solid #2a2a34;}
+.bhead>div{font-size:9.5px;font-family:'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);padding:10px 15px 9px;border-right:0.5px solid var(--line);}
+.bhead>div:last-child{border-right:0;}
+.grow{border-bottom:0.5px solid var(--line);}
+.grow:last-child{border-bottom:0;}
+.grow>*{padding:13px 15px;border-right:0.5px solid var(--line);min-width:0;}
+.grow>*:last-child{border-right:0;}
+.grow.off{background:#131010;}
+.cgoal{display:flex;flex-direction:column;gap:8px;border-left:2px solid var(--muted);}
+.cgoal.s-done{border-left-color:var(--teal);}
+.cgoal.s-act{border-left-color:var(--amber);}
+.cgoal.s-risk{border-left-color:var(--red);}
+.gtext{font-size:14px;font-weight:500;line-height:1.35;color:#edeef2;}
+.gmeta{display:flex;flex-wrap:wrap;align-items:center;gap:5px;}
+.newflag{font-size:9px;font-family:'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--amber);background:#EF9F2718;border:0.5px solid #EF9F2740;padding:2px 5px;border-radius:4px;}
+.prog{display:flex;align-items:center;gap:8px;}
+.pbar{flex:1;height:4px;background:#1e1e28;border-radius:3px;overflow:hidden;min-width:40px;}
+.pbar i{display:block;height:100%;background:var(--teal);border-radius:3px;}
+.pnum{font-size:10.5px;font-family:'JetBrains Mono',monospace;color:var(--text3);font-variant-numeric:tabular-nums;white-space:nowrap;}
+.cown{display:flex;flex-direction:column;gap:5px;}
+.oname{font-size:13px;font-weight:500;color:#edeef2;line-height:1.35;}
+.osub{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--text3);font-variant-numeric:tabular-nums;}
+.ctasks{display:flex;flex-direction:column;}
+.task{display:grid;grid-template-columns:82px minmax(0,1fr) auto;gap:4px 10px;align-items:baseline;padding:6px 0;border-top:0.5px dashed #23232e;}
+.task:first-child{border-top:0;padding-top:0;}
+.tkey{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--teal);text-decoration:none;}
+a.tkey:hover{text-decoration:underline;}
+.tsum{font-size:12px;line-height:1.45;color:var(--text);overflow-wrap:anywhere;}
+.tsum .pts{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--text3);margin-left:6px;font-variant-numeric:tabular-nums;}
+.chips{display:flex;align-items:center;gap:5px;justify-self:end;white-space:nowrap;}
+.pill{font-size:9.5px;font-family:'JetBrains Mono',monospace;padding:2px 6px;border-radius:4px;background:#1e1e28;color:var(--text3);white-space:nowrap;}
+.pill.s-done{background:#5DCAA518;color:var(--teal);}
+.pill.s-act{background:#EF9F2718;color:var(--amber);}
+.pill.s-risk{background:#F0959518;color:var(--red);}
+.chip{font-size:9.5px;font-family:'JetBrains Mono',monospace;padding:2px 6px;border-radius:4px;border:0.5px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;min-width:66px;text-align:center;transition:all .13s;}
+.chip:hover{border-color:var(--border2);color:var(--text);}
+.chip.drv{border-style:dashed;}
+.chip.on-teal{border-color:#1D9E7560;background:#5DCAA512;color:var(--teal);border-style:solid;}
+.chip.on-amber{border-color:#EF9F2740;background:#EF9F2712;color:var(--amber);border-style:solid;}
+.chip.on-red{border-color:#A32D2D60;background:#F0959512;color:var(--red);border-style:solid;}
+.chip.on-blue{border-color:#378ADD50;background:#378ADD12;color:var(--blue);border-style:solid;}
+.notasks{font-size:12px;color:var(--amber);font-style:italic;}
+.empty{padding:46px 20px;text-align:center;color:var(--text3);font-size:12.5px;line-height:1.7;}
+.empty b{display:block;color:var(--text2);font-size:13.5px;font-weight:500;margin-bottom:6px;}
+
+.foot{font-size:10.5px;font-family:'JetBrains Mono',monospace;color:#4e4e5a;line-height:1.7;padding:2px 2px 0;}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#1a1a22;border:0.5px solid var(--border2);color:var(--text);font-size:12px;padding:9px 17px;border-radius:9px;z-index:40;box-shadow:0 8px 26px rgba(0,0,0,.6);}
+#copysrc{position:absolute;left:-9999px;top:0;width:900px;}
+@media(max-width:900px){.sidebar{display:none;}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;}}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sb-hd">
+    <div class="sb-title">Sprint Goals</div>
+    <div class="sb-sub">Goal → owner → tasks,<br>on one page.</div>
+  </div>
+  <div class="sb-body">
+
+    <div class="sb-group">
+      <div class="sb-glabel"><span class="pip" style="background:var(--teal)"></span>Source</div>
+      <div class="seg" id="seg-src">
+        <button data-src="sheet" class="on">Sheet link</button>
+        <button data-src="paste">Paste</button>
+      </div>
+
+      <div id="src-sheet" style="display:flex;flex-direction:column;gap:8px">
+        <input id="sheet-url" class="inp mono" placeholder="https://docs.google.com/spreadsheets/d/…" spellcheck="false">
+        <div class="fhint">The sheet must be shared as <b>anyone with the link can view</b>, or published to the web. Fetched by the app, not the page.</div>
+        <button class="btn go" id="btn-sync">Sync from sheet</button>
+        <label class="toggle"><input type="checkbox" id="auto-ref"> Auto-refresh every 5 min</label>
+        <div class="synced" id="synced">Not synced yet.</div>
+      </div>
+
+      <div id="src-paste" style="display:none;flex-direction:column;gap:8px">
+        <div class="fhint">Paste the rows straight out of the sheet (or a Jira CSV export). Header row included.</div>
+        <textarea id="paste-rows" class="ta" spellcheck="false" placeholder="Key&#9;Summary&#9;Status&#9;Assignee&#9;Goal"></textarea>
+      </div>
+    </div>
+
+    <div class="sb-group">
+      <div class="sb-glabel"><span class="pip" style="background:var(--amber)"></span>Goals <span id="goal-mode" style="margin-left:auto;color:var(--text3);text-transform:none;letter-spacing:0"></span></div>
+      <div class="fhint" id="goal-hint">If the sheet has a Goal column it is used directly. Otherwise paste the Slack goals here and they join on the assignee's first name.</div>
+      <textarea id="goals-txt" class="ta" spellcheck="false" placeholder="Philip - Continue towards prop support in map layout tool&#10;Maciej - Localization web tool !"></textarea>
+    </div>
+
+    <div class="sb-group" id="map-group" style="display:none">
+      <div class="sb-glabel"><span class="pip" style="background:var(--blue)"></span>Columns</div>
+      <div class="fhint">Detected from the header row — override any that landed wrong.</div>
+      <div id="mapping" style="display:flex;flex-direction:column;gap:6px"></div>
+    </div>
+
+    <div class="sb-group">
+      <div class="sb-glabel"><span class="pip" style="background:var(--purple)"></span>Jira</div>
+      <input id="jira-base" class="inp mono" placeholder="https://your.atlassian.net" spellcheck="false">
+      <div class="fhint">Makes each task key a link to the real ticket.</div>
+    </div>
+
+  </div>
+</aside>
+
+<main class="main">
+  <div class="mwrap">
+
+    <div class="topbar">
+      <div class="tb-left">
+        <div class="tb-eyebrow">Pre-planning &amp; in-sprint view</div>
+        <h1>Sprint Goals</h1>
+      </div>
+      <div class="tb-right">
+        <div class="sprint-fld">
+          <label for="sprint">Sprint</label>
+          <input id="sprint" spellcheck="false" placeholder="Sprint 28">
+        </div>
+        <button class="tb-btn pri" id="btn-cortex">Copy Cortex table</button>
+        <button class="tb-btn" id="btn-text">Copy as text</button>
+      </div>
+    </div>
+
+    <div class="rollup" id="rollup"></div>
+    <div class="notices" id="notices"></div>
+
+    <div class="board-wrap">
+      <div class="board-scroll">
+        <div class="board">
+          <div class="bhead">
+            <div>Sprint goal</div>
+            <div>Assignee / responsible</div>
+            <div>Tasks mapped (Jira) → state</div>
+          </div>
+          <div id="rows"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="foot">
+      Snapshot of the sheet at the last sync — nothing here writes back to Jira or the sheet. QA and CR chips are your own overlay: click to set, dashed means derived from the task status. Stored locally per sprint.
+    </div>
+
+  </div>
+</main>
+
+<div id="copysrc" aria-hidden="true"></div>
+
+<script>
+"use strict";
+
+var QA_STATES = ["—", "Ready", "Testing", "Passed", "Failed", "N/A"];
+var CR_STATES = ["—", "PR open", "Changes req", "Approved", "Merged", "N/A"];
+var FIELDS = [
+  { k: "key",      label: "Key",      exact: [/^issue ?key$/i, /^key$/i, /^ticket$/i, /^id$/i],
+                                      loose: [/key/i, /^ticket/i, /issue/i] },
+  { k: "summary",  label: "Summary",  exact: [/^summary$/i, /^title$/i, /^task$/i, /^description$/i],
+                                      loose: [/summary/i, /descript/i, /^task/i] },
+  { k: "status",   label: "Status",   exact: [/^status$/i, /^state$/i, /^progress$/i, /^jira status$/i, /^task status$/i],
+                                      loose: [/^(?!qa|code|pr|review).*status/i, /state/i, /progress/i] },
+  { k: "assignee", label: "Assignee", exact: [/^assignee$/i, /^owner$/i, /^who$/i, /^responsible$/i, /^assigned to$/i],
+                                      loose: [/assignee/i, /assigned/i, /responsib/i, /owner/i] },
+  { k: "goal",     label: "Goal",     exact: [/^goal$/i, /^sprint ?goal$/i, /^theme$/i, /^objective$/i],
+                                      loose: [/goal/i, /theme/i, /objective/i] },
+  { k: "points",   label: "Points",   exact: [/^story ?points?$/i, /^points?$/i, /^sp$/i, /^estimate$/i],
+                                      loose: [/story ?points?/i, /points?/i, /estimate/i] },
+  { k: "sprint",   label: "Sprint",   exact: [/^sprint$/i, /^iteration$/i, /^sprint sort$/i],
+                                      loose: [/sprint/i, /iteration/i] },
+  { k: "qa",       label: "QA",       exact: [/^qa$/i, /^qa status$/i, /^testing$/i, /^test status$/i, /^qa state$/i],
+                                      loose: [/qa/i, /testing/i] },
+  { k: "cr",       label: "Code rev", exact: [/^code ?review$/i, /^cr$/i, /^review$/i, /^pr$/i, /^pull request$/i],
+                                      loose: [/code ?review/i, /review/i, /pull ?request/i, /pr/i] }
+];
+
+var rawTable = null;       // { header:[], rows:[[]] }
+var mapOverride = {};      // field -> column index (-1 = none)
+var overrides = {};        // "qa:KEY" -> state
+var lastHTML = "", lastText = "";
+var autoTimer = null;
+
+function $(s) { return document.querySelector(s); }
+function el(t, c, x) { var n = document.createElement(t); if (c) n.className = c; if (x != null) n.textContent = x; return n; }
+function store(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+function pull(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+
+/* ── CSV / TSV parsing (handles quoted cells with commas + newlines) ── */
+function parseTable(text) {
+  if (!text || !text.trim()) return null;
+  var head = text.split(/\r?\n/, 1)[0] || "";
+  var delim = head.indexOf("\t") > -1 ? "\t"
+            : (head.indexOf(",") > -1 ? ","
+            : (head.indexOf(";") > -1 ? ";"
+            : (head.indexOf("|") > -1 ? "|" : ",")));
+  var rows = [], row = [], cur = "", inQ = false, i;
+  for (i = 0; i < text.length; i++) {
+    var ch = text[i];
+    if (inQ) {
+      if (ch === '"') {
+        if (text[i + 1] === '"') { cur += '"'; i++; } else { inQ = false; }
+      } else { cur += ch; }
+    } else if (ch === '"') {
+      inQ = true;
+    } else if (ch === delim) {
+      row.push(cur); cur = "";
+    } else if (ch === "\n") {
+      row.push(cur); cur = ""; rows.push(row); row = [];
+    } else if (ch !== "\r") {
+      cur += ch;
+    }
+  }
+  row.push(cur);
+  rows.push(row);
+  rows = rows.filter(function (r) { return r.some(function (c) { return String(c).trim() !== ""; }); });
+  if (!rows.length) return null;
+  var header = rows[0].map(function (c) { return String(c).trim(); });
+  return { header: header, rows: rows.slice(1) };
+}
+
+function detectMap(header) {
+  // Two passes on purpose. A loose pattern must never outrank another field's
+  // exact header name — otherwise /status/i claims "QA Status" before /^state$/i
+  // gets a look at "State", and the QA column is left unmapped.
+  var used = {}, out = {};
+  FIELDS.forEach(function (f) { out[f.k] = -1; });
+  ["exact", "loose"].forEach(function (tier) {
+    FIELDS.forEach(function (f) {
+      if (out[f.k] > -1) return;
+      var pats = f[tier] || [];
+      for (var p = 0; p < pats.length && out[f.k] < 0; p++) {
+        for (var c = 0; c < header.length; c++) {
+          if (!used[c] && pats[p].test(header[c])) { out[f.k] = c; used[c] = 1; break; }
+        }
+      }
+    });
+  });
+  return out;
+}
+function activeMap() {
+  if (!rawTable) return {};
+  var m = detectMap(rawTable.header);
+  Object.keys(mapOverride).forEach(function (k) { m[k] = mapOverride[k]; });
+  return m;
+}
+
+/* ── goals pasted as text ────────────────────────────────── */
+function parseGoalText(text) {
+  var out = [];
+  text.split(/\r?\n/).forEach(function (raw) {
+    var s = raw.trim();
+    if (!s) return;
+    s = s.replace(/^[-•*•▪]\s+/, "").replace(/^\d+[.)]\s+/, "");
+    var m = s.match(/^([^\-–—:|]{1,44}?)\s*[-–—:|]\s+(.+)$/);
+    if (!m) return;
+    var name = m[1].trim().replace(/[*_`]/g, "");
+    var goal = m[2].trim();
+    if (!name || !goal || name.split(/\s+/).length > 4) return;
+    var isNew = false;
+    if (/[!❗‼]\s*$/.test(goal)) { isNew = true; goal = goal.replace(/[\s!❗‼️]+$/, ""); }
+    out.push({ name: name, goal: goal, isNew: isNew, tasks: [] });
+  });
+  return out;
+}
+
+/* ── state derivation ────────────────────────────────────── */
+function statusClass(s) {
+  s = String(s || "").toLowerCase();
+  if (/block|impedi|on hold|waiting|failed|reopen/.test(s)) return "s-risk";
+  if (/done|closed|resolved|complete|shipped|released/.test(s)) return "s-done";
+  if (/progress|review|qa|test|verif|implement|doing/.test(s)) return "s-act";
+  return "";
+}
+function derivedQA(t) {
+  if (t.qaRaw) return normState(t.qaRaw, QA_STATES);
+  var s = String(t.status || "").toLowerCase();
+  if (/in qa|qa in|testing|in test|verif/.test(s)) return "Testing";
+  if (/ready for (qa|test)|awaiting (qa|test)/.test(s)) return "Ready";
+  if (/done|closed|resolved|complete|shipped|released/.test(s)) return "Passed";
+  return "—";
+}
+function derivedCR(t) {
+  if (t.crRaw) return normState(t.crRaw, CR_STATES);
+  var s = String(t.status || "").toLowerCase();
+  if (/changes? request/.test(s)) return "Changes req";
+  if (/code review|in review|peer review|review/.test(s)) return "PR open";
+  if (/done|closed|resolved|complete|shipped|released|in qa|testing/.test(s)) return "Merged";
+  return "—";
+}
+function normState(raw, list) {
+  var v = String(raw).trim();
+  if (!v) return "—";
+  var lower = v.toLowerCase();
+  for (var i = 0; i < list.length; i++) {
+    if (list[i].toLowerCase() === lower) return list[i];
+  }
+  if (/pass|ok|green|done/.test(lower)) return list === QA_STATES ? "Passed" : "Merged";
+  if (/fail|bug|red/.test(lower)) return list === QA_STATES ? "Failed" : "Changes req";
+  if (/test|progress/.test(lower)) return list === QA_STATES ? "Testing" : "PR open";
+  if (/ready|waiting/.test(lower)) return list === QA_STATES ? "Ready" : "PR open";
+  if (/approve/.test(lower)) return list === QA_STATES ? "Passed" : "Approved";
+  if (/n\/?a|none|no/.test(lower)) return "N/A";
+  return v.slice(0, 12);
+}
+function resolve(kind, t) {
+  var k = kind + ":" + t.key;
+  if (Object.prototype.hasOwnProperty.call(overrides, k)) return overrides[k];
+  return kind === "qa" ? derivedQA(t) : derivedCR(t);
+}
+function isDerived(kind, t) { return !Object.prototype.hasOwnProperty.call(overrides, kind + ":" + t.key); }
+function chipTone(kind, v) {
+  if (v === "—" || v === "N/A") return "";
+  if (kind === "qa") {
+    if (v === "Passed") return "on-teal";
+    if (v === "Failed") return "on-red";
+    if (v === "Testing") return "on-blue";
+    return "on-amber";
+  }
+  if (v === "Approved" || v === "Merged") return "on-teal";
+  if (v === "Changes req") return "on-red";
+  return "on-amber";
+}
+function firstName(s) { return String(s || "").trim().split(/[\s,]+/)[0].toLowerCase(); }
+
+/* ── model ───────────────────────────────────────────────── */
+function build() {
+  var m = activeMap();
+  var sprintLabel = $("#sprint").value.trim();
+  var tasks = [], sprintFiltered = 0;
+
+  if (rawTable) {
+    var cell = function (r, k) { return m[k] > -1 && r[m[k]] != null ? String(r[m[k]]).trim() : ""; };
+    rawTable.rows.forEach(function (r) {
+      if (m.sprint > -1 && sprintLabel) {
+        var sv = cell(r, "sprint");
+        if (sv && sv.toLowerCase().indexOf(sprintLabel.toLowerCase()) < 0) { sprintFiltered++; return; }
+      }
+      var key = cell(r, "key"), sum = cell(r, "summary");
+      if (!key && !sum) return;
+      tasks.push({
+        key: key || "—",
+        summary: sum || "(no summary)",
+        status: cell(r, "status") || "Unknown",
+        assignee: cell(r, "assignee"),
+        goal: cell(r, "goal"),
+        qaRaw: cell(r, "qa"),
+        crRaw: cell(r, "cr"),
+        points: parseFloat(cell(r, "points")) || 0
+      });
+    });
+  }
+
+  var goals = [], orphans = {}, mode;
+  var hasGoalCol = m.goal > -1 && tasks.some(function (t) { return t.goal; });
+
+  if (hasGoalCol) {
+    mode = "sheet";
+    var byGoal = {};
+    tasks.forEach(function (t) {
+      var g = t.goal.trim();
+      if (!g) {
+        var lbl = t.assignee.trim() || "Unassigned";
+        if (!orphans[lbl]) orphans[lbl] = [];
+        orphans[lbl].push(t);
+        return;
+      }
+      var isNew = false, gclean = g;
+      if (/[!❗‼]\s*$/.test(gclean)) { isNew = true; gclean = gclean.replace(/[\s!❗‼️]+$/, ""); }
+      if (!byGoal[gclean]) {
+        byGoal[gclean] = { name: "", goal: gclean, isNew: isNew, tasks: [], who: {} };
+        goals.push(byGoal[gclean]);
+      }
+      byGoal[gclean].tasks.push(t);
+      if (t.assignee.trim()) byGoal[gclean].who[t.assignee.trim()] = 1;
+    });
+    goals.forEach(function (g) {
+      var names = Object.keys(g.who);
+      g.name = names.length ? names.join(", ") : "Unassigned";
+    });
+  } else {
+    mode = "text";
+    goals = parseGoalText($("#goals-txt").value);
+    var byName = {};
+    goals.forEach(function (g) { byName[firstName(g.name)] = g; });
+    tasks.forEach(function (t) {
+      var fn = firstName(t.assignee);
+      if (fn && byName[fn]) { byName[fn].tasks.push(t); }
+      else {
+        var lbl = t.assignee.trim() || "Unassigned";
+        if (!orphans[lbl]) orphans[lbl] = [];
+        orphans[lbl].push(t);
+      }
+    });
+  }
+
+  return { goals: goals, orphans: orphans, tasks: tasks, mode: mode, filtered: sprintFiltered, hasRows: !!rawTable };
+}
+
+function goalStats(g) {
+  var s = { done: 0, total: g.tasks.length, pts: 0, qa: 0, cr: 0, risk: 0 };
+  g.tasks.forEach(function (t) {
+    var c = statusClass(t.status);
+    if (c === "s-done") s.done++;
+    if (c === "s-risk") s.risk++;
+    s.pts += t.points;
+    var qa = resolve("qa", t), cr = resolve("cr", t);
+    if (qa === "Testing" || qa === "Ready") s.qa++;
+    if (cr === "PR open" || cr === "Changes req") s.cr++;
+  });
+  return s;
+}
+
+/* ── render ──────────────────────────────────────────────── */
+function jiraBase() {
+  var b = ($("#jira-base").value || "").trim().replace(/\/+$/, "");
+  if (b && !/^https?:\/\//i.test(b)) b = "https://" + b;
+  return b;
+}
+function keyNode(key) {
+  var base = jiraBase();
+  if (!base || !/^[A-Z][A-Z0-9]{1,9}-\d+$/.test(key)) return el("span", "tkey", key);
+  var a = el("a", "tkey", key);
+  a.href = base + "/browse/" + key;
+  a.target = "_blank";
+  a.rel = "noopener noreferrer";
+  a.title = "Open " + key + " in Jira";
+  return a;
+}
+
+function renderTask(t) {
+  var row = el("div", "task");
+  row.appendChild(keyNode(t.key));
+  var sum = el("span", "tsum", t.summary);
+  if (t.points) sum.appendChild(el("span", "pts", t.points + " pt"));
+  row.appendChild(sum);
+  var chips = el("div", "chips");
+  chips.appendChild(el("span", "pill " + statusClass(t.status), t.status));
+  ["qa", "cr"].forEach(function (kind) {
+    var v = resolve(kind, t);
+    var b = el("button", "chip " + chipTone(kind, v) + (isDerived(kind, t) ? " drv" : ""),
+               (kind === "qa" ? "QA " : "CR ") + v);
+    b.title = isDerived(kind, t)
+      ? 'Derived from "' + t.status + '" — click to set by hand'
+      : "Set by hand — click to change";
+    b.addEventListener("click", function () {
+      var list = kind === "qa" ? QA_STATES : CR_STATES;
+      var i = list.indexOf(v);
+      overrides[kind + ":" + t.key] = list[(i + 1) % list.length];
+      store(ovKey(), JSON.stringify(overrides));
+      render();
+    });
+    chips.appendChild(b);
+  });
+  row.appendChild(chips);
+  return row;
+}
+
+function renderGoalRow(g) {
+  var s = goalStats(g);
+  var row = el("div", "grow");
+  var tone = s.risk ? "s-risk" : (s.total && s.done === s.total ? "s-done" : (s.done || s.qa || s.cr ? "s-act" : ""));
+  var gc = el("div", "cgoal " + tone);
+  gc.appendChild(el("div", "gtext", g.goal));
+  var meta = el("div", "gmeta");
+  if (g.isNew) meta.appendChild(el("span", "newflag", "New topic"));
+  if (s.qa) meta.appendChild(el("span", "pill s-act", s.qa + " in QA"));
+  if (s.cr) meta.appendChild(el("span", "pill", s.cr + " in review"));
+  if (s.risk) meta.appendChild(el("span", "pill s-risk", s.risk + " blocked"));
+  if (meta.childNodes.length) gc.appendChild(meta);
+  var prog = el("div", "prog"), bar = el("div", "pbar"), fill = el("i");
+  fill.style.width = (s.total ? Math.round((s.done / s.total) * 100) : 0) + "%";
+  bar.appendChild(fill); prog.appendChild(bar);
+  prog.appendChild(el("span", "pnum", s.done + "/" + s.total + " done"));
+  gc.appendChild(prog);
+  row.appendChild(gc);
+
+  var own = el("div", "cown");
+  own.appendChild(el("div", "oname", g.name || "—"));
+  own.appendChild(el("div", "osub", s.total + (s.total === 1 ? " task" : " tasks") + (s.pts ? " · " + s.pts + " pts" : "")));
+  row.appendChild(own);
+
+  var tc = el("div", "ctasks");
+  if (!g.tasks.length) tc.appendChild(el("div", "notasks", "No tasks mapped yet — pull some in before planning."));
+  else g.tasks.forEach(function (t) { tc.appendChild(renderTask(t)); });
+  row.appendChild(tc);
+  return row;
+}
+
+function renderOrphan(label, list) {
+  var row = el("div", "grow off");
+  var gc = el("div", "cgoal");
+  gc.appendChild(el("div", "gtext", "No goal on the list"));
+  var meta = el("div", "gmeta");
+  meta.appendChild(el("span", "pill s-act", "Off-goal work"));
+  gc.appendChild(meta);
+  row.appendChild(gc);
+  var own = el("div", "cown");
+  own.appendChild(el("div", "oname", label));
+  own.appendChild(el("div", "osub", list.length + (list.length === 1 ? " task" : " tasks")));
+  row.appendChild(own);
+  var tc = el("div", "ctasks");
+  list.forEach(function (t) { tc.appendChild(renderTask(t)); });
+  row.appendChild(tc);
+  return row;
+}
+
+function renderRollup(model) {
+  var box = $("#rollup");
+  box.textContent = "";
+  var mapped = 0, done = 0, qa = 0, cr = 0, risk = 0, empty = 0, off = 0;
+  model.goals.forEach(function (g) {
+    var s = goalStats(g);
+    mapped += s.total; done += s.done; qa += s.qa; cr += s.cr; risk += s.risk;
+    if (!s.total) empty++;
+  });
+  Object.keys(model.orphans).forEach(function (k) { off += model.orphans[k].length; });
+  [
+    { n: model.goals.length, l: "goals", c: "" },
+    { n: mapped, l: "tasks mapped", c: "" },
+    { n: done, l: "done", c: "done" },
+    { n: qa, l: "in QA", c: "blue" },
+    { n: cr, l: "in code review", c: "act" },
+    { n: risk, l: "blocked", c: risk ? "risk" : "" },
+    { n: empty, l: "goals with no tasks", c: empty ? "risk" : "" },
+    { n: off, l: "off-goal tasks", c: off ? "act" : "" }
+  ].forEach(function (s) {
+    var d = el("div", "stat " + s.c);
+    d.appendChild(el("b", null, String(s.n)));
+    d.appendChild(el("span", null, s.l));
+    box.appendChild(d);
+  });
+}
+
+function renderNotices(model) {
+  var box = $("#notices");
+  box.textContent = "";
+  function push(kind, tag, text, em) {
+    var d = el("div", "notice " + kind);
+    d.appendChild(el("span", "tag", tag));
+    var p = el("span");
+    if (em) { p.appendChild(el("em", null, em)); p.appendChild(document.createTextNode(" " + text)); }
+    else { p.textContent = text; }
+    d.appendChild(p);
+    box.appendChild(d);
+  }
+  if (!model.hasRows) return;
+  if (model.mode === "text" && !model.goals.length) {
+    push("", "no goals", "The sheet has no Goal column, so paste the Slack goals in the sidebar. Lines read “Name - goal”.");
+    return;
+  }
+  var bare = model.goals.filter(function (g) { return !g.tasks.length; }).map(function (g) { return g.name || g.goal; });
+  if (bare.length) push("bad", "coverage", "— nothing pulled in for " + (bare.length === 1 ? "this goal" : "these goals") + " yet.", bare.join(", "));
+  var orph = Object.keys(model.orphans);
+  if (orph.length) push("", "unmapped", "— tasks that don't match a goal. Check the name spelling, or accept it as off-goal work.", orph.join(", "));
+  if (model.filtered) push("", "sprint filter", model.filtered + " row" + (model.filtered === 1 ? "" : "s") + " hidden — the sheet's Sprint column didn't match “" + $("#sprint").value.trim() + "”.");
+  var noEst = model.tasks.filter(function (t) { return !t.points; }).length;
+  if (noEst && noEst < model.tasks.length) push("", "estimates", noEst + " of " + model.tasks.length + " tasks carry no story points.");
+  if (!bare.length && !orph.length) push("ok", "ready", "Every goal has tasks mapped and every task belongs to a goal.");
+}
+
+function renderMapping() {
+  var g = $("#map-group");
+  if (!rawTable) { g.style.display = "none"; return; }
+  g.style.display = "flex";
+  var m = activeMap(), box = $("#mapping");
+  box.textContent = "";
+  FIELDS.forEach(function (f) {
+    var r = el("div", "maprow");
+    r.appendChild(el("span", null, f.label));
+    var sel = document.createElement("select");
+    var none = document.createElement("option");
+    none.value = "-1"; none.textContent = "—";
+    sel.appendChild(none);
+    rawTable.header.forEach(function (h, i) {
+      var o = document.createElement("option");
+      o.value = String(i);
+      o.textContent = h || "col " + (i + 1);
+      sel.appendChild(o);
+    });
+    sel.value = String(m[f.k]);
+    sel.addEventListener("change", function () {
+      mapOverride[f.k] = parseInt(sel.value, 10);
+      store("sg.map", JSON.stringify(mapOverride));
+      render();
+    });
+    r.appendChild(sel);
+    box.appendChild(r);
+  });
+}
+
+function render() {
+  if ($("#seg-src button.on").dataset.src === "paste") {
+    rawTable = parseTable($("#paste-rows").value);
+  }
+  var model = build();
+  var rows = $("#rows");
+  rows.textContent = "";
+
+  if (!model.hasRows) {
+    var e = el("div", "empty");
+    e.appendChild(el("b", null, "No rows yet"));
+    e.appendChild(document.createTextNode("Point the sidebar at your sheet and hit Sync, or switch to Paste and drop the rows in."));
+    rows.appendChild(e);
+  } else {
+    model.goals.forEach(function (g) { rows.appendChild(renderGoalRow(g)); });
+    Object.keys(model.orphans).forEach(function (k) { rows.appendChild(renderOrphan(k, model.orphans[k])); });
+    if (!model.goals.length && !Object.keys(model.orphans).length) {
+      var e2 = el("div", "empty");
+      e2.appendChild(el("b", null, "Rows loaded, but nothing mapped"));
+      e2.appendChild(document.createTextNode("Check the Columns panel in the sidebar — Key/Summary may have landed on the wrong column."));
+      rows.appendChild(e2);
+    }
+  }
+
+  $("#goal-mode").textContent = model.mode === "sheet" ? "from sheet" : (model.hasRows ? "from text" : "");
+  $("#goals-txt").style.opacity = model.mode === "sheet" ? ".45" : "1";
+  renderRollup(model);
+  renderNotices(model);
+  renderMapping();
+  buildOutputs(model);
+  persist();
+}
+
+/* ── outputs ─────────────────────────────────────────────── */
+function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+function cortexTable(model) {
+  var sprint = $("#sprint").value.trim();
+  var out = ["<tr><th>Sprint goal</th><th>Assignee / responsible</th><th>Tasks mapped (Jira) &#8594; state</th></tr>"];
+  function lines(list) {
+    return list.map(function (t) {
+      var bits = [esc(t.key) + " " + esc(t.summary), esc(t.status)];
+      var qa = resolve("qa", t), cr = resolve("cr", t);
+      if (qa !== "—" && qa !== "N/A") bits.push("QA: " + esc(qa));
+      if (cr !== "—" && cr !== "N/A") bits.push("CR: " + esc(cr));
+      return "&#8226; " + bits.join(" &#8212; ");
+    }).join("<br>");
+  }
+  model.goals.forEach(function (g) {
+    var s = goalStats(g);
+    var gc = esc(g.goal) + (g.isNew ? "<br>[NEW TOPIC]" : "") + "<br>" + s.done + "/" + s.total + " done" + (s.pts ? " &#8212; " + s.pts + " pts" : "");
+    out.push("<tr><td>" + gc + "</td><td>" + esc(g.name) + "</td><td>" + (g.tasks.length ? lines(g.tasks) : "No tasks mapped yet") + "</td></tr>");
+  });
+  Object.keys(model.orphans).forEach(function (k) {
+    out.push("<tr><td>No goal on the list &#8212; off-goal work</td><td>" + esc(k) + "</td><td>" + lines(model.orphans[k]) + "</td></tr>");
+  });
+  return (sprint ? "<p>" + esc(sprint) + " &#8212; sprint goals and mapped tasks</p>" : "") + "<table>" + out.join("") + "</table>";
+}
+
+function plainText(model) {
+  var L = [], sprint = $("#sprint").value.trim();
+  if (sprint) { L.push(sprint + " — sprint goals and mapped tasks"); L.push(""); }
+  function taskLine(t) {
+    var qa = resolve("qa", t), cr = resolve("cr", t);
+    var s = "    · " + t.key + " " + t.summary + " — " + t.status;
+    if (qa !== "—" && qa !== "N/A") s += " — QA: " + qa;
+    if (cr !== "—" && cr !== "N/A") s += " — CR: " + cr;
+    return s;
+  }
+  model.goals.forEach(function (g) {
+    var s = goalStats(g);
+    L.push(g.name + " — " + g.goal + (g.isNew ? " [NEW TOPIC]" : "") + "  (" + s.done + "/" + s.total + " done" + (s.pts ? ", " + s.pts + " pts" : "") + ")");
+    if (!g.tasks.length) L.push("    · no tasks mapped yet");
+    else g.tasks.forEach(function (t) { L.push(taskLine(t)); });
+    L.push("");
+  });
+  Object.keys(model.orphans).forEach(function (k) {
+    L.push(k + " — off-goal work");
+    model.orphans[k].forEach(function (t) { L.push(taskLine(t)); });
+    L.push("");
+  });
+  return L.join("\n");
+}
+
+function buildOutputs(model) { lastHTML = cortexTable(model); lastText = plainText(model); }
+
+function toast(msg) {
+  var old = document.querySelector(".toast");
+  if (old) old.remove();
+  var t = el("div", "toast", msg);
+  document.body.appendChild(t);
+  setTimeout(function () { if (t.parentNode) t.remove(); }, 2800);
+}
+
+function copyRich(html, plain) {
+  var host = $("#copysrc");
+  host.innerHTML = html;
+  var range = document.createRange();
+  range.selectNodeContents(host);
+  var sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+  var ok = false;
+  try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+  sel.removeAllRanges();
+  return ok;
+}
+
+/* ── sheet sync ──────────────────────────────────────────── */
+function setSynced(text, isErr) {
+  var n = $("#synced");
+  n.className = "synced" + (isErr ? " err" : "");
+  n.innerHTML = text;
+}
+
+function syncSheet(quiet) {
+  var link = $("#sheet-url").value.trim();
+  if (!link) { if (!quiet) toast("Paste the sheet link first."); return; }
+  var btn = $("#btn-sync");
+  btn.disabled = true;
+  btn.textContent = "Syncing…";
+  fetch("/api/sheet-fetch", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ link: link })
+  }).then(function (r) {
+    return r.json().then(function (j) { return { ok: r.ok, j: j }; });
+  }).then(function (res) {
+    if (!res.ok || res.j.error) throw new Error(res.j.error || "sync failed");
+    rawTable = parseTable(res.j.csv);
+    var n = rawTable ? rawTable.rows.length : 0;
+    var now = new Date();
+    var hh = String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0");
+    setSynced("Synced <b>" + hh + "</b> — " + n + " row" + (n === 1 ? "" : "s") + (res.j.tab ? ", tab " + res.j.tab : ""), false);
+    store("sg.csv", res.j.csv);
+    render();
+    if (!quiet) toast("Synced " + n + " row" + (n === 1 ? "" : "s") + " from the sheet.");
+  }).catch(function (e) {
+    setSynced("<b>" + esc(e.message || "sync failed").slice(0, 120) + "</b>", true);
+    if (!quiet) toast(e.message || "Could not read the sheet.");
+  }).then(function () {
+    btn.disabled = false;
+    btn.textContent = "Sync from sheet";
+  });
+}
+
+function setAuto(on) {
+  if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+  if (on) autoTimer = setInterval(function () { syncSheet(true); }, 5 * 60 * 1000);
+  store("sg.auto", on ? "1" : "0");
+}
+
+/* ── persistence ─────────────────────────────────────────── */
+function ovKey() { return "sg.ov." + ($("#sprint").value.trim() || "default"); }
+function loadOverrides() {
+  overrides = {};
+  var raw = pull(ovKey());
+  if (!raw) return;
+  try { var p = JSON.parse(raw); if (p && typeof p === "object") overrides = p; } catch (e) {}
+}
+function persist() {
+  store("sg.sprint", $("#sprint").value);
+  store("sg.url", $("#sheet-url").value);
+  store("sg.jira", $("#jira-base").value);
+  store("sg.goals", $("#goals-txt").value);
+  store("sg.paste", $("#paste-rows").value);
+}
+
+/* ── wiring ──────────────────────────────────────────────── */
+$("#seg-src").addEventListener("click", function (e) {
+  var b = e.target.closest("button[data-src]");
+  if (!b) return;
+  Array.prototype.forEach.call($("#seg-src").children, function (x) { x.classList.remove("on"); });
+  b.classList.add("on");
+  var paste = b.dataset.src === "paste";
+  $("#src-sheet").style.display = paste ? "none" : "flex";
+  $("#src-paste").style.display = paste ? "flex" : "none";
+  store("sg.srcmode", b.dataset.src);
+  if (paste) { rawTable = parseTable($("#paste-rows").value); }
+  else { var c = pull("sg.csv"); rawTable = c ? parseTable(c) : null; }
+  render();
+});
+$("#btn-sync").addEventListener("click", function () { syncSheet(false); });
+$("#auto-ref").addEventListener("change", function () { setAuto(this.checked); if (this.checked) syncSheet(true); });
+$("#paste-rows").addEventListener("input", render);
+$("#goals-txt").addEventListener("input", render);
+$("#jira-base").addEventListener("input", render);
+$("#sheet-url").addEventListener("input", persist);
+$("#sprint").addEventListener("input", function () { loadOverrides(); render(); });
+$("#btn-cortex").addEventListener("click", function () {
+  toast(copyRich(lastHTML, lastText)
+    ? "Table copied — paste into Cortex, then delete the placeholder table."
+    : "Copy blocked by the browser.");
+});
+$("#btn-text").addEventListener("click", function () {
+  var ok = copyRich("<pre>" + esc(lastText) + "</pre>", lastText);
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(lastText).then(function () { toast("Plain text copied."); },
+      function () { toast(ok ? "Plain text copied." : "Copy blocked by the browser."); });
+  } else { toast(ok ? "Plain text copied." : "Copy blocked by the browser."); }
+});
+
+/* ── boot ────────────────────────────────────────────────── */
+(function boot() {
+  var v;
+  if ((v = pull("sg.sprint"))) $("#sprint").value = v;
+  if ((v = pull("sg.url"))) $("#sheet-url").value = v;
+  if ((v = pull("sg.jira"))) $("#jira-base").value = v;
+  if ((v = pull("sg.goals"))) $("#goals-txt").value = v;
+  if ((v = pull("sg.paste"))) $("#paste-rows").value = v;
+  try { var mo = JSON.parse(pull("sg.map") || "{}"); if (mo && typeof mo === "object") mapOverride = mo; } catch (e) {}
+
+  var mode = pull("sg.srcmode") || "sheet";
+  if (mode === "paste") {
+    Array.prototype.forEach.call($("#seg-src").children, function (x) { x.classList.toggle("on", x.dataset.src === "paste"); });
+    $("#src-sheet").style.display = "none";
+    $("#src-paste").style.display = "flex";
+    rawTable = parseTable($("#paste-rows").value);
+  } else {
+    var c = pull("sg.csv");
+    if (c) {
+      rawTable = parseTable(c);
+      setSynced("Showing the last synced copy — hit Sync to refresh.", false);
+    }
+  }
+
+  if (pull("sg.auto") === "1") { $("#auto-ref").checked = true; setAuto(true); }
+  loadOverrides();
+  render();
+})();
+</script>
+</body>
+</html>

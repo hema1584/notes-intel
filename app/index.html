@@ -335,8 +335,8 @@
  .ctx-input:focus{border-color:#383848;}
  .ctx-input::placeholder{color:#404050;}
  .ctx-textarea{resize:none;overflow:hidden;line-height:1.6;min-height:52px;}
- .ctx-save-btn{padding:5px 14px;background:#1a1a22;border:0.5px solid #2a2a38;border-radius:6px;font-size:12px;color:#888898;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .15s;}
- .ctx-save-btn:hover{border-color:#404050;background:#1e1e28;}
+ .ctx-save-btn{padding:5px 16px;background:#0F6E56;border:0.5px solid #148A6A;border-radius:6px;font-size:12px;color:#D6F5E8;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .15s;font-weight:500;}
+ .ctx-save-btn:hover{background:#14846A;border-color:#1CA383;color:#EAFBF4;}
  .ctx-clear-btn{padding:5px 14px;background:transparent;border:0.5px solid #1e1e24;border-radius:6px;font-size:12px;color:#333340;cursor:pointer;font-family:'JetBrains Mono',monospace;}
  .ctx-clear-btn:hover{color:#666;border-color:#333;}
  .ctx-saved-note{font-size:10px;font-family:'JetBrains Mono',monospace;color:#534AB7;}
@@ -350,6 +350,46 @@
  .att-btn-pm:hover{border-color:#b89eff;color:#b89eff;}
  .att-btn-importhtml{border-color:#5dca9a40;color:#5dca9a;}
  .att-btn-importhtml:hover{border-color:#5DCAA5;color:#5DCAA5;}
+ .att-btn-bugvid{border-color:#e8a33d40;color:#e8a33d;}
+ .att-btn-bugvid:hover{border-color:#e8a33d;color:#e8a33d;}
+ .att-btn-walkthrough{border-color:#6fb5e840;color:#6fb5e8;}
+ .att-btn-walkthrough:hover{border-color:#6fb5e8;color:#6fb5e8;}
+ .wt-spin{width:10px;height:10px;border:1.6px solid #6fb5e845;border-top-color:#6fb5e8;border-radius:50%;display:inline-block;animation:bvspin .8s linear infinite;flex-shrink:0;}
+ .bv-bg{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:1200;display:none;align-items:center;justify-content:center;padding:24px;}
+ .bv-modal{width:100%;max-width:840px;max-height:88vh;overflow-y:auto;background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:22px 24px;}
+ .bv-title{font-size:16px;font-weight:500;color:var(--text);display:flex;align-items:center;gap:9px;}
+ .bv-title .bv-dot{color:#e8a33d;}
+ .bv-sub{font-size:12px;color:var(--text3);margin-top:5px;font-family:'JetBrains Mono',monospace;}
+ .bv-drop{margin-top:18px;border:1px dashed var(--border2);border-radius:12px;padding:30px 20px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;}
+ .bv-drop:hover{border-color:#e8a33d;background:#e8a33d0d;}
+ .bv-drop-t{font-size:14px;color:var(--text);}
+ .bv-drop-s{font-size:11.5px;color:var(--text3);margin-top:6px;font-family:'JetBrains Mono',monospace;}
+ .bv-gloss summary{cursor:pointer;font-size:11.5px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:16px;}
+ .bv-gloss textarea{width:100%;margin-top:9px;background:var(--bg);border:0.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--text2);line-height:1.6;min-height:120px;resize:vertical;outline:none;}
+ .bv-gloss .bv-gloss-hint{font-size:10.5px;color:var(--text3);margin-top:6px;font-family:'JetBrains Mono',monospace;}
+ .bv-status{margin-top:20px;text-align:center;font-size:13px;color:var(--text2);}
+ .bv-spin{width:26px;height:26px;border:2.5px solid var(--border2);border-top-color:#e8a33d;border-radius:50%;animation:bvspin .8s linear infinite;margin:0 auto 14px;}
+ @keyframes bvspin{to{transform:rotate(360deg);}}
+ .bv-field{margin-top:15px;}
+ .bv-field label{display:block;font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--text3);letter-spacing:.09em;text-transform:uppercase;margin-bottom:6px;}
+ .bv-field input,.bv-field textarea{width:100%;background:var(--bg);border:0.5px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13.5px;font-family:'Sora',sans-serif;color:var(--text);line-height:1.6;outline:none;resize:vertical;transition:border-color .15s;}
+ .bv-field input:focus,.bv-field textarea:focus{border-color:#e8a33d;}
+ .bv-field textarea{min-height:66px;}
+ .bv-editor{width:100%;min-height:480px;max-height:62vh;overflow:auto;resize:vertical;background:var(--bg);border:0.5px solid var(--border);border-radius:8px;padding:12px 14px;font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.7;color:var(--text);outline:none;white-space:pre-wrap;word-break:break-word;transition:border-color .15s;}
+ .bv-editor:focus{border-color:#e8a33d;}
+ .bv-editor .bv-ln{min-height:1.7em;}
+ .bv-editor .bv-title-ln{font-weight:500;}
+ .bv-editor .bv-lbl{color:var(--text2);}
+ .bv-editor .bv-lbl-obs{color:#f3c27a;font-weight:500;}
+ .bv-row{display:flex;gap:12px;}
+ .bv-row .bv-field{flex:1;}
+ .bv-actions{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap;}
+ .bv-btn{border-radius:9px;padding:9px 16px;font-size:12.5px;font-family:'Sora',sans-serif;cursor:pointer;border:0.5px solid var(--border2);background:transparent;color:var(--text2);transition:all .12s;}
+ .bv-btn:hover{color:var(--text);border-color:var(--text3);}
+ .bv-btn-primary{background:#e8a33d;border-color:#e8a33d;color:#1a1206;font-weight:500;}
+ .bv-btn-primary:hover{background:#f0b256;color:#1a1206;}
+ .bv-close{margin-left:auto;background:transparent;border:none;color:var(--text3);font-size:18px;cursor:pointer;line-height:1;}
+ .bv-close:hover{color:var(--text);}
  #file-input{display:none;}
  #full-report-btn{width:100%;padding:12px;background:linear-gradient(135deg,#0e1f1a 0%,#0a1a14 100%);border:1px solid #2a5a45;border-radius:9px;font-size:12px;color:#5DCAA5;font-family:'JetBrains Mono',monospace;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:all .2s;letter-spacing:0.02em;box-shadow:0 0 0 1px #5dca9a18,0 2px 12px #5dca9a10;}
  #full-report-btn:hover{background:linear-gradient(135deg,#132b22 0%,#0e2219 100%);border-color:#5DCAA5;color:#8de8c8;box-shadow:0 0 0 1px #5dca9a40,0 4px 20px #5dca9a20;}
@@ -622,7 +662,7 @@
     <div class="logo-icon"><svg width="26" height="26" viewBox="0 0 20 20" fill="none"><ellipse cx="10" cy="10" rx="8" ry="3.4" stroke="#5DCAA5" stroke-width="1"/><ellipse cx="10" cy="10" rx="8" ry="3.4" transform="rotate(60 10 10)" stroke="#7F77DD" stroke-width="1"/><ellipse cx="10" cy="10" rx="8" ry="3.4" transform="rotate(-60 10 10)" stroke="#EF9F27" stroke-width="1"/><path d="M8.2 10l1.3 1.3 2.3-2.6" stroke="#5DCAA5" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     <div class="logo-div"></div>
     <div>
-      <div class="logo-name-row"><span class="logo-name">Notes Intel</span><span class="logo-dot"></span><span class="logo-ver" id="logo-ver">v4.8.0</span></div>
+      <div class="logo-name-row"><span class="logo-name">Notes Intel</span><span class="logo-dot"></span><span class="logo-ver" id="logo-ver">v5.0.0</span></div>
       <div class="logo-tag">QA intelligence engine</div>
     </div>
   </div>
@@ -728,21 +768,28 @@
           <textarea class="ctx-input ctx-textarea" id="ctx-tc-style" oninput="autoResize(this);saveContext()" placeholder="e.g. Steps must be device-action level (tap, swipe, wait). Always test Android first. Preconditions must name build/branch. Expected result must reference both UI state and server response." rows="3"></textarea>
         </div>
         <div class="ctx-field" style="margin-top:6px;">
-          <label class="ctx-label">Gold example bank <span class="ex-count" id="ex-count"></span><span style="color:#5a5470;text-transform:none;letter-spacing:0;font-size:10px;margin-left:4px;">— approve generated TCs below to build this up</span></label>
+          <label class="ctx-label">Examples that shape your test cases <span class="ex-count" id="ex-count"></span></label>
+          <div id="style-auto-note" style="font-size:11px;color:#6a6a88;font-family:'Sora',sans-serif;margin:4px 0 8px;line-height:1.6;"></div>
           <div class="ex-bank-wrap" id="ex-bank-list"><div class="ex-bank-empty">No examples saved yet — approve a generated test case to add it here.</div></div>
-        </div>
-        <div class="ctx-field" style="margin-top:12px;">
-          <label class="ctx-label">Generation style</label>
-          <div style="display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap;">
-            <div style="display:flex;gap:2px;background:#0d0d10;border-radius:8px;padding:3px;border:0.5px solid #2a2a3e;">
-              <button id="style-own-btn" onclick="setQaStyle('own')" style="font-size:11px;padding:5px 16px;border-radius:6px;border:none;background:#0a1a14;color:#5DCAA5;font-family:'JetBrains Mono',monospace;cursor:pointer;letter-spacing:.03em;font-weight:500;">Own style</button>
-              <button id="style-ref-btn" onclick="setQaStyle('reference')" style="font-size:11px;padding:5px 16px;border-radius:6px;border:none;background:transparent;color:#52526a;font-family:'JetBrains Mono',monospace;cursor:pointer;letter-spacing:.03em;">Reference style</button>
-            </div>
-            <input id="ref-ticket-input" type="text" placeholder="SMR-10397" value="SMR-10397" spellcheck="false" style="font-size:11px;padding:5px 10px;border-radius:7px;border:0.5px solid #33335a;background:#0d0d10;color:#9D97E8;font-family:'JetBrains Mono',monospace;letter-spacing:.03em;width:110px;text-transform:uppercase;"/>
-            <button onclick="loadReferenceFromJira(this)" id="load-ref-btn" style="font-size:11px;padding:5px 14px;border-radius:7px;border:0.5px solid #33335a;background:transparent;color:#9D97E8;font-family:'JetBrains Mono',monospace;cursor:pointer;letter-spacing:.03em;">↓ Load from Jira</button>
-            <span id="ref-cases-status" style="font-size:11px;color:#52526a;font-family:'JetBrains Mono',monospace;"></span>
+          <div style="display:flex;align-items:center;justify-content:flex-end;margin-top:8px;">
+            <button class="ctx-clear-btn" onclick="openStoreFolder()" title="Open the folder holding your saved data (ni-store.json) — examples, project context, history">
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px;margin-right:4px;"><path d="M1.5 4.5a1 1 0 0 1 1-1h3l1.2 1.5h6.8a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1v-7.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>saved data
+            </button>
           </div>
-          <p style="font-size:11px;color:#6a6a88;font-family:'Sora',sans-serif;margin-top:8px;line-height:1.6;">Enter a ticket key and click ↓ Load to fetch its subtasks. Fetch one at a time (e.g. <span style="color:#9D97E8;">SMR-10397</span>, then <span style="color:#9D97E8;">SMR-10636</span>) — each load adds to what's already saved locally. <span id="ref-loaded-count" style="color:#5DCAA5;"></span></p>
+          <details style="margin-top:10px;">
+            <summary style="cursor:pointer;font-size:11px;color:#6a6a88;font-family:'JetBrains Mono',monospace;">⚙ team reference cases &amp; style override</summary>
+            <div style="display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap;">
+              <div style="display:flex;gap:2px;background:#0d0d10;border-radius:8px;padding:3px;border:0.5px solid #2a2a3e;">
+                <button id="style-auto-btn" onclick="setQaStyle('auto')" style="font-size:11px;padding:5px 14px;border-radius:6px;border:none;background:#0a1a14;color:#5DCAA5;font-family:'JetBrains Mono',monospace;cursor:pointer;letter-spacing:.03em;font-weight:500;">Auto</button>
+                <button id="style-own-btn" onclick="setQaStyle('own')" style="font-size:11px;padding:5px 14px;border-radius:6px;border:none;background:transparent;color:#52526a;font-family:'JetBrains Mono',monospace;cursor:pointer;letter-spacing:.03em;">Mine</button>
+                <button id="style-ref-btn" onclick="setQaStyle('reference')" style="font-size:11px;padding:5px 14px;border-radius:6px;border:none;background:transparent;color:#52526a;font-family:'JetBrains Mono',monospace;cursor:pointer;letter-spacing:.03em;">Team</button>
+              </div>
+              <input id="ref-ticket-input" type="text" placeholder="SMR-10397" value="SMR-10397" spellcheck="false" style="font-size:11px;padding:5px 10px;border-radius:7px;border:0.5px solid #33335a;background:#0d0d10;color:#9D97E8;font-family:'JetBrains Mono',monospace;letter-spacing:.03em;width:110px;text-transform:uppercase;"/>
+              <button onclick="loadReferenceFromJira(this)" id="load-ref-btn" style="font-size:11px;padding:5px 14px;border-radius:7px;border:0.5px solid #33335a;background:transparent;color:#9D97E8;font-family:'JetBrains Mono',monospace;cursor:pointer;letter-spacing:.03em;">↓ Load from Jira</button>
+              <span id="ref-cases-status" style="font-size:11px;color:#52526a;font-family:'JetBrains Mono',monospace;"></span>
+            </div>
+            <p style="font-size:11px;color:#6a6a88;font-family:'Sora',sans-serif;margin-top:8px;line-height:1.6;">Auto uses your own approved cases and falls back to the team's while your bank is empty. Load team cases by ticket key, one at a time (e.g. <span style="color:#9D97E8;">SMR-10397</span>, then <span style="color:#9D97E8;">SMR-10636</span>) — each load adds to what is already saved. <span id="ref-loaded-count" style="color:#5DCAA5;"></span></p>
+          </details>
         </div>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;">
@@ -814,6 +861,17 @@
         import html
       </div>
       <input type="file" id="html-import-input" accept=".html,.htm" onchange="handleHtmlImport(this)" style="display:none;"/>
+      <div class="att-btn att-btn-bugvid" onclick="openBugVideo()" title="Turn a screen recording into an editable bug report">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="3" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M11.5 6.2l3-1.6v6.8l-3-1.6" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><circle cx="6.5" cy="8" r="1.6" stroke="currentColor" stroke-width="1.1"/></svg>
+        BugReport from Video
+      </div>
+      <input type="file" id="bugvid-input" accept="video/*,image/png,image/jpeg,image/webp,image/gif" multiple onchange="handleBugVideo(this)" style="display:none;"/>
+      <div class="att-btn att-btn-walkthrough" onclick="document.getElementById('walkthrough-input').click()" title="Turn a screen recording into a written walkthrough — real screens, labels and steps — added to your content for test case generation">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 3.5h7M2 6.5h5M2 9.5h7M2 12.5h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M11.5 8.5l3-1.7v6l-3-1.7z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+        video walkthrough
+      </div>
+      <input type="file" id="walkthrough-input" accept="video/*,image/png,image/jpeg,image/webp,image/gif" multiple onchange="handleWalkthrough(this)" style="display:none;"/>
+      <span id="wt-status" style="display:none;font-size:11px;font-family:'JetBrains Mono',monospace;color:#6fb5e8;"></span>
       <div class="att-sep"></div>
       <div class="att-tags" id="att-tags"></div>
       <div id="img-preview-wrap" style="display:none;position:relative;">
@@ -937,6 +995,7 @@
           <span class="qa-type-head-hint">— leave empty for full coverage</span>
         </div>
         <div class="qa-type-chips" id="qa-type-chips">
+          <button type="button" class="qa-type-chip" data-type="e2e" onclick="toggleQAType(this)" title="One single test case covering the whole happy-path flow end to end">E2E Happy Path</button>
           <button type="button" class="qa-type-chip" data-type="regression" onclick="toggleQAType(this)">Regression Check</button>
           <button type="button" class="qa-type-chip" data-type="smoke" onclick="toggleQAType(this)">Smoke Test</button>
           <button type="button" class="qa-type-chip" data-type="sanity" onclick="toggleQAType(this)">Sanity Check</button>
@@ -1252,8 +1311,60 @@
   <img id="img-lightbox-img" alt="screenshot full size" style="max-width:92vw;max-height:92vh;border-radius:10px;border:0.5px solid #2e2e38;"/>
 </div>
 
-<script>var currentMode = 'notes';
+<script>
+/* ── Persist ni_* settings across restarts ────────────────────────────────────
+   The proxy picks a random free port each launch, so the page origin changes, so
+   Chromium gives the UI a brand-new EMPTY localStorage every time (project context,
+   history, gold examples and the video glossary were all being lost). Mirror those
+   keys to a JSON file in userData via /api/store.
+   Hydration is a synchronous request on purpose: every init path below reads
+   localStorage immediately, so the values must already be in place. It is a few KB
+   from a local file — sub-millisecond. */
+(function () {
+  var PREFIX = 'ni_';
+  function post(body) {
+    try {
+      var p = new XMLHttpRequest();
+      p.open('POST', '/api/store', true);
+      p.setRequestHeader('Content-Type', 'application/json');
+      p.send(JSON.stringify(body));
+    } catch (e) { /* storage sync is best-effort, never break the UI */ }
+  }
+  try {
+    var x = new XMLHttpRequest();
+    x.open('GET', '/api/store', false);
+    x.send(null);
+    var saved = (x.status === 200) ? JSON.parse(x.responseText || '{}') : {};
+    // Restore anything this (fresh) origin does not have yet.
+    Object.keys(saved).forEach(function (k) {
+      if (localStorage.getItem(k) === null) localStorage.setItem(k, saved[k]);
+    });
+    // Adopt anything already in THIS origin that the file has not seen, so data
+    // written before this fix (or during this session) is captured rather than lost.
+    var adopt = {};
+    for (var i = 0; i < localStorage.length; i++) {
+      var k2 = localStorage.key(i);
+      if (k2 && k2.indexOf(PREFIX) === 0 && !(k2 in saved)) adopt[k2] = localStorage.getItem(k2);
+    }
+    if (Object.keys(adopt).length) post({ bulk: adopt });
+  } catch (e) { /* first run, or store unavailable — carry on with empty storage */ }
+
+  // Write-through: keep the file in step with every ni_* change.
+  var _set = localStorage.setItem.bind(localStorage);
+  var _rm = localStorage.removeItem.bind(localStorage);
+  localStorage.setItem = function (k, v) {
+    _set(k, v);
+    if (String(k).indexOf(PREFIX) === 0) post({ key: k, value: String(v) });
+  };
+  localStorage.removeItem = function (k) {
+    _rm(k);
+    if (String(k).indexOf(PREFIX) === 0) post({ key: k, value: null });
+  };
+})();
+
+var currentMode = 'notes';
 var attachedImage = null; // {base64, mediaType, name}
+var attachedWalkthrough = null; // {name, text} — video kept as REFERENCE, never pasted into the content box
 var attachedLinks = [];
 var qaData = [];
 var _qaIsDeep = false;
@@ -1530,6 +1641,12 @@ function ctxCommitGame() {
   saveContext();
 }
 
+// Reveal ni-store.json in the OS file manager, so saved data can be inspected,
+// backed up or shared without hunting through AppData.
+function openStoreFolder() {
+  fetch('/api/open-store-folder').catch(function () {});
+}
+
 function clearContext() {
   var sel = document.getElementById('ctx-game'); if (sel) sel.value = '';
   ['ctx-qa-focus','ctx-refs','ctx-slack','ctx-extra','ctx-tc-style'].forEach(function(id){
@@ -1586,8 +1703,12 @@ function getExamples() {
   try { return JSON.parse(localStorage.getItem(_NI_EX_KEY) || '[]'); } catch(e) { return []; }
 }
 
+// Keep the MOST RECENT 25. The old slice(0,5) kept the FIRST five, so once five were
+// approved every later approval was silently discarded and your style could never evolve.
+// The bank is a library; only a subset is injected into prompts (see buildExamplesBlock).
+var _NI_EX_MAX = 25;
 function saveExamples(arr) {
-  try { localStorage.setItem(_NI_EX_KEY, JSON.stringify(arr.slice(0, 5))); } catch(e) {}
+  try { localStorage.setItem(_NI_EX_KEY, JSON.stringify(arr.slice(-_NI_EX_MAX))); } catch(e) {}
 }
 
 function approveTC(i, btn) {
@@ -1624,7 +1745,8 @@ function renderExampleBank() {
   var list = document.getElementById('ex-bank-list');
   var countEl = document.getElementById('ex-count');
   var examples = getExamples();
-  if (countEl) countEl.textContent = examples.length ? '(' + examples.length + '/5)' : '';
+  if (countEl) countEl.textContent = examples.length ? '(' + examples.length + '/' + _NI_EX_MAX + ')' : '';
+  try { updateStyleNote(examples); } catch(e) {}
   if (!list) return;
   if (!examples.length) {
     list.innerHTML = '<div class="ex-bank-empty">No examples saved yet — approve a generated test case to add it here.</div>';
@@ -1642,24 +1764,53 @@ function renderExampleBank() {
 }
 
 var _NI_REF_KEY = 'ni_ref_examples';
-var _qaStyle = 'own';
+var _qaStyle = (function(){ try { return localStorage.getItem('ni_qa_style') || 'auto'; } catch(e) { return 'auto'; } })();
 
 function getReferenceExamples() {
   try { return JSON.parse(localStorage.getItem(_NI_REF_KEY) || '[]'); } catch(e) { return []; }
 }
 
+// 'auto' (default) = your approved cases when you have any, the team's while you don't.
+// 'own' / 'reference' force one source. Resolve to a concrete source at use time.
+function resolveQaStyle() {
+  if (_qaStyle === 'own' || _qaStyle === 'reference') return _qaStyle;
+  return getExamples().length ? 'own' : 'reference';
+}
+
 function setQaStyle(style) {
   _qaStyle = style;
-  var ownBtn = document.getElementById('style-own-btn');
-  var refBtn = document.getElementById('style-ref-btn');
-  if (ownBtn) {
-    ownBtn.style.background = style === 'own' ? '#0a1a14' : 'transparent';
-    ownBtn.style.color = style === 'own' ? '#5DCAA5' : '#606070';
+  try { localStorage.setItem('ni_qa_style', style); } catch(e) {}
+  [['style-auto-btn', 'auto'], ['style-own-btn', 'own'], ['style-ref-btn', 'reference']].forEach(function(p) {
+    var b = document.getElementById(p[0]);
+    if (!b) return;
+    var on = (style === p[1]);
+    b.style.background = on ? '#0a1a14' : 'transparent';
+    b.style.color = on ? '#5DCAA5' : '#606070';
+    b.style.fontWeight = on ? '500' : '';
+  });
+  updateStyleNote();
+}
+
+// One plain line telling you which examples are actually being used.
+// Pass the already-loaded array when the caller has one, so the note can never
+// disagree with the count rendered beside it.
+function updateStyleNote(examplesOpt) {
+  var el = document.getElementById('style-auto-note');
+  if (!el) return;
+  var own = examplesOpt || getExamples();
+  var mine = own.length, team = getReferenceExamples().length;
+  var active = (_qaStyle === 'own' || _qaStyle === 'reference') ? _qaStyle : (mine ? 'own' : 'reference');
+  var txt;
+  if (active === 'own') {
+    txt = 'Using your ' + mine + ' approved test case' + (mine === 1 ? '' : 's') + ' as the style' +
+          (_qaStyle === 'own' ? ' (forced).' : '. Approve more below to keep shaping it.');
+  } else if (active === 'reference' && team) {
+    txt = 'Using ' + team + ' team reference case' + (team === 1 ? '' : 's') +
+          (_qaStyle === 'reference' ? ' (forced).' : ' — approve your own test cases and they take over automatically.');
+  } else {
+    txt = 'No examples yet — approve a generated test case to start building your style, or load the team\'s below.';
   }
-  if (refBtn) {
-    refBtn.style.background = style === 'reference' ? '#0a1a14' : 'transparent';
-    refBtn.style.color = style === 'reference' ? '#5DCAA5' : '#606070';
-  }
+  el.textContent = txt;
 }
 
 async function loadReferenceFromJira(btn) {
@@ -1743,12 +1894,15 @@ function refreshRefLoadedCount() {
 }
 
 function buildExamplesBlock() {
-  var examples = _qaStyle === 'reference' ? getReferenceExamples() : getExamples();
+  var style = resolveQaStyle();
+  var examples = style === 'reference' ? getReferenceExamples() : getExamples();
+  // Inject only the most recent few — enough to convey style, without flooding the prompt.
+  if (examples.length > 6) examples = examples.slice(-6);
   if (!examples.length) {
-    if (_qaStyle === 'reference') return '\n\n[Reference style selected but no cases loaded — click "Load from Jira" in Project Context.]\n';
+    if (_qaStyle === 'reference') return '\n\n[Team style selected but no cases loaded — use "Load from Jira" under the example bank.]\n';
     return '';
   }
-  var label = _qaStyle === 'reference'
+  var label = style === 'reference'
     ? '\n\nREFERENCE EXAMPLES — these are real approved test cases from the team (SMR-10397 Season Pass + SMR-10636 Level Climb). Match the naming style, scenario depth, step granularity, and coverage pattern. Use <placeholder> notation for variable content. Match style and granularity but do not copy weaknesses — improve vague expected results, remove duplicate steps, sharpen preconditions, and apply all anti-hallucination rules as primary constraints. Approved before does not mean best practice now.\n'
     : '\n\nGOLD EXAMPLES — match this format, step depth, and quality level exactly:\n';
   var exStr = examples.map(function(ex, i) {
@@ -2071,6 +2225,7 @@ async function runDeepAnalysis() {
     'Content type: ' + currentMode + '. ' + (modeHints[currentMode] || '') + '\n\n';
   if (contentText) _textBase += 'Content:\n' + smartTruncate(contentText) + '\n\n';
   if (attachedImage) _textBase += 'A screenshot has been attached.\n\n';
+  if (attachedWalkthrough) _textBase += 'REFERENCE — flow observed from an attached screen recording (' + attachedWalkthrough.name + '). It records the REAL screens, on-screen labels and device-level steps of this flow. Use it as source material: take screen names, button labels and step wording from it so any test cases match the real UI. Do not describe or summarise the recording itself, and do not treat it as a defect report. On-screen labels below appear in single quotes — keep single quotes when you refer to them, and NEVER place an unescaped double quote inside a JSON string value. HOW TO USE IT: this is BACKGROUND so you understand the feature — the real screen names, the real flow between them, and what each control does. It is NOT content to reproduce. Write test cases about the FEATURE UNDER TEST and its relevant preconditions only; do not describe the recording, do not list what is on screen, and do not add coverage for screens or controls the feature does not involve. Carry over only the naming and flow accuracy. Never carry incidental values from that session (move counts, currency totals, timers, level numbers, item quantities) into steps or expected results.\n' + attachedWalkthrough.text + '\n\n';
 
   var confPages = attachedLinks.filter(function(l){ return l.confluenceId; });
   var slackThreads = attachedLinks.filter(function(l){ return l.slackChannelId; });
@@ -2121,7 +2276,7 @@ async function runDeepAnalysis() {
       '- All string values must be on a single line with no embedded newlines\n' +
       '- Output the JSON object only — nothing else.';
 
-    var needsMcp = _textBase.indexOf('Atlassian MCP') > -1 || _textBase.indexOf('Slack MCP') > -1 || attachedLinks.some(function(l){ return l.cortexUrl; });
+    var needsMcp = _textBase.indexOf('Atlassian MCP') > -1 || _textBase.indexOf('Slack MCP') > -1 || _textBase.indexOf('PM MCP') > -1 || attachedLinks.some(function(l){ return l.cortexUrl || l.pmItemKey; });
     // For image attachments, send image block + full prompt as separate text block
     var call1MsgContent = (_msgContent && Array.isArray(_msgContent))
       ? [..._msgContent.filter(function(b){ return b.type === 'image'; }), { type: 'text', text: call1Prompt }]
@@ -2137,6 +2292,7 @@ async function runDeepAnalysis() {
       if (_textBase.indexOf('Atlassian MCP') > -1) servers.push({ type: 'url', url: 'https://mcp.atlassian.com/v1/mcp', name: 'atlassian-mcp' });
       if (_textBase.indexOf('Slack MCP') > -1) servers.push({ type: 'url', url: 'https://mcp.slack.com/mcp', name: 'slack-mcp' });
       if (attachedLinks.some(function(l){ return l.cortexUrl; })) servers.push({ type: 'url', url: 'https://cortex-api.tactilews.com/mcp', name: 'cortex-mcp' });
+    if (attachedLinks.some(function(l){ return l.pmItemKey; })) servers.push({ type: 'url', url: 'https://pm-mcp.tactilews.com/mcp', name: 'pm-mcp' });
       if (servers.length) call1Body.mcp_servers = servers;
     }
 
@@ -2260,6 +2416,7 @@ async function runDeepAnalysis() {
       if (_textBase.indexOf('Atlassian MCP') > -1) s3.push({ type: 'url', url: 'https://mcp.atlassian.com/v1/mcp', name: 'atlassian-mcp' });
       if (_textBase.indexOf('Slack MCP') > -1) s3.push({ type: 'url', url: 'https://mcp.slack.com/mcp', name: 'slack-mcp' });
       if (attachedLinks.some(function(l){ return l.cortexUrl; })) s3.push({ type: 'url', url: 'https://cortex-api.tactilews.com/mcp', name: 'cortex-mcp' });
+    if (attachedLinks.some(function(l){ return l.pmItemKey; })) s3.push({ type: 'url', url: 'https://pm-mcp.tactilews.com/mcp', name: 'pm-mcp' });
       if (s3.length) call3Body.mcp_servers = s3;
     }
     var call3Promise = fetch(getApiUrl(), { method: 'POST', headers: getApiHeaders(), body: JSON.stringify(wrapBody(call3Body)) });
@@ -2509,6 +2666,7 @@ function clearAll() {
   if (ti) { ti.value = ''; ti._userEdited = false; ti.style.height = 'auto'; }
   // Clear attachments
   attachedImage = null;
+  attachedWalkthrough = null;
   attachedLinks = [];
   var preview = document.getElementById('img-preview');
   var wrap = document.getElementById('img-preview-wrap');
@@ -2771,15 +2929,15 @@ function addPmRef() {
   }
 }
 
-// ⚠ PLACEHOLDER — developer must confirm the real PM tool API endpoint + auth.
-// Likely pattern based on item URL pm.tactilews.com/pm/items/HTP-1
+// PM items are now read through the Tactile PM MCP connector (same pattern as Jira /
+// Confluence / Cortex) instead of the guessed REST endpoint this used to call.
+// Kept only as a fallback for environments without the MCP connector.
 async function fetchPmItem(itemKey) {
   var base = 'https://pm.tactilews.com';
-  var url = base + '/api/items/' + encodeURIComponent(itemKey);  // ⚠ guess — confirm with dev
-  var resp = await fetch(url, { credentials: 'include' });        // ⚠ assumes session-cookie auth
+  var url = base + '/api/items/' + encodeURIComponent(itemKey);  // ⚠ unverified endpoint
+  var resp = await fetch(url, { credentials: 'include' });
   if (!resp.ok) throw new Error('PM API ' + resp.status);
   var data = await resp.json();
-  // ⚠ field names are guesses — adjust to real API response shape
   var title = data.title || data.name || itemKey;
   var desc = data.description || data.desc || '';
   return 'PM item ' + itemKey + ' — ' + title + '\n' + desc;
@@ -2912,6 +3070,7 @@ function addConfluenceRef() {
 
 function removeImg() {
   attachedImage = null;
+  attachedWalkthrough = null;
   var preview = document.getElementById('img-preview');
   preview.src = '';
   preview.style.display = 'none';
@@ -2935,6 +3094,13 @@ function renderAttTags() {
       '<span class="x" onclick="event.preventDefault();event.stopPropagation();removeLink('+i+')">×</span>'+
     '</a>';
   });
+  if (attachedWalkthrough) {
+    html += '<span class="att-tag" title="Flow reference read from this recording — used when generating the gist and test cases">' +
+      '<div class="att-dot" style="background:#6fb5e8"></div>' +
+      '<span style="color:#6fb5e8;">🎬 ' + esc(attachedWalkthrough.name) + '</span>' +
+      '<span class="x" onclick="attachedWalkthrough=null;renderAttTags();" style="cursor:pointer;">×</span>' +
+    '</span>';
+  }
   el.innerHTML = html;
 }
 
@@ -2996,6 +3162,7 @@ async function runAnalysis() {
     'Content type: ' + currentMode + '. ' + modeHints[currentMode] + '\n\n';
   if (contentText) _textBase += 'Content:\n' + smartTruncate(contentText) + '\n\n';
   if (attachedImage) _textBase += 'A screenshot has been attached.\n\n';
+  if (attachedWalkthrough) _textBase += 'REFERENCE — flow observed from an attached screen recording (' + attachedWalkthrough.name + '). It records the REAL screens, on-screen labels and device-level steps of this flow. Use it as source material: take screen names, button labels and step wording from it so any test cases match the real UI. Do not describe or summarise the recording itself, and do not treat it as a defect report. On-screen labels below appear in single quotes — keep single quotes when you refer to them, and NEVER place an unescaped double quote inside a JSON string value. HOW TO USE IT: this is BACKGROUND so you understand the feature — the real screen names, the real flow between them, and what each control does. It is NOT content to reproduce. Write test cases about the FEATURE UNDER TEST and its relevant preconditions only; do not describe the recording, do not list what is on screen, and do not add coverage for screens or controls the feature does not involve. Carry over only the naming and flow accuracy. Never carry incidental values from that session (move counts, currency totals, timers, level numbers, item quantities) into steps or expected results.\n' + attachedWalkthrough.text + '\n\n';
   var confPages = attachedLinks.filter(function(l){ return l.confluenceId; });
   var slackThreads = attachedLinks.filter(function(l){ return l.slackChannelId; });
   var jiraTickets = attachedLinks.filter(function(l){ return l.jiraTicketKey; });
@@ -3049,18 +3216,15 @@ async function runAnalysis() {
   }
 
   if (pmItems.length > 0) {
-    for (var pi = 0; pi < pmItems.length; pi++) {
-      var pmRef = pmItems[pi];
-      try {
-        var pmText = await fetchPmItem(pmRef.pmItemKey);
-        _textBase += pmText + '\n\n';
-      } catch(pe) {
-        window._analysisRunning = false;
-        setLoading(false);
-        showErr('Could not read PM item ' + pmRef.pmItemKey + ' from inside claude.ai (needs login + cross-site access, and the API endpoint must be confirmed). Paste the item details into the notes box, or run the tool hosted on the internal network.');
-        return;
-      }
-    }
+    // Tactile PM tools are DEFERRED — absent from the default tool list and must be searched
+    // for before use, so name them explicitly or the model concludes PM is unavailable.
+    _textBase += 'PM tool items to read via the Tactile PM MCP (these tools are deferred — search your available tools for the "mcp__claude_ai_Tactile_PM__" prefix and load them first):\n' +
+      '- mcp__claude_ai_Tactile_PM__pm_get_task — fetch the item (title, description, acceptance criteria, status). If it needs an internal id rather than a key, find it first with mcp__claude_ai_Tactile_PM__pm_search_tasks.\n' +
+      '- mcp__claude_ai_Tactile_PM__pm_list_comments — comments often carry requirements and decisions.\n' +
+      '- mcp__claude_ai_Tactile_PM__pm_list_subtasks — only when the item is a parent and its subtasks matter.\n' +
+      'Read each item fully before writing anything. Items to read:\n';
+    pmItems.forEach(function(l) { _textBase += '- item key: ' + l.pmItemKey + '\n'; });
+    _textBase += '\n';
   }
 
   if (plainLinks.length > 0) _textBase += 'Referenced links: ' + plainLinks.map(function(l){ return l.url; }).join(', ') + '\n\n';
@@ -3095,7 +3259,7 @@ async function runAnalysis() {
     var hasJiraTickets = attachedLinks.some(function(l){ return l.jiraTicketKey; });
     var hasCortexPages = attachedLinks.some(function(l){ return l.cortexUrl; });
     var hasRefDocs = getReferenceDocNames().length > 0;
-    var needsMcp = hasConfluencePages || hasSlackThreads || hasJiraTickets || hasCortexPages || hasRefDocs;
+    var needsMcp = hasConfluencePages || hasSlackThreads || hasJiraTickets || hasCortexPages || hasRefDocs || hasPmRef;
     var gistBody = {
       model: needsMcp ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001',
       max_tokens: needsMcp ? 3000 : 1500,
@@ -3107,6 +3271,7 @@ async function runAnalysis() {
       if (hasConfluencePages || hasJiraTickets || hasRefDocs) gistBody.mcp_servers.push({ type: 'url', url: 'https://mcp.atlassian.com/v1/mcp', name: 'atlassian-mcp' });
       if (hasSlackThreads) gistBody.mcp_servers.push({ type: 'url', url: 'https://mcp.slack.com/mcp', name: 'slack-mcp' });
       if (hasCortexPages) gistBody.mcp_servers.push({ type: 'url', url: 'https://cortex-api.tactilews.com/mcp', name: 'cortex-mcp' });
+      if (hasPmRef) gistBody.mcp_servers.push({ type: 'url', url: 'https://pm-mcp.tactilews.com/mcp', name: 'pm-mcp' });
     }
     // Show intermediate status while fetching
     var runLbl = document.getElementById('run-label');
@@ -3185,9 +3350,10 @@ async function runAnalysis() {
 
 // ── QA test-type selection (checkbox footer in the gist card) ──
 var qaTypes = [];
-var QA_TYPE_NAMES = { regression:'Regression Check', smoke:'Smoke Test', sanity:'Sanity Check', negative:'Negative Test', functional:'Functional Check', bugfix:'Bug Fix Check', acceptance:'Acceptance Criteria Check' };
-var QA_TYPE_ORDER = ['acceptance','functional','bugfix','regression','smoke','sanity','negative']; // most-critical first
+var QA_TYPE_NAMES = { e2e:'E2E Happy Path', regression:'Regression Check', smoke:'Smoke Test', sanity:'Sanity Check', negative:'Negative Test', functional:'Functional Check', bugfix:'Bug Fix Check', acceptance:'Acceptance Criteria Check' };
+var QA_TYPE_ORDER = ['e2e','acceptance','functional','bugfix','regression','smoke','sanity','negative']; // most-critical first
 var QA_TYPE_DIRECTIVES = {
+  e2e: 'E2E HAPPY PATH — one single end-to-end test case for the main successful journey through this feature, start to finish.',
   regression: 'REGRESSION — focus on existing functionality this change could break: integration points, shared systems, and previously-working flows near the change. Skip new-feature happy paths unless they touch existing behaviour.',
   smoke: 'SMOKE — broad, shallow pass over the critical end-to-end paths only; one check per critical path, no edge exploration.',
   sanity: 'SANITY CHECK — narrow, shallow pass on the specific changed area only; confirm the change works and did not obviously break its immediate surroundings.',
@@ -3219,6 +3385,9 @@ function qaFocusLabelSuffix() {
 }
 
 function updateQAFocusLabel() {
+  // "Add edge & simple checks" would append more cases, contradicting E2E's single case.
+  var edgeBtn = document.getElementById('qa-edge-btn');
+  if (edgeBtn) edgeBtn.style.display = (qaTypes.indexOf('e2e') > -1) ? 'none' : '';
   var btn = document.getElementById('qa-focus-btn');
   if (!btn || btn.disabled) return;
   btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 5h10M3 8h7M3 11h5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg> Generate QA Focus' + qaFocusLabelSuffix();
@@ -3227,6 +3396,15 @@ function updateQAFocusLabel() {
 // Directive injected into the QA prompt based on ticked test types.
 // None ticked OR all ticked → '' (full coverage, unchanged behaviour).
 function buildQaTypeFocus() {
+  // E2E is exclusive by design: one case, whole flow, happy path only. It overrides the
+  // ADAPTIVE COUNT in the shared instruction, so it must state the count unambiguously.
+  if (qaTypes.indexOf('e2e') > -1) {
+    return 'E2E HAPPY PATH — RETURN EXACTLY ONE TEST CASE. This overrides any other guidance about how many cases to produce: the array must contain exactly 1 item, never 2 or more. ' +
+      'That single case covers the MAIN SUCCESSFUL JOURNEY through this feature from start to finish, in the order a player performs it, using the real screen and control names. ' +
+      'HAPPY PATH ONLY: no negative, error, edge, boundary, interruption, permission or failure scenarios, and no alternate branches — assume everything behaves correctly. ' +
+      'Steps are sequential device-level actions covering the whole flow (up to 8 entries are allowed here); "expected" states the end-to-end outcome plus the key checkpoints along the way, separated by semicolons. ' +
+      'Preconditions: only what is genuinely needed to start the flow. ';
+  }
   if (!qaTypes.length || qaTypes.length >= QA_TYPE_ORDER.length) return '';
   var lines = QA_TYPE_ORDER.filter(function(t){ return qaTypes.indexOf(t) > -1; })
     .map(function(t){ return '• ' + QA_TYPE_DIRECTIVES[t]; });
@@ -3292,6 +3470,7 @@ async function ensureSourcesFetched() {
   if (attachedLinks.some(function (l) { return l.confluenceId || l.jiraTicketKey; })) servers.push({ type: 'url', url: 'https://mcp.atlassian.com/v1/mcp', name: 'atlassian-mcp' });
   if (attachedLinks.some(function (l) { return l.slackChannelId; })) servers.push({ type: 'url', url: 'https://mcp.slack.com/mcp', name: 'slack-mcp' });
   if (attachedLinks.some(function (l) { return l.cortexUrl; })) servers.push({ type: 'url', url: 'https://cortex-api.tactilews.com/mcp', name: 'cortex-mcp' });
+    if (attachedLinks.some(function(l){ return l.pmItemKey; })) servers.push({ type: 'url', url: 'https://pm-mcp.tactilews.com/mcp', name: 'pm-mcp' });
   if (!servers.length) return '';
   var refs = [];
   attachedLinks.forEach(function (l) {
@@ -3361,6 +3540,7 @@ async function generateQA(tier) {
       if (attachedLinks.some(function(l){ return l.confluenceId || l.jiraTicketKey; })) qaServers.push({ type: 'url', url: 'https://mcp.atlassian.com/v1/mcp', name: 'atlassian-mcp' });
       if (attachedLinks.some(function(l){ return l.slackChannelId; })) qaServers.push({ type: 'url', url: 'https://mcp.slack.com/mcp', name: 'slack-mcp' });
       if (attachedLinks.some(function(l){ return l.cortexUrl; })) qaServers.push({ type: 'url', url: 'https://cortex-api.tactilews.com/mcp', name: 'cortex-mcp' });
+    if (attachedLinks.some(function(l){ return l.pmItemKey; })) qaServers.push({ type: 'url', url: 'https://pm-mcp.tactilews.com/mcp', name: 'pm-mcp' });
     }
 
     var qaPrompt = (_msgContent && typeof _msgContent !== 'string')
@@ -3414,19 +3594,37 @@ async function generateQA(tier) {
       .replace(/,\s*([\]}])/g, '$1')                               // trailing commas
       .replace(/,\s*([\]}])/g, '$1');                              // trailing commas (double pass)
     // Try parsing; if it fails, attempt per-item extraction as fallback
-    var qaArray;
-    try {
-      qaArray = JSON.parse(clean2);
-    } catch(parseErr) {
+    var qaArray = null, parseErr = null;
+    // 1) straight parse  2) repair unescaped inner quotes  3) per-item extraction below
+    try { qaArray = JSON.parse(clean2); }
+    catch(e1) {
+      parseErr = e1;
+      try { qaArray = JSON.parse(bvRepairInnerQuotes(clean2)); } catch(e2) { qaArray = null; }
+    }
+    if (!qaArray) {
       // Fallback: extract individual objects from the array string
       var items = [];
-      var depth = 0, start = -1;
+      var depth = 0, start = -1, inStr = false, esc = false;
       for (var ci = 0; ci < clean2.length; ci++) {
-        if (clean2[ci] === '{') { if (depth === 0) start = ci; depth++; }
-        else if (clean2[ci] === '}') {
+        var ch = clean2[ci];
+        // Track string literals so braces inside values don't shift the depth count.
+        if (inStr) {
+          if (esc) esc = false;
+          else if (ch === '\\') esc = true;
+          else if (ch === '"') inStr = false;
+          continue;
+        }
+        if (ch === '"') { inStr = true; continue; }
+        if (ch === '{') { if (depth === 0) start = ci; depth++; }
+        else if (ch === '}') {
           depth--;
           if (depth === 0 && start !== -1) {
-            try { items.push(JSON.parse(clean2.slice(start, ci+1))); } catch(ie) {}
+            var frag = clean2.slice(start, ci + 1);
+            try { items.push(JSON.parse(frag)); }
+            catch(ie) {
+              // Last resort: repair unescaped inner quotes inside string values.
+              try { items.push(JSON.parse(bvRepairInnerQuotes(frag))); } catch(ie2) {}
+            }
             start = -1;
           }
         }
@@ -6074,6 +6272,54 @@ function cancelGistEdit() {
   btn.classList.remove('active');
 }
 
+// Repair the commonest malformed-JSON case from an LLM: an unescaped double quote INSIDE
+// a string value (e.g. "objective": "Tap the "Skip" button"). A value's closing quote is
+// the one followed by , : } ] or end — any other quote inside it gets escaped.
+function bvRepairInnerQuotes(s) {
+  var out = '', inStr = false, esc = false;
+  for (var i = 0; i < s.length; i++) {
+    var c = s[i];
+    if (!inStr) { out += c; if (c === '"') inStr = true; continue; }
+    if (esc) { out += c; esc = false; continue; }
+    if (c === '\\') { out += c; esc = true; continue; }
+    if (c === '"') {
+      var j = i + 1;
+      while (j < s.length && /\s/.test(s[j])) j++;
+      if (j >= s.length || /[,:}\]]/.test(s[j])) { out += c; inStr = false; }
+      else { out += '\\"'; }               // quote in the middle of a value → escape it
+      continue;
+    }
+    out += c;
+  }
+  return out;
+}
+
+// Return the first complete, brace-balanced JSON object/array in a string, ignoring
+// braces inside string literals. Tolerates extra junk (or extra braces) afterwards.
+function bvBalancedJson(str) {
+  var open = str.search(/[{[]/);
+  if (open === -1) return '';
+  var stack = [], inStr = false, esc = false;
+  for (var i = open; i < str.length; i++) {
+    var c = str[i];
+    if (inStr) {
+      if (esc) { esc = false; }
+      else if (c === '\\') { esc = true; }
+      else if (c === '"') { inStr = false; }
+      continue;
+    }
+    if (c === '"') { inStr = true; continue; }
+    if (c === '{' || c === '[') { stack.push(c); continue; }
+    if (c === '}' || c === ']') {
+      var want = (c === '}') ? '{' : '[';
+      if (stack[stack.length - 1] === want) stack.pop();
+      else return str.slice(open, i); // mismatched — hand back what balanced so far
+      if (!stack.length) return str.slice(open, i + 1);
+    }
+  }
+  return str.slice(open);
+}
+
 function renderGist(text) {
   var html = '';
   var parsed = null;
@@ -6089,6 +6335,9 @@ function renderGist(text) {
     var clean = text.replace(/```json|```/g, '').trim();
     // Strategy 1: parse full clean string (handles both object and array)
     try { var raw = JSON.parse(_cj(clean)); parsed = Array.isArray(raw) ? raw[0] : raw; } catch(e1) { parsed = null; }
+    // Strategy 1b: balanced-brace slice — survives trailing junk such as one stray
+    // closing brace, which "first { .. last }" cannot (it swallows the extra brace).
+    if (!parsed) { try { parsed = JSON.parse(_cj(bvBalancedJson(clean))); } catch(e1b) { parsed = null; } }
     // Strategy 2: extract {...} slice
     if (!parsed) {
       var s = clean.indexOf('{'), e = clean.lastIndexOf('}');
@@ -6503,6 +6752,7 @@ async function generateRisk() {
     if (attachedLinks.some(function(l){ return l.confluenceId || l.jiraTicketKey; })) mcpServers.push({ type: 'url', url: 'https://mcp.atlassian.com/v1/mcp', name: 'atlassian-mcp' });
     if (attachedLinks.some(function(l){ return l.slackChannelId; })) mcpServers.push({ type: 'url', url: 'https://mcp.slack.com/mcp', name: 'slack-mcp' });
     if (attachedLinks.some(function(l){ return l.cortexUrl; })) mcpServers.push({ type: 'url', url: 'https://cortex-api.tactilews.com/mcp', name: 'cortex-mcp' });
+    if (attachedLinks.some(function(l){ return l.pmItemKey; })) mcpServers.push({ type: 'url', url: 'https://pm-mcp.tactilews.com/mcp', name: 'pm-mcp' });
   }
 
   var reqBody = {
@@ -7311,5 +7561,992 @@ window.addEventListener('load', function() {
     </div>
   </div>
 </div>
+
+<!-- ── Bug from Video ─────────────────────────────────────────── -->
+<div class="bv-bg" id="bv-bg" onmousedown="bvBgDown(event,this)" onclick="bvBgClick(event,this)">
+  <div class="bv-modal">
+    <div style="display:flex;align-items:center;">
+      <div>
+        <div class="bv-title"><span class="bv-dot">●</span> BugReport from Video</div>
+        <div class="bv-sub">Screen recording or screenshots → editable bug report</div>
+      </div>
+      <button class="bv-close" onclick="closeBugVideo()">✕</button>
+    </div>
+
+    <!-- STATE: upload -->
+    <div id="bv-upload">
+      <div class="bv-field" style="margin-top:4px;">
+        <label>Quick note — what did you do &amp; what went wrong? <span style="text-transform:none;letter-spacing:0;color:var(--text3);">(optional, but boosts accuracy a lot)</span></label>
+        <textarea id="bv-hint" rows="3" placeholder="e.g. Adhoc: skipped the cutscene, then tapped the Settings and Task buttons back-to-back — Lily vanished from the screen."></textarea>
+      </div>
+      <div class="bv-field">
+        <label>Feature under test <span style="text-transform:none;letter-spacing:0;color:var(--text3);">(optional — tags the title and starts the steps from this feature)</span></label>
+        <input id="bv-feature" placeholder="e.g. Collection League"/>
+      </div>
+      <label style="display:flex;align-items:flex-start;gap:9px;margin:12px 2px 2px;cursor:pointer;font-size:12.5px;color:var(--text2);line-height:1.5;">
+        <input type="checkbox" id="bv-dense" style="margin-top:2px;accent-color:#e8a33d;width:15px;height:15px;flex-shrink:0;cursor:pointer;"/>
+        <span>Fast interactions <span style="color:var(--text3);">— sample more frames for quick taps / back-to-back button presses (pairs well with Android "Show taps"). A little slower &amp; costs slightly more.</span></span>
+      </label>
+      <div class="bv-drop" onclick="document.getElementById('bugvid-input').click()">
+        <div class="bv-drop-t">Click to choose a screen recording — or paste a snip with Ctrl+V</div>
+        <div class="bv-drop-s">video: .mp4 / .mov / .webm (short edited clips work best) · images: .png / .jpg / .webp, or paste straight from Snipping Tool</div>
+      </div>
+      <div id="bv-paste-wrap" style="display:none;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px;"></div>
+      <details class="bv-gloss">
+        <summary>⚙ smart words — optional: teach it this game's terms so the report uses the right names</summary>
+        <textarea id="bv-glossary" spellcheck="false"></textarea>
+        <div class="bv-gloss-hint">One rule per line: <em>what you see = what to call it</em>. Saved on this device. Edit anytime.</div>
+        <div style="margin-top:8px;"><button class="bv-btn" onclick="bvResetGlossary()">reset to defaults</button></div>
+      </details>
+    </div>
+
+    <!-- STATE: processing -->
+    <div id="bv-processing" style="display:none;">
+      <div class="bv-status"><div class="bv-spin"></div><div id="bv-status-txt">Reading the recording…</div></div>
+    </div>
+
+    <!-- STATE: report -->
+    <div id="bv-report" style="display:none;">
+      <div id="bv-file-label" style="margin-top:14px;font-size:11.5px;font-family:'JetBrains Mono',monospace;color:#e8a33d;word-break:break-all;"></div>
+      <div class="bv-field">
+        <label>Bug report — edit anything before copying</label>
+        <div id="bv-r-all" class="bv-editor" contenteditable="true" spellcheck="true" onpaste="bvEditorPaste(event)"></div>
+      </div>
+      <div class="bv-actions">
+        <button class="bv-btn" onclick="bvBackToUpload()">↺ new video</button>
+        <button class="bv-btn" onclick="bvToggleJira()">＋ create Jira bug</button>
+        <button class="bv-btn-primary bv-btn" onclick="bvCopyAll(this)">copy report</button>
+      </div>
+      <div id="bv-jira-row" style="display:none;margin-top:12px;align-items:center;gap:8px;flex-wrap:wrap;">
+        <input id="bv-jira-proj" class="link-input" placeholder="Parent ticket link / SMR-1234 — or just SMR for a standalone bug" style="max-width:340px;" onkeydown="if(event.key==='Enter')bvCreateJiraBug()"/>
+        <span id="bv-jira-mode-wrap" style="display:none;align-items:center;gap:12px;font-size:12px;color:var(--text2);">
+          <label style="display:flex;align-items:center;gap:5px;cursor:pointer;"><input type="radio" name="bv-jira-mode" value="one" checked style="accent-color:#e8a33d;cursor:pointer;"/>one ticket</label>
+          <label style="display:flex;align-items:center;gap:5px;cursor:pointer;"><input type="radio" name="bv-jira-mode" value="split" style="accent-color:#e8a33d;cursor:pointer;"/>separate (<span id="bv-jira-n">2</span>)</label>
+        </span>
+        <button class="bv-btn bv-btn-primary" id="bv-jira-go" onclick="bvCreateJiraBug()">create bug</button>
+        <span id="bv-jira-status" style="font-size:11.5px;font-family:'JetBrains Mono',monospace;color:var(--text3);"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ════════════════ Bug from Video ════════════════ */
+// Game-neutral by default: only a helper template. The universal "ignore recording
+// artifacts / read the version overlay" rules live in the analysis prompt, so they
+// apply even if this box is empty. Add your own game's terms here (optional).
+var BV_DEFAULT_GLOSSARY = [
+  '# Optional — add this game\'s terms so the report uses the right names.',
+  '# One per line, in the form:   what you see = what to call it',
+  '#',
+  '# Examples (delete these — just samples):',
+  '# the small coloured icon in the top bar = Energy',
+  '# the main character = <character name>',
+  '# the area/level name shown on screen = <feature name>'
+].join('\n');
+
+// Old game-specific default that may have been auto-saved before this change — migrate it away.
+var BV_LEGACY_GLOSSARY_SIG = 'red-haired female character = Lily';
+
+function bvGlossary(){
+  var g = localStorage.getItem('ni_bugvid_glossary');
+  if (g && g.indexOf(BV_LEGACY_GLOSSARY_SIG) > -1) { localStorage.removeItem('ni_bugvid_glossary'); g = null; }
+  return g || BV_DEFAULT_GLOSSARY;
+}
+// Real terms only: strip comment/blank lines before sending to the model.
+function bvGlossaryForPrompt(){
+  return (document.getElementById('bv-glossary') ? document.getElementById('bv-glossary').value : bvGlossary())
+    .split('\n').map(function(s){ return s.trim(); })
+    .filter(function(s){ return s && s.charAt(0) !== '#'; }).join('\n');
+}
+function bvResetGlossary(){ localStorage.removeItem('ni_bugvid_glossary'); document.getElementById('bv-glossary').value = BV_DEFAULT_GLOSSARY; }
+
+var bvCurrentFile = '';
+var bvSource = 'video'; // 'video' | 'images'
+// The note is PER VIDEO — a stale note from the last clip would drive the wrong report.
+function bvClearNote(){ var h = document.getElementById('bv-hint'); if (h) h.value = ''; }
+// The feature under test usually stays the same across several clips, so it is remembered
+// (unlike the note, which is strictly per video).
+function bvFeature(){ var f = document.getElementById('bv-feature'); return f ? f.value.trim() : ''; }
+function bvSaveFeature(){ try { localStorage.setItem('ni_bugvid_feature', bvFeature()); } catch(e){} }
+
+function openBugVideo(){
+  document.getElementById('bv-glossary').value = bvGlossary();
+  var f = document.getElementById('bv-feature');
+  if (f && !f.value) f.value = localStorage.getItem('ni_bugvid_feature') || '';
+  // Don't discard an existing report just because the modal was reopened — restore it.
+  // "↺ new video" is the explicit way to start over.
+  var ed = document.getElementById('bv-r-all');
+  var hasReport = ed && (ed.innerText || ed.textContent || '').trim();
+  if (hasReport){
+    bvShowState('report');
+  } else {
+    bvClearNote();
+    bvClearPasted();
+    bvCurrentFile = '';
+    bvShowState('upload');
+  }
+  document.getElementById('bv-bg').style.display = 'flex';
+}
+function closeBugVideo(){
+  var g = document.getElementById('bv-glossary').value.trim();
+  // Persist only a genuinely customised list; never persist the empty box or the template.
+  if (!g || g === BV_DEFAULT_GLOSSARY.trim()) localStorage.removeItem('ni_bugvid_glossary');
+  else localStorage.setItem('ni_bugvid_glossary', g);
+  document.getElementById('bv-bg').style.display = 'none';
+}
+/* ════════════ Video walkthrough → main content (source for test cases) ════════════
+   Separate from BugReport from Video: this is a NEUTRAL walkthrough (screens, labels,
+   device-level actions) appended to the content box, so the normal Notes Intel pipeline
+   can combine it with Jira/Confluence/notes when generating test cases.            */
+
+var wtBusy = false;
+
+function wtStatus(msg, done){
+  var el = document.getElementById('wt-status');
+  if (!el) return;
+  if (!msg){ el.style.display = 'none'; el.innerHTML = ''; return; }
+  el.style.display = 'inline-flex';
+  el.style.alignItems = 'center';
+  el.style.gap = '6px';
+  el.style.color = done ? '#5DCAA5' : '#6fb5e8';
+  el.innerHTML = (done ? '' : '<span class="wt-spin"></span>') + '<span>' + msg + '</span>';
+}
+
+// While the walkthrough is still being written the content box does not yet contain it —
+// running the analysis now would analyse an empty/partial input (it did: "I don't see an
+// attached video"). Lock the analyse buttons until it lands.
+function wtSetBusy(on){
+  wtBusy = !!on;
+  ['run-btn', 'deep-analysis-btn'].forEach(function(id){
+    var b = document.getElementById(id);
+    if (!b) return;
+    b.disabled = wtBusy;
+    b.style.opacity = wtBusy ? '.45' : '';
+    b.style.cursor = wtBusy ? 'not-allowed' : '';
+    b.title = wtBusy ? 'Waiting for the video walkthrough to finish…' : '';
+  });
+}
+
+async function handleWalkthrough(input){
+  var files = Array.prototype.slice.call(input.files || []);
+  input.value = '';
+  if (!files.length) return;
+  var isImages = files.every(function(f){ return /^image\//i.test(f.type || ''); });
+  if (!isImages && files.length > 1){ alert('Choose one video, or one or more screenshots.'); return; }
+  if (typeof currentProvider !== 'undefined' && currentProvider === 'openai'){
+    alert('Video walkthrough needs the Claude provider (vision). Switch provider to Claude and try again.');
+    return;
+  }
+  var name = files[0].name || 'recording';
+  wtSetBusy(true);
+  try {
+    wtStatus(isImages ? 'reading screenshots…' : 'reading video… (this takes a minute)');
+    var out = isImages ? await bvImagesToFrames(files) : await bvExtractFrames(files[0], { scenes: true });
+    wtStatus('reading the flow from ' + out.frames.length + ' screens…');
+    var wt = await wtAnalyze(out.frames, isImages);
+    // Held as a reference attachment (like a screenshot) — NOT pasted into the content box.
+    attachedWalkthrough = { name: name, text: wtFormat(wt, name, isImages) };
+    renderAttTags();
+    wtStatus('✓ video attached as reference', true);
+    setTimeout(function(){ wtStatus(''); }, 4000);
+  } catch(e){
+    wtStatus('');
+    alert('Could not read the walkthrough: ' + (e && e.message ? e.message : e));
+  } finally {
+    wtSetBusy(false);
+  }
+}
+
+async function wtAnalyze(frames, isImg){
+  var unit = isImg ? 'Screenshot' : 'Frame';
+  var ctxBlock = '';
+  try { if (typeof buildContextBlock === 'function') ctxBlock = buildContextBlock() || ''; } catch(e){ ctxBlock = ''; }
+  var glossary = (typeof bvGlossaryForPrompt === 'function') ? bvGlossaryForPrompt() : '';
+
+  // Scope the walkthrough to what the tester is actually working on. Without this it runs
+  // blind and has to guess which parts of the screen matter. Works whether the video is
+  // attached before analysing (content box only) or after (gist as well).
+  var focusBits = [];
+  try {
+    var ta = document.getElementById('main-input');
+    var typed = ta ? ta.value.trim() : '';
+    if (typed) focusBits.push('What the tester wrote about this work:\n' + typed.slice(0, 1500));
+  } catch(e) {}
+  try {
+    var gb = document.getElementById('gist-body');
+    var gistTxt = gb ? (gb.innerText || gb.textContent || '').trim() : '';
+    if (gistTxt) focusBits.push('Summary of the feature already produced from the other sources:\n' + gistTxt.slice(0, 1500));
+  } catch(e) {}
+  var focusBlock = focusBits.length
+    ? 'FOCUS — this is what the tester is working on. Describe the part of the recording that relates to it, and skip everything else:\n' +
+      focusBits.join('\n\n') + '\n' +
+      'If the recording shows other screens or features that are not related to the above, leave them out entirely. ' +
+      'If nothing in the recording relates to it, describe the main flow that IS shown rather than inventing a connection.\n\n'
+    : '';
+
+  var p =
+    'You are a QA engineer writing a factual WALKTHROUGH of what happens in a mobile-game ' + (isImg ? 'set of screenshots' : 'screen recording') + '. ' +
+    'This walkthrough will be used as source material for writing test cases, so it must capture the REAL screens, the REAL on-screen labels and the REAL order of actions.\n\n' +
+    focusBlock +
+    ctxBlock +
+    (glossary ? 'VOCABULARY (what you see = what to call it):\n' + glossary + '\n\n' : '') +
+    'CAPTURE:\n' +
+    '- "title": the flow in a few plain words, naming what was exercised (e.g. "Opening and closing the pause overlay"). No level names, build numbers or scene description.\n' +
+    '- "screens": each distinct screen/state in the order it appears. "name" = its on-screen title if there is one (keep the original language, in single quotes); otherwise a short plain description (garden map). ' +
+    '"elements" = ONLY the UI that is part of THIS flow: the controls the player actually interacts with, and anything that visibly CHANGES as a result. 1-4 entries per screen, exact on-screen text.\n' +
+    '- DESCRIBE THE FLOW, NOT THE SCREEN. This is the single most important rule. Ignore everything that is merely present: background art, scenery, the game board, HUD and counters that never change, and any panel the player never touches. If removing a detail would not affect someone reproducing or verifying this flow, leave it out. A recording of a pause button should mention the pause button, the overlay it opens and what that overlay changes — nothing about the board, moves, boosters or currency.\n' +
+    '- LEAVE OUT INCIDENTAL VALUES: counters, currency totals, move counts, timers, resource amounts, item quantities, level numbers, progress figures. Mention a number ONLY when the flow is specifically about it (e.g. a purchase that must deduct a price).\n' +
+    '- "actions": what the player does, in order, at DEVICE level — "Tap <exact button label>", "Swipe left on the map", "Wait for the animation". Infer each action from what changes between ' + unit.toLowerCase() + 's. Name the control tapped whenever it is identifiable.\n' +
+    '- "transitions": how the flow moves between screens — one line each as "<from screen> -> <to screen> : <what triggers it>". This is what makes the flow understandable; include every screen change you can see.\n' +
+    '- "controls": the few controls central to this flow and what each one DOES (e.g. "pause button - opens the pause overlay", "sound icon - toggles sound on/off"). Purpose and behaviour, not appearance. Note a state only when the flow shows it changing (enabled/disabled, on/off, selected).\n' +
+    '- "preconditions": the minimum needed to reach the starting point of THIS flow, stated generally ("a level is in progress", "the feature is unlocked"). Usually 1-2 entries. Never the exact values seen in this recording, and nothing about parts of the screen the flow does not touch.\n' +
+    '- "endState": what has been achieved by the end.\n' +
+    '- "environment": build version and device from the top-left debug overlay, exactly as shown; "" if absent.\n\n' +
+    'RULES:\n' +
+    '- This is NOT a bug report. Do not judge, do not look for defects, do not say anything is wrong. Describe the flow neutrally, as intended behaviour.\n' +
+    '- Only what is visible. Never invent screens, labels, buttons or numbers. If a label is unreadable, describe the control plainly instead of guessing.\n' +
+    '- Never claim something is absent — sampled ' + unit.toLowerCase() + 's cannot prove that.\n' +
+    '- Ignore the phone status bar, the Android notification shade and any "Recording screen" banner; they are not part of the game.\n' +
+    '- Keep every entry short and concrete. No narration ("the player then proceeds to"), no timestamps, no frame numbers.\n\n' +
+    'Return ONLY valid JSON (no markdown) shaped exactly:\n' +
+    '{"title":"","preconditions":["..."],"screens":[{"name":"","elements":["..."]}],"transitions":["..."],"controls":["..."],"actions":["..."],"endState":"","environment":""}';
+
+  var content = [{ type: 'text', text: p }];
+  frames.forEach(function(f, i){
+    content.push({ type: 'text', text: unit + ' ' + (i + 1) + ' of ' + frames.length + ':' });
+    content.push({ type: 'image', source: { type: 'base64', media_type: f.mediaType || 'image/jpeg', data: f.base64 } });
+  });
+
+  try {
+    return await bvCallJson(content, 4000, { model: 'claude-opus-5', effort: 'high', frameMode: true });
+  } catch(e){
+    wtStatus('Opus unavailable — retrying with Sonnet…');
+    return await bvCallJson(content, 4000, { model: 'claude-sonnet-5', effort: 'high', frameMode: true });
+  }
+}
+
+// Plain text for the content box — readable, and easy to edit before analysing.
+function wtFormat(wt, fileName, isImg){
+  var L = [];
+  L.push('--- Video walkthrough: ' + fileName + ' ---');
+  L.push('(observed from a ' + (isImg ? 'set of screenshots' : 'screen recording') + ' — real screens, labels and steps)');
+  if (wt.title) L.push('Flow: ' + String(wt.title).trim());
+  if (wt.environment) L.push('Build/device seen: ' + String(wt.environment).trim());
+  if (Array.isArray(wt.preconditions) && wt.preconditions.length){
+    L.push(''); L.push('Preconditions observed:');
+    wt.preconditions.forEach(function(p){ L.push('- ' + String(p).trim()); });
+  }
+  if (Array.isArray(wt.screens) && wt.screens.length){
+    L.push(''); L.push('Screens in order:');
+    wt.screens.forEach(function(s, i){
+      L.push((i + 1) + '. ' + String(s && s.name ? s.name : 'screen').trim());
+      if (s && Array.isArray(s.elements) && s.elements.length){
+        L.push('   elements: ' + s.elements.map(function(e){ return String(e).trim(); }).join(' · '));
+      }
+    });
+  }
+  if (Array.isArray(wt.transitions) && wt.transitions.length){
+    L.push(''); L.push('Screen transitions:');
+    wt.transitions.forEach(function(t){ L.push('- ' + String(t).trim()); });
+  }
+  if (Array.isArray(wt.controls) && wt.controls.length){
+    L.push(''); L.push('Controls and what they do:');
+    wt.controls.forEach(function(c){ L.push('- ' + String(c).trim()); });
+  }
+  if (Array.isArray(wt.actions) && wt.actions.length){
+    L.push(''); L.push('Actions performed (device level):');
+    wt.actions.forEach(function(a, i){ L.push((i + 1) + '. ' + String(a).trim()); });
+  }
+  if (wt.endState){ L.push(''); L.push('End state: ' + String(wt.endState).trim()); }
+  L.push('--- end walkthrough ---');
+  // Labels are quoted in this text ("Fail level", "MOVES"). If those double quotes reach
+  // the model they get echoed INSIDE later JSON string values unescaped, which breaks the
+  // QA/test-case parse. Downgrade every double quote to a single quote.
+  return L.join('\n').replace(/"/g, "'");
+}
+
+/* ── Paste screenshots straight from the clipboard (Snipping Tool etc.) ───────── */
+var bvPasted = [];
+
+function bvClearPasted(){
+  bvPasted.forEach(function(p){ try { URL.revokeObjectURL(p.url); } catch(e){} });
+  bvPasted = [];
+  bvRenderPasted();
+}
+function bvRemovePasted(i){
+  if (!bvPasted[i]) return;
+  try { URL.revokeObjectURL(bvPasted[i].url); } catch(e){}
+  bvPasted.splice(i, 1);
+  bvRenderPasted();
+}
+function bvRenderPasted(){
+  var wrap = document.getElementById('bv-paste-wrap');
+  if (!wrap) return;
+  if (!bvPasted.length){ wrap.style.display = 'none'; wrap.innerHTML = ''; return; }
+  var h = bvPasted.map(function(p, i){
+    return '<span style="position:relative;display:inline-block;">' +
+      '<img src="' + p.url + '" alt="pasted screenshot" style="width:76px;height:56px;object-fit:cover;border-radius:6px;border:0.5px solid var(--border);display:block;"/>' +
+      '<button onclick="bvRemovePasted(' + i + ')" title="remove" style="position:absolute;top:-6px;right:-6px;width:17px;height:17px;border-radius:50%;background:#1a1a20;border:0.5px solid #2e2e38;color:#aaa;font-size:10px;line-height:1;cursor:pointer;">×</button>' +
+      '<span style="position:absolute;bottom:2px;left:3px;font-size:9px;font-family:JetBrains Mono,monospace;color:#fff;background:rgba(0,0,0,.55);border-radius:3px;padding:0 3px;">' + (i + 1) + '</span>' +
+    '</span>';
+  }).join('');
+  h += '<button class="bv-btn bv-btn-primary" onclick="bvRunPasted()">analyse ' + bvPasted.length + ' screenshot' + (bvPasted.length > 1 ? 's' : '') + '</button>';
+  h += '<button class="bv-btn" onclick="bvClearPasted()">clear</button>';
+  wrap.style.display = 'flex';
+  wrap.innerHTML = h;
+}
+function bvRunPasted(){
+  if (!bvPasted.length) return;
+  var files = bvPasted.map(function(p){ return p.file; });
+  var label = files.length > 1 ? ('pasted snip (+' + (files.length - 1) + ' more)') : 'pasted snip';
+  bvClearPasted();
+  bvProcessFiles(files, label);
+}
+
+// Ctrl+V anywhere in the modal's upload state stages the clipboard image(s).
+document.addEventListener('paste', function(e){
+  var bg = document.getElementById('bv-bg');
+  if (!bg || bg.style.display === 'none') return;
+  var up = document.getElementById('bv-upload');
+  if (!up || up.style.display === 'none') return; // not while processing or editing a report
+  var items = (e.clipboardData && e.clipboardData.items) || [];
+  var added = 0;
+  for (var i = 0; i < items.length; i++){
+    if (items[i].kind === 'file' && /^image\//i.test(items[i].type || '')){
+      var f = items[i].getAsFile();
+      if (f){ bvPasted.push({ file: f, url: URL.createObjectURL(f) }); added++; }
+    }
+  }
+  if (added){ e.preventDefault(); bvRenderPasted(); }
+});
+
+// Keep the report editor plain text — pasting from Jira/Slack would otherwise inject markup.
+function bvEditorPaste(e){
+  e.preventDefault();
+  var t = ((e.clipboardData || window.clipboardData).getData('text/plain') || '');
+  if (t) document.execCommand('insertText', false, t);
+}
+
+// Close on backdrop click only — NOT when a text selection that started inside the
+// modal happens to end on the backdrop (that was closing the modal mid-selection).
+var _bvBgDown = false;
+function bvBgDown(e, el){ _bvBgDown = (e.target === el); }
+function bvBgClick(e, el){
+  var wasDown = _bvBgDown; _bvBgDown = false;
+  if (e.target !== el || !wasDown) return;
+  var sel = window.getSelection && window.getSelection();
+  if (sel && String(sel).trim()) return; // user was selecting text
+  closeBugVideo();
+}
+
+function bvShowState(s){
+  document.getElementById('bv-upload').style.display     = s==='upload'     ? 'block' : 'none';
+  document.getElementById('bv-processing').style.display = s==='processing' ? 'block' : 'none';
+  document.getElementById('bv-report').style.display     = s==='report'     ? 'block' : 'none';
+}
+function bvBackToUpload(){
+  bvClearNote(); bvClearPasted(); bvCurrentFile = '';
+  var ed = document.getElementById('bv-r-all'); if (ed) ed.innerHTML = '';
+  var jr = document.getElementById('bv-jira-row'); if (jr) jr.style.display = 'none';
+  bvShowState('upload');
+}
+
+function bvReadAsBase64(file){
+  return new Promise(function(resolve, reject){
+    var reader = new FileReader();
+    reader.onload = function(e){ resolve((e.target.result.split(',')[1]) || ''); };
+    reader.onerror = function(){ reject(new Error('Could not read the file from disk.')); };
+    reader.readAsDataURL(file);
+  });
+}
+
+// Screenshots path: no ffmpeg needed. Each image becomes one "frame" (in the order chosen).
+// Wide images are downscaled to 1280px so 20 phone screenshots don't blow up the request.
+function bvImagesToFrames(files){
+  return Promise.all(files.map(function(f){
+    return new Promise(function(resolve, reject){
+      var reader = new FileReader();
+      reader.onload = function(e){
+        var dataUrl = e.target.result;
+        var img = new Image();
+        img.onload = function(){
+          var MAX = 1280, w = img.naturalWidth, h = img.naturalHeight;
+          if (w <= MAX){
+            var m = dataUrl.match(/^data:(image\/[a-z+]+);base64,(.*)$/i);
+            var mt = (m ? m[1] : (f.type || 'image/png')).toLowerCase().replace('image/jpg', 'image/jpeg');
+            resolve({ t: null, base64: m ? m[2] : dataUrl.split(',')[1], mediaType: mt });
+            return;
+          }
+          var c = document.createElement('canvas'); c.width = MAX; c.height = Math.round(h * MAX / w);
+          c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+          resolve({ t: null, base64: c.toDataURL('image/jpeg', 0.85).split(',')[1], mediaType: 'image/jpeg' });
+        };
+        img.onerror = function(){ reject(new Error('Could not read image: ' + f.name)); };
+        img.src = dataUrl;
+      };
+      reader.onerror = function(){ reject(new Error('Could not read file: ' + f.name)); };
+      reader.readAsDataURL(f);
+    });
+  })).then(function(frames){ return { frames: frames, duration: 0 }; });
+}
+
+// Frames are sampled by the bundled ffmpeg in the Electron main process (codec-independent),
+// because this build's <video> element can't decode H.264.
+async function bvExtractFrames(file, opts){
+  opts = opts || {};
+  var dataB64 = await bvReadAsBase64(file);
+  if (!dataB64) throw new Error('The file appears to be empty.');
+  var dense = !!(document.getElementById('bv-dense') && document.getElementById('bv-dense').checked);
+  var r = await fetch('/api/video-frames', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ dataB64: dataB64, dense: dense, scenes: !!opts.scenes })
+  });
+  var data;
+  try { data = await r.json(); } catch(e){ throw new Error('The video engine returned an unreadable response.'); }
+  if (!r.ok || data.error) throw new Error(data && data.error ? data.error : ('video engine error ' + r.status));
+  if (!data.frames || !data.frames.length) throw new Error('No frames could be sampled from this video.');
+  return data;
+}
+
+async function handleBugVideo(input){
+  var files = Array.prototype.slice.call(input.files || []);
+  input.value = '';
+  await bvProcessFiles(files);
+}
+
+async function bvProcessFiles(files, labelOverride){
+  if (!files || !files.length) return;
+  var file = files[0];
+  // Either ONE video, or one-or-more screenshots (treated as an ordered sequence of frames).
+  var isImages = files.every(function(f){ return /^image\//i.test(f.type || ''); });
+  if (!isImages && files.length > 1){ alert('Choose one video, or one or more screenshots (.png / .jpg / .webp).'); return; }
+  bvSource = isImages ? 'images' : 'video';
+  bvSaveFeature();
+  bvCurrentFile = labelOverride || ((isImages && files.length > 1)
+    ? (file.name + '  (+' + (files.length - 1) + ' more)')
+    : (file.name || ''));
+  if (typeof currentProvider !== 'undefined' && currentProvider === 'openai'){
+    alert('Bug from Video needs the Claude provider (vision). Switch provider to Claude and try again.');
+    return;
+  }
+  bvShowState('processing');
+  document.getElementById('bv-status-txt').textContent = isImages ? 'Reading the screenshots…' : 'Reading the recording…';
+  try {
+    var out = isImages ? await bvImagesToFrames(files) : await bvExtractFrames(file);
+    document.getElementById('bv-status-txt').textContent = 'Writing the bug report…';
+    var report = await bvAnalyze(out.frames, out.duration, { source: isImages ? 'images' : 'video' });
+    bvFillReport(report, out.frames);
+    bvShowState('report');
+  } catch (e){
+    bvShowState('upload');
+    alert('Could not generate a report: ' + (e && e.message ? e.message : e));
+  }
+}
+
+// One JSON-returning model call; shared by both passes.
+// NOTE: the app's /api/claude proxy runs the Claude Code CLI, not the HTTP API. It maps the
+// model name by alias — any name containing "opus" → the CLI's current Opus, otherwise Sonnet —
+// and forwards body.effort as --effort. Sampling params (temperature) are ignored by that path.
+async function bvCallJson(content, maxTokens, opts){
+  opts = opts || {};
+  var body = { model: opts.model || 'claude-sonnet-5', max_tokens: maxTokens || 1800, messages: [{ role: 'user', content: content }] };
+  if (opts.effort) body.effort = opts.effort;
+  if (opts.frameMode) body.frameMode = true; // terse per-image wording in the proxy (many frames)
+  var r = await fetch(getApiUrl(), { method: 'POST', headers: getApiHeaders(), body: JSON.stringify(wrapBody(body)) });
+  if (!r.ok){ var t = await r.text(); throw new Error('API ' + r.status + ' — ' + t.slice(0, 200)); }
+  var data = await r.json();
+  var raw = extractText(data).trim();
+  var m = raw.match(/\{[\s\S]*\}/);
+  if (!m) throw new Error('The model did not return readable JSON.');
+  return JSON.parse(m[0]);
+}
+function bvSetStatus(t){ var el = document.getElementById('bv-status-txt'); if (el) el.textContent = t; }
+
+// TWO-PASS so the video and the tester's text never blend:
+//   Pass 1 sees ONLY the frames → objective observations (this is the validation).
+//   Pass 2 sees those observations + the note → writes the report. Names/terms come
+//   from the note; symptoms may only come from what pass 1 actually saw.
+async function bvAnalyze(frames, duration, opts){
+  var isImg = !!(opts && opts.source === 'images');
+  var unit = isImg ? 'Screenshot' : 'Frame';
+  var srcWord = isImg ? 'screenshots' : 'video';
+  var feature = bvFeature();
+  var featureRule = feature
+    ? '- FEATURE UNDER TEST: "' + feature + '". Start the title with "[' + feature + '] " and set "screen" to the specific screen inside that feature. Do NOT claim the bug is caused by the feature unless that is visible — the feature is context for where testing happened.\n'
+    : '';
+  // Reuse the app's existing Project Context (game, platforms, QA focus, quirks-to-ignore,
+  // house style) so reports are written from inside the project instead of describing pixels.
+  var ctxBlock = '';
+  try { if (typeof buildContextBlock === 'function') ctxBlock = buildContextBlock() || ''; } catch (e) { ctxBlock = ''; }
+  // Guard against the context becoming a source of invented detail.
+  var ctxGuard = ctxBlock
+    ? 'USING THE PROJECT CONTEXT — naming and ruling-out ONLY. Use it to name the game, screens, features and currencies correctly, and to recognise behaviour listed as known/by-design (do not report those as bugs). ' +
+      'It is NOT evidence: never take a symptom, a step, a screen or a value from the context if it is not actually visible in the ' + srcWord + '. Everything you report must still be checkable in the ' + srcWord + '.\n\n'
+    : '';
+  var hint = (document.getElementById('bv-hint') && document.getElementById('bv-hint').value || '').trim();
+  var glossary = bvGlossaryForPrompt();
+  var glossaryBlock = glossary
+    ? 'VOCABULARY (what you see = what to call it) — use these names when they clearly apply:\n' + glossary + '\n\n'
+    : '';
+
+  // ── PASS 1: observe (frames only, NO note) ──────────────────────────────
+  bvSetStatus('Watching the recording…');
+  // With a note, pass 1 is a targeted VERIFICATION of the tester's claim (track the named
+  // things frame by frame). Without one, it hunts for the clearest in-world anomaly — but
+  // character/object behaviour first; HUD counters are the last resort, not the default.
+  var taskBlock = hint
+    ? 'TESTER\'S CLAIM TO VERIFY: "' + hint + '"\n' +
+      'Your job is to CHECK this claim against the frames, like a reviewer. Identify the characters/objects/screens it names, then TRACK THEM FRAME BY FRAME: where are they, do they change position between frames, what appears/disappears, when do they move again. ' +
+      'Decide "confirmed" (frames clearly show it), "partial" (some of it visible), or "not_confirmed" (frames do not show it), and cite the frame numbers. ' +
+      'Do NOT get distracted by HUD counters, timers or currency unless the claim is about them.\n\n'
+    : 'No claim was given. Sweep the categories below and report the clearest defect you can actually see. ' +
+      'Gameplay/world problems (a character or object that stops moving, disappears, is mispositioned) and UI/visual problems (overlapping, leftover or clipped elements) are equally valid — pick whichever is most clearly wrong. ' +
+      'A counter or timer on its own is the weakest kind of finding; prefer it only if nothing else looks wrong.\n\n';
+
+  var p1 =
+    (isImg
+      ? 'You are looking at screenshots of a mobile game, in the order the tester chose them (each labelled "Screenshot N of M"). '
+      : 'You are watching still frames from a mobile-game screen recording, in chronological order (each labelled "Frame N of M"). ') +
+    'Describe objectively what is visible and what CHANGES between them. Do not write a bug report.\n\n' +
+    taskBlock + ctxBlock + ctxGuard + glossaryBlock +
+    'ISSUE CATEGORIES — use these to CLASSIFY the problem(s) you were asked about. This is a classifier, NOT a hunt: never go looking for extra issues beyond the claim (or, with no claim, beyond the single clearest defect).\n' +
+    '- CRASH / ANR: the app closing and the device home screen or launcher becoming visible; an Android system dialog such as "<app> keeps stopping", "<app> has stopped", or "isn\'t responding" with Close/Wait/Open app again buttons; a console/terminal window or an error notification appearing over the game. Read any such dialog text exactly. A crash is the highest-value finding — report it above anything else you see.\n' +
+    '- VISUAL / RENDERING: elements overlapping or drawn on top of the wrong thing; leftover elements from a previous state that did not clear; missing, blank or placeholder art; stretched or wrongly scaled art; clipped or cut-off text; misaligned elements; duplicates; half-drawn or flickering frames.\n' +
+    '- LAYOUT / SAFE AREA: text overflowing its button or box; elements partly off-screen; content hidden under the notch or rounded corners; overlapping tap targets.\n' +
+    '- UX FLOW: a popup that will not close or reopens by itself; two popups at once; the wrong screen after an action; a close/back button that leaves the player stuck; an action with no visible feedback; a dead-end or blocked state; a step the player has to repeat.\n' +
+    '- TEXT / LOCALISATION: untranslated or mixed-language strings; visible placeholder keys; truncated translations; garbled characters.\n' +
+    '- STATE / DATA: a counter, price, quantity or reward that is clearly wrong for its context (e.g. a "x0" quantity, a value above its stated cap, an empty reward).\n' +
+    'FOR REPRODUCTION STEPS — also note, for each distinct screen or state you see: what that screen is (use its on-screen title/labels) and what the player appears to have just done to arrive there. This is what the steps are built from.\n' +
+    'NAME THE SCREEN/FEATURE: put the clearest name for where the problem occurs into "screenName" — use the on-screen title if there is one (e.g. "¿Seguir jugando?" popup), otherwise the game feature it belongs to. Leave "" if genuinely unclear.\n\n' +
+    'IGNORE (recording/phone artifacts, not the game): the phone status bar (clock, wifi/battery icons) or a black letterbox bar at the top; the Android notification shade (dark panel with toggle circles and a red "Recording screen" card). Do not list these.\n\n' +
+    'RULES:\n' +
+    '- Describe ONLY what you can literally see. Say "a character" if you cannot name it; never guess names or numbers you cannot read.\n' +
+    '- NEVER CLAIM SOMETHING IS ABSENT. Sampled stills CANNOT prove absence — a button may be small, low-contrast, in a corner, or on screen only briefly between two sampled frames. Never write "there is no X", "X is missing", "no Skip button", "the button cannot be found". If you do not see something, simply do not mention it; only if it matters, write "X is not visible in the sampled frames" and set confidence to low.\n' +
+    '- IF THE CLAIM SAYS THE TESTER USED A CONTROL, THAT CONTROL EXISTS. Assume it is there (they operated the device) and focus on WHAT HAPPENED when they used it — never contradict them by reporting the control as absent.\n' +
+    '- TESTER ANNOTATIONS: red boxes, circles, arrows or highlights drawn ON a screenshot are the tester pointing at the problem — they are NOT game UI. Treat these as the primary evidence.\n' +
+    '  COUNT them first and give ONE observation per annotated region (e.g. "Annotation 1 of 2: ..."), describing exactly what is inside it: which element, where it sits, what it overlaps or covers. Never describe only some of them.\n' +
+    '  An ARROW from one element to another means the tester is linking them — state where it starts and where it ends, because that relationship is usually the bug.\n' +
+    '- BE CONCRETE about UI: name elements by their visible label or appearance (e.g. the "¿Seguir jugando?" popup, the "Compra rápida" panel, a purple booster piece with a "10" counter) and say WHERE each is and WHAT it overlaps. Never write vague words like "messed up", "disordered", "broken layout", "out of order".\n' +
+    '- Use on-screen text to name screens, popups, panels and buttons; keep labels in their original language, in quotes.\n' +
+    '- Do NOT use interpretive words like "unresponsive", "stuck", "crash", "broken", "frozen", "blocked". Say what is visible: "stay in the same position from Frame 9 to Frame 15", "is no longer shown".\n' +
+    '- AT MOST 4 short observations PER problem you were asked about (the claim may name more than one; if there is no claim, there is exactly one problem). Nothing else — no notes about parts that work correctly, no describing tutorials/tooltips/normal flow, and NEVER an inventory of what a screen contains (do not list item names, icons or quantities). If it is not needed to understand or reproduce the problem, leave it out.\n' +
+    '- If a top-left debug overlay shows a build version and/or device name, read it exactly into "environment"; else "".\n\n' +
+    'Return ONLY valid JSON (no markdown) shaped exactly:\n' +
+    '{"observations":["..."],"claimVerdict":"confirmed|partial|not_confirmed|no_claim","claimEvidence":"one sentence: what the frames show about the claim (or the clearest anomaly if no claim)","evidenceFrames":[1],"screenName":"","environment":"","confidence":"high|medium|low"}';
+
+  var c1 = [{ type: 'text', text: p1 }];
+  frames.forEach(function(f, i){
+    c1.push({ type: 'text', text: unit + ' ' + (i + 1) + ' of ' + frames.length + ':' });
+    c1.push({ type: 'image', source: { type: 'base64', media_type: f.mediaType || 'image/jpeg', data: f.base64 } });
+  });
+  // Pass 1 is where accuracy lives → strongest vision model (Opus). Opus burns subscription
+  // quota faster than Sonnet, so it's used ONLY here; if it fails (quota/availability), fall
+  // back to Sonnet so the tool still works.
+  var obs;
+  try {
+    obs = await bvCallJson(c1, 4000, { model: 'claude-opus-5', effort: 'high', frameMode: true });
+  } catch (e1) {
+    bvSetStatus('Opus unavailable — retrying with Sonnet…');
+    obs = await bvCallJson(c1, 4000, { model: 'claude-sonnet-5', effort: 'high', frameMode: true });
+  }
+  var observations = Array.isArray(obs.observations) ? obs.observations : [];
+
+  // ── PASS 2: write (observations + note, text only) ───────────────────────
+  bvSetStatus('Writing the bug report…');
+  var noteBlock = hint
+    ? 'TESTER\'S NOTE (what they did and what they think went wrong):\n"' + hint + '"\n\n'
+    : 'TESTER\'S NOTE: (none given)\n\n';
+
+  var p2 =
+    'You are a senior QA engineer writing a concise bug report for a developer.\n\n' +
+    'You have two sources. Keep them straight:\n' +
+    '(A) VIDEO OBSERVATIONS + a VERDICT on whether the frames confirm the tester\'s claim — this decides how strongly the symptom can be stated and gives the visible detail.\n' +
+    '(B) TESTER\'S NOTE — this IS the reported issue. It supplies the NAMES/TERMS (characters, features, screens, buttons) and the TRIGGER/ACTIONS taken.\n\n' +
+    'VERIFIED VIDEO OBSERVATIONS:\n' + (observations.length ? observations.map(function(o){ return '- ' + o; }).join('\n') : '- (none)') + '\n' +
+    'VIDEO VERDICT ON THE TESTER\'S CLAIM: ' + (obs.claimVerdict || 'no_claim') + (obs.claimEvidence ? ' — ' + obs.claimEvidence : '') + '\n\n' +
+    'SCREEN / FEATURE identified from the ' + srcWord + ': ' + (obs.screenName || '(not identified)') + '\n\n' +
+    (bvCurrentFile ? 'SOURCE FILE NAME (testers often name the bug here — a useful hint, but weaker than the note and the observations; never let it contradict them): "' + bvCurrentFile + '"\n\n' : '') +
+    noteBlock + ctxBlock + ctxGuard + glossaryBlock +
+    'RULES:\n' +
+    '- THE NOTE DECIDES HOW MANY ISSUES. If the note describes ONE problem, return exactly one entry in "issues". If it clearly describes SEVERAL distinct problems, return one entry PER problem, in the order the note mentions them — do not merge them into one and do not drop any. If there is no note, return exactly one entry: the single clearest defect. NEVER add an issue the note did not raise.\n' +
+    '- Each entry is self-contained (its own title, description, steps, observation, expected, screen, issueType, severity) and obeys the length limits below on its own.\n' +
+    '- THE NOTE\'S PREMISE IS AUTHORITATIVE. The tester operated the device, so whatever they say they did or used — a button, a screen, a control, an action — EXISTS and happened. Never contradict it, never describe it as missing or absent, and never write a step about looking for it. If the frames did not happen to show it, that is a limitation of frame sampling: say so in "videoCheck" only, and still report the bug the tester described.\n' +
+    '- If the verdict is "not_confirmed" for an issue, still report it, keep the wording to what the tester described, and say so in "videoCheck".\n' +
+    '- OMIT EVERYTHING THAT IS NOT THE BUG. Do not mention tutorials, tooltips, onboarding, normal flow, or anything that merely looked unfamiliar — unfamiliar is not broken. Never list a screen\'s contents or item quantities. If you are unsure something is a defect, leave it out entirely.\n' +
+    '- KEEP IT SHORT — a QA engineer should read it in 20 seconds. Hard limits: title max 14 words; description max 3 sentences; steps max 5; "actual" max 2 sentences; "expected" 1 sentence; "videoCheck" 1 short line. Prefer fewer.\n' +
+    '- USE THE NAMES FROM THE NOTE (when it matches). If the note says "Lily and Luke", write Lily and Luke — never "the two characters" or "second character". Map "a character" in the observations to the named character when the note makes it clear. Same for features, screens and buttons the note names.\n' +
+    '- Describe the SYMPTOM as the tester\'s claim, phrased with what is visible: if the claim says "unable to move" and the frames show the characters staying in the same position, write "stop moving / stay in place" — do not upgrade it to "unresponsive/frozen/crash" unless the frames show that. Do not add other problems (counters, currency) that are not the claim.\n' +
+    '- STEPS: build the shortest path a fresh tester could follow — ' + (feature
+      ? '(1) start the "' + feature + '" feature, (2) make the progress needed inside it, (3) reach the screen/state from the observations, (4) perform the trigger action from the note if there is one, (5) EXACTLY ONE final "Observe ..." step. '
+      : '(1) get to the screen/state named in the observations, using its on-screen name and the in-game condition that makes it appear, (2) perform the trigger action from the note if there is one, (3) EXACTLY ONE final "Observe ..." step naming everything to look at. ') +
+    'One action per step, 3-6 steps total. ' +
+    'Steps must be ACTIONS the tester performs, not instructions to look around or investigate: never use "Locate ...", "Attempt to find ...", "Look for ...", "Check whether ... exists", and never write more than one "Observe" step. If the note says the tester tapped/skipped/opened something, the step is that action ("Tap Skip on the tutorial"), never a search for it. No recording or notification-panel steps. If there is no visible path to the screen, start with a step that reaches it by name rather than inventing navigation.\n' +
+    '- WRITE IT IN THE GAME\'S TERMS, not as a description of pixels. Refer to things by the name the team would use — the game\'s own screen, feature, reward, currency and character names (from the Project Context and the on-screen labels): "the \'¡Piezas rosas!\' reward", "the level-fail continue offer", "the quick-buy IAP panel" — NOT "a purple booster piece with a 10 counter" or "a panel on the right".\n' +
+    '- "screen" = the screen/feature where it happens (use the identified name above). "issueType" = ONE of: Crash/ANR, UI layout, Visual glitch, Overlapping windows, Localization, Flow/UX, Data/State, Performance.\n' +
+    featureRule +
+    '- SEVERITY follows the type: Crash/ANR = High. Progress-blocking or money/IAP-affecting = High. Overlapping windows, Visual glitch, UI layout, Data/State, Flow/UX = Medium. Cosmetic-only or Localization = Low (Medium if it makes text unreadable or a button unusable).\n' +
+    '- BE SPECIFIC, NEVER VAGUE: do not write "messed up", "disordered", "broken", "out of order", "UI flow", "glitchy". State exactly WHICH elements appear wrong, WHERE, and WHAT they overlap or cover, using the names/labels from the observations (on-screen labels stay in their original language, in quotes).\n' +
+    '- If the observations mention tester annotations, the report is about what they point at, and it must cover EVERY annotated region — not just one. Two or more marked spots are usually the SAME bug showing in two places: say so in one title and describe each marked element in the description. Never silently drop a marked region.\n' +
+    '- Arrows drawn from one element to others show a RELATIONSHIP the tester is pointing out (e.g. this reward appearing in those wrong places). Report that relationship as the defect rather than describing the endpoints separately.\n' +
+    '- "actual" (shown as Observation) is the concrete visible defect at element level, as seen on screen. It must NOT restate the description or the note in other words.\n' +
+    '- "description": 2-3 tight present-tense sentences ABOUT THE ISSUE ONLY: what goes wrong, what triggers it, how it recovers. ' +
+    'Do NOT pad it with incidental on-screen details that are not the bug — counters, currency, Energy values, timers, unrelated UI. ' +
+    'Those belong in "videoCheck" as supporting evidence, not in the description. No storytelling ("while playing", "the tester").\n' +
+    '- DESCRIPTION SHAPE — pick whichever reads faster:\n' +
+    '  (a) ONE short paragraph (1-3 sentences) when it is a single connected point; or\n' +
+    '  (b) 2-4 BULLET lines, each starting "- ", when there are distinct facts (what breaks / what triggers it / what is logged / how it recovers). Put each bullet on its own line, max ~14 words, no sub-bullets, no trailing full stops on bullets.\n' +
+    '  Use bullets whenever a paragraph would need "and" or a semicolon to hold separate facts together.\n' +
+    '- WORD ECONOMY: cut every word that carries no information. Delete hedges and filler — "appears to", "seems to", "it can be seen that", "the in-game", "in the recording", "there is a", "is being", "proceeds to", "following which". Use the active voice and the shortest accurate verb ("logs" not "then logs an entry for"; "crashes" not "results in a crash"). Keep exact names, labels, numbers and error text verbatim — shorten the prose, never the evidence.\n' +
+    '- WRITE AS OBSERVED FROM THE RECORDING. The whole report (title, description, steps, expected, actual) must read as an account of what happens in the recording — plain observed events in present tense, e.g. "Lily and Luke stop moving after the cinematic is skipped". ' +
+    'NEVER attribute anything to a person or source inside the report: no "the tester reports/says", "according to the note", "reportedly", "might happen", "it is said". The ONLY place sources are distinguished is the "videoCheck" line. Steps describe the actions performed in the recording.\n' +
+    '- No timestamps or frame numbers anywhere in the text.\n' +
+    '- Do not invent screens, menus or numbers not in the observations or the note.\n' +
+    '- "videoCheck": ONE short line, format exactly: "From ' + srcWord + ': <what was actually visible> | From note: <what came only from the note, or \'none\'>". This lets the reviewer see the sources were kept separate.\n' +
+    '- NO SPECULATION: state only what is visible. Do not add consequences or behaviour you cannot see' + (isImg ? ' — a single still cannot show whether a flow is blocked, whether something recovers, or what happens next' : '') + '. Drop any sentence that is inference rather than observation.\n\n' +
+    'Return ONLY valid JSON (no markdown) shaped exactly:\n' +
+    '{"issues":[{"title":"","screen":"","issueType":"","description":"","steps":["..."],"expected":"","actual":"","severity":"Low|Medium|High"}],"videoCheck":""}';
+
+  // Pass 2 is plain text → Sonnet at medium effort (cheap on quota, more than good enough).
+  var rep = await bvCallJson([{ type: 'text', text: p2 }], 2000, { model: 'claude-sonnet-5', effort: 'medium' });
+
+  // Merge: facts that only the video can supply come from pass 1.
+  rep.environment    = obs.environment || '';
+  rep.evidenceFrames = obs.evidenceFrames || [];
+  return rep;
+}
+
+function bvFmtTime(sec){
+  sec = Math.max(0, Math.round(sec));
+  var m = Math.floor(sec / 60), s = sec % 60;
+  return m + ':' + (s < 10 ? '0' : '') + s;
+}
+// Map the model's flagged frame numbers back to a timecode range in the video.
+function bvSeenLine(rp, frames){
+  // Screenshots have no timeline (t is null) — no "Seen in recording" line for them.
+  if (!Array.isArray(frames) || !frames.length || frames[0].t == null) return '';
+  var nums = (rp.evidenceFrames || []).map(function(n){ return parseInt(n, 10); })
+    .filter(function(n){ return n >= 1 && n <= frames.length; });
+  if (!nums.length) return '';
+  var times = nums.map(function(n){ return frames[n - 1].t; }).sort(function(a, b){ return a - b; });
+  var lo = times[0], hi = times[times.length - 1];
+  return 'Seen in recording: ~' + bvFmtTime(lo) + (hi - lo > 1.2 ? '–' + bvFmtTime(hi) : '');
+}
+
+// The report box is a contenteditable div (a textarea can't colour a label). Each line is a
+// <div class="bv-ln">, so innerText copies back out as clean plain text with line breaks.
+function bvEsc(s){ return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function bvLn(html){ return '<div class="bv-ln">' + (html === '' ? '<br>' : html) + '</div>'; }
+function bvLbl(label, rest, cls){
+  return bvLn('<span class="' + (cls || 'bv-lbl') + '">' + bvEsc(label) + '</span>' + (rest ? ' ' + bvEsc(rest) : ''));
+}
+
+// Raw debug-overlay text -> team convention.
+// "Version 3.81.0-753997 : SM-G998B:High" -> release 3.81.x rev. 753997  +  device SM-G998B (High)
+function bvFormatEnv(raw){
+  var s = raw.replace(/^\s*Version\s*/i, '').trim();
+  var m = s.match(/(\d+)\.(\d+)\.(\d+)[.\-_]+(\d{4,})/);
+  var release = s, device = '';
+  if (m){
+    release = 'release ' + m[1] + '.' + m[2] + '.x rev. ' + m[4];
+    var rest = s.slice(s.indexOf(m[0]) + m[0].length).replace(/^[\s:,-]+/, '').trim();
+    if (rest){
+      var q = rest.split(':').map(function(t){ return t.trim(); }).filter(Boolean);
+      device = q.length > 1 ? (q[0] + ' (' + q.slice(1).join(' ') + ')') : q[0];
+    }
+  }
+  return { release: release, device: device };
+}
+
+function bvFillReport(rp, frames){
+  var fl = document.getElementById('bv-file-label');
+  if (fl) fl.textContent = bvCurrentFile ? '🎬 Report for: ' + bvCurrentFile : '';
+  var H = [];
+  // The note decides the count: 1 issue renders flat (as before), 2+ render as numbered blocks.
+  var issues = (Array.isArray(rp.issues) && rp.issues.length) ? rp.issues : [rp];
+  var multi = issues.length > 1;
+
+  issues.forEach(function(it, n){
+    if (n) H.push(bvLn(''));
+    var title = (it.title || 'Bug report').trim();
+    H.push(bvLn('<span class="bv-title-ln">' + bvEsc(multi ? ('Issue ' + (n + 1) + ' — ' + title) : title) + '</span>'));
+    if (!n){
+      var seen = bvSeenLine(rp, frames);
+      if (seen) H.push(bvLn(bvEsc(seen)));
+    }
+    // Classification up front — it is what a reviewer triages on.
+    var meta = [];
+    if (it.screen)    meta.push(bvLbl('Screen / Feature:', String(it.screen).trim()));
+    if (it.issueType) meta.push(bvLbl('Issue type:', String(it.issueType).trim()));
+    // A crash is never Medium — enforce the floor regardless of what the model returned.
+    var sev = String(it.severity || '').trim();
+    if (/crash|anr/i.test(String(it.issueType || ''))) sev = 'High';
+    if (sev) meta.push(bvLbl('Severity:', sev));
+    // With a single issue the shared lines are unambiguous, so they belong up here too.
+    // With several, they stay as a shared footer (and bvSplitIssues relies on that).
+    if (!multi){
+      if (rp.environment){
+        var env1 = bvFormatEnv(String(rp.environment).trim());
+        meta.push(bvLbl('Environment:', env1.release));
+        if (env1.device) meta.push(bvLbl('Device:', env1.device));
+      }
+      if (rp.videoCheck) meta.push(bvLbl((bvSource === 'images' ? 'Screenshot check —' : 'Video check —'), String(rp.videoCheck).trim()));
+    }
+    if (meta.length){ H.push(bvLn('')); H = H.concat(meta); }
+    if (it.description){
+      H.push(bvLn('')); H.push(bvLbl('Description:'));
+      // Render bullets / multi-line descriptions one line per row, bullets slightly indented.
+      String(it.description).trim().split('\n').forEach(function(d){
+        var t = d.trim();
+        if (!t) return;
+        var b = t.match(/^[-*•]\s*(.+)$/);
+        H.push(b ? bvLn('<span style="padding-left:14px;">• ' + bvEsc(b[1]) + '</span>')
+                 : bvLn(bvEsc(t)));
+      });
+    }
+    if (Array.isArray(it.steps) && it.steps.length){
+      H.push(bvLn('')); H.push(bvLbl('Steps to reproduce:'));
+      it.steps.forEach(function(s, i){ H.push(bvLn(bvEsc((i + 1) + '. ' + String(s).trim()))); });
+    }
+    // "Observation" (what was seen) comes BEFORE Expected, highlighted in light orange.
+    if (it.actual){   H.push(bvLn('')); H.push(bvLbl('Observation:', String(it.actual).trim(), 'bv-lbl-obs')); }
+    if (it.expected){ H.push(bvLn('')); H.push(bvLbl('Expected:', String(it.expected).trim())); }
+  });
+
+  // Several issues -> Environment / check line stay a shared footer (bvSplitIssues expects
+  // them trailing, so each split ticket inherits them).
+  if (multi){
+    if (rp.environment){
+      var env = bvFormatEnv(String(rp.environment).trim());
+      H.push(bvLn(''));
+      H.push(bvLbl('Environment:', env.release));
+      if (env.device) H.push(bvLbl('Device:', env.device));
+    }
+    if (rp.videoCheck){ H.push(bvLn('')); H.push(bvLbl((bvSource === 'images' ? 'Screenshot check —' : 'Video check —'), String(rp.videoCheck).trim())); }
+  }
+  document.getElementById('bv-r-all').innerHTML = H.join('');
+}
+
+function bvCopyAll(btn){
+  var el = document.getElementById('bv-r-all');
+  bvCopy((el.innerText || el.textContent || '').trim(), btn, 'copy report');
+}
+
+/* ── Create the report as a Jira Bug (same Atlassian-MCP path the subtask push uses) ── */
+function bvToggleJira(){
+  var row = document.getElementById('bv-jira-row');
+  var show = row.style.display === 'none';
+  row.style.display = show ? 'flex' : 'none';
+  if (show){
+    var inp = document.getElementById('bv-jira-proj');
+    if (!inp.value) inp.value = localStorage.getItem('ni_bugvid_project') || '';
+    // Offer one-vs-separate only when the report actually has numbered issue blocks.
+    var ed = document.getElementById('bv-r-all');
+    var n = bvSplitIssues((ed.innerText || ed.textContent || '').trim()).length;
+    var wrap = document.getElementById('bv-jira-mode-wrap');
+    if (n > 1){
+      document.getElementById('bv-jira-n').textContent = n;
+      wrap.style.display = 'flex';
+    } else {
+      wrap.style.display = 'none';
+      var one = document.querySelector('input[name="bv-jira-mode"][value="one"]');
+      if (one) one.checked = true;
+    }
+    document.getElementById('bv-jira-status').textContent = '';
+    inp.focus();
+  }
+}
+
+// Turn the (possibly edited) report text into ADF so Jira renders headings, bold labels
+// and a numbered step list — the same structure the subtask push builds.
+function bvReportTextToAdf(text){
+  var P  = function(t){ return { type: 'paragraph', content: [{ type: 'text', text: t }] }; };
+  var H  = function(t){ return { type: 'heading', attrs: { level: 3 }, content: [{ type: 'text', text: t }] }; };
+  var LP = function(label, rest){
+    var c = [{ type: 'text', text: label, marks: [{ type: 'strong' }] }];
+    if (rest) c.push({ type: 'text', text: ' ' + rest });
+    return { type: 'paragraph', content: c };
+  };
+  var content = [], steps = [], bullets = [];
+  function flushSteps(){
+    if (!steps.length) return;
+    content.push({ type: 'orderedList', content: steps.map(function(t){ return { type: 'listItem', content: [P(t)] }; }) });
+    steps = [];
+  }
+  function flushBullets(){
+    if (!bullets.length) return;
+    content.push({ type: 'bulletList', content: bullets.map(function(t){ return { type: 'listItem', content: [P(t)] }; }) });
+    bullets = [];
+  }
+  var labelRe = /^(Observation|Expected|Environment|Device|Severity|Screen \/ Feature|Issue type|Seen in recording|Video check|Screenshot check)\s*[:—-]\s*(.*)$/;
+  text.split('\n').forEach(function(raw){
+    var ln = raw.trim(), m;
+    if (!ln){ flushSteps(); flushBullets(); return; }
+    if ((m = ln.match(/^\d+\.\s+(.*)$/))){ flushBullets(); steps.push(m[1]); return; }
+    if ((m = ln.match(/^[-*•]\s+(.+)$/))){ flushSteps(); bullets.push(m[1]); return; }
+    flushSteps(); flushBullets();
+    if (/^(Description|Steps to reproduce):$/i.test(ln)){ content.push(H(ln.replace(/:$/, ''))); return; }
+    if ((m = ln.match(labelRe))){ content.push(LP(m[1] + ':', m[2])); return; }
+    content.push(P(ln));
+  });
+  flushSteps(); flushBullets();
+  return { type: 'doc', version: 1, content: content };
+}
+
+// Split an (edited) report into its "Issue N — ..." blocks. Returns [] when there is
+// only one issue. Environment / check lines at the end are shared by every ticket.
+function bvSplitIssues(text){
+  var lines = text.split('\n');
+  var marks = [];
+  lines.forEach(function(ln, i){ if (/^\s*Issue\s+\d+\s*[—-]\s*\S/i.test(ln)) marks.push(i); });
+  if (marks.length < 2) return [];
+  // Trailing shared lines (Environment / Video check / Screenshot check) after the last block.
+  var end = lines.length, shared = [];
+  for (var i = lines.length - 1; i > marks[marks.length - 1]; i--){
+    if (/^\s*(Environment:|Video check|Screenshot check)/i.test(lines[i])){ shared = lines.slice(i).filter(function(s){ return s.trim(); }); end = i; }
+  }
+  return marks.map(function(start, n){
+    var stop = (n + 1 < marks.length) ? marks[n + 1] : end;
+    var title = lines[start].trim().replace(/^\s*Issue\s+\d+\s*[—-]\s*/i, '');
+    var body  = lines.slice(start + 1, stop).join('\n').trim();
+    if (shared.length) body += '\n\n' + shared.join('\n');
+    return { title: title, body: body };
+  });
+}
+
+// Accepts a parent ticket (full Jira URL or SMR-1234) or a bare project key (SMR).
+// Returns {project, parent} or null when unrecognised.
+function bvParseJiraTarget(raw){
+  var s = String(raw || '').trim();
+  var m = s.match(/([A-Za-z][A-Za-z0-9]{1,9})-(\d+)/);
+  if (m) return { project: m[1].toUpperCase(), parent: (m[1] + '-' + m[2]).toUpperCase() };
+  var p = s.replace(/^.*\/browse\//i, '').replace(/[?#].*$/, '').trim();
+  if (/^[A-Za-z][A-Za-z0-9]{1,9}$/.test(p)) return { project: p.toUpperCase(), parent: '' };
+  return null;
+}
+
+// Create ONE Jira Bug via the Atlassian MCP — as a subtask when target.parent is set.
+// Returns {key, url}.
+async function bvJiraCreateIssue(target, rawTitle, bodyText){
+  var proj = target.project, parent = target.parent || '';
+  var summary = String(rawTitle).trim().replace(/^Issue\s+\d+\s*[—-]\s*/i, '')
+    .replace(/[^\w \-_.(),:'"\/]/g, ' ').replace(/\s{2,}/g, ' ').slice(0, 240);
+  var adf = bvReportTextToAdf(String(bodyText || '').trim());
+  var prompt = parent ? [
+    "You are an automation assistant. Create a Jira BUG as a CHILD/SUBTASK of an existing parent issue, using the Atlassian MCP tools.",
+    "",
+    "cloudId: 34aa4a4c-c013-48e8-831e-38a9b5e86a13",
+    "projectKey: " + proj,
+    "parent: " + parent,
+    "",
+    "STEP 1 — pick the issue type: inspect the issue types available for project " + proj + " (e.g. with getJiraProjectIssueTypesMetadata).",
+    "Choose, in this order of preference: a subtask-level type whose name contains 'Bug'; else 'Bug' if it is valid as a child of " + parent + "; else the project's subtask type (e.g. 'Sub-task', 'Subtask').",
+    "",
+    "STEP 2 — create it with createJiraIssue using EXACTLY these values (do not modify them):",
+    "- summary: " + summary,
+    "- parent: " + parent,
+    "- contentFormat: adf",
+    "- description: " + JSON.stringify(JSON.stringify(adf)),
+    "",
+    "Pass the description field as the exact ADF JSON string above — do not reformat or summarise it.",
+    "Do not transition or change the status of the issue.",
+    "",
+    "Return ONLY JSON like: {\"key\":\"PROJ-123\",\"url\":\"https://tactileentertainment.atlassian.net/browse/PROJ-123\"}"
+  ].join("\n") : [
+    "You are an automation assistant. Create a Jira issue of type 'Bug' using the Atlassian MCP createJiraIssue tool.",
+    "",
+    "Use these EXACT parameters — do not modify any values:",
+    "- cloudId: 34aa4a4c-c013-48e8-831e-38a9b5e86a13",
+    "- projectKey: " + proj,
+    "- issueTypeName: Bug",
+    "- summary: " + summary,
+    "- contentFormat: adf",
+    "- description: " + JSON.stringify(JSON.stringify(adf)),
+    "",
+    "Pass the description field as the exact ADF JSON string above — do not reformat or summarise it.",
+    "Do not transition or change the status of the issue.",
+    "",
+    "Return ONLY JSON like: {\"key\":\"PROJ-123\",\"url\":\"https://tactileentertainment.atlassian.net/browse/PROJ-123\"}"
+  ].join("\n");
+
+    var resp = await fetch(getApiUrl(), { method: 'POST', headers: getApiHeaders(), body: JSON.stringify(wrapBody({
+      model: 'claude-sonnet-5', max_tokens: 1000,
+      mcp_servers: [{ type: 'url', url: 'https://mcp.atlassian.com/v1/mcp', name: 'atlassian-mcp' }],
+      messages: [{ role: 'user', content: prompt }]
+    })) });
+    if (!resp.ok){ var et = await resp.text(); throw new Error('Jira API error ' + resp.status + ': ' + et.slice(0, 80)); }
+    var data = await resp.json();
+    var raw = extractText(data);
+    if (!raw.trim()) throw new Error('Empty response from Jira MCP — check MCP connection');
+    // The CLI owns the Atlassian connector; surface the one-time auth step clearly.
+    if (/requires?\s+authentication|needs\s+authentication|not\s+authenticated|please\s+authenticate|unauthori[sz]ed/i.test(raw)){
+      throw new Error('Atlassian is not authenticated in Claude Code. In a terminal run "claude", type /mcp, select "claude.ai Atlassian" and authenticate — then retry.');
+    }
+    var clean = raw.replace(/```json|```/g, '').trim();
+    var s = clean.indexOf('{'), e = clean.lastIndexOf('}');
+    if (s === -1 || e === -1) throw new Error('No JSON in response: ' + clean.slice(0, 120));
+    var parsed = JSON.parse(clean.slice(s, e + 1));
+    if (!parsed.key) throw new Error('No ticket key returned — check Jira permissions');
+    var url = (parsed.url && parsed.url.indexOf('https://tactileentertainment.atlassian.net') === 0)
+      ? parsed.url : ('https://tactileentertainment.atlassian.net/browse/' + parsed.key);
+    return { key: parsed.key, url: url };
+}
+
+function bvJiraLink(key, url){
+  return '<a href="' + url + '" target="_blank" rel="noopener noreferrer" style="color:#5DCAA5;">' + bvEsc(key) + ' ↗</a>';
+}
+
+async function bvCreateJiraBug(){
+  var st = document.getElementById('bv-jira-status'), go = document.getElementById('bv-jira-go');
+  var rawTarget = (document.getElementById('bv-jira-proj').value || '').trim();
+  var target = bvParseJiraTarget(rawTarget);
+  if (!target){ st.textContent = 'Enter a parent ticket (link or SMR-1234) or a project key (SMR).'; st.style.color = '#F09595'; return; }
+  var proj = target.project;
+  if (typeof currentProvider !== 'undefined' && currentProvider === 'openai'){ st.textContent = 'Jira push requires the Claude provider.'; st.style.color = '#F09595'; return; }
+  var el = document.getElementById('bv-r-all');
+  var text = (el.innerText || el.textContent || '').trim();
+  if (!text){ st.textContent = 'Nothing to send.'; return; }
+  try { localStorage.setItem('ni_bugvid_project', rawTarget); } catch(e){}
+  var where = target.parent ? ('subtask under ' + target.parent) : ('bug in ' + proj);
+
+  var picked = document.querySelector('input[name="bv-jira-mode"]:checked');
+  var split = !!(picked && picked.value === 'split');
+  var issues = split ? bvSplitIssues(text) : [];
+  go.disabled = true; st.style.color = 'var(--text3)';
+
+  try {
+    if (issues.length > 1){
+      // One ticket per issue block.
+      var made = [], failed = 0;
+      for (var i = 0; i < issues.length; i++){
+        st.textContent = 'Creating ' + (i + 1) + ' of ' + issues.length + ' — ' + where + '…';
+        try {
+          var r = await bvJiraCreateIssue(target, issues[i].title, issues[i].body);
+          made.push(bvJiraLink(r.key, r.url));
+        } catch(e1){ failed++; }
+      }
+      st.innerHTML = (made.length ? '✓ created ' + made.join(', ') : '✗ none created') + (failed ? ' · ' + failed + ' failed' : '');
+      st.style.color = failed ? '#EF9F27' : '#5DCAA5';
+    } else {
+      var lines = text.split('\n');
+      st.textContent = 'Creating ' + where + '…';
+      var one = await bvJiraCreateIssue(target, lines[0], lines.slice(1).join('\n'));
+      st.innerHTML = '✓ created ' + bvJiraLink(one.key, one.url);
+      st.style.color = '#5DCAA5';
+    }
+  } catch(err){
+    st.textContent = '✗ ' + (err && err.message ? err.message.slice(0, 120) : 'failed');
+    st.style.color = '#F09595';
+  } finally { go.disabled = false; }
+}
+
+function bvCopy(text, btn, label){
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent; btn.textContent = '✓ copied';
+    setTimeout(function(){ btn.textContent = label; }, 1400);
+  }).catch(function(){ alert('Copy failed — select the text manually.'); });
+}
+</script>
 </body>
 </html>
