@@ -330,15 +330,15 @@
  .context-fields{display:flex;flex-direction:column;gap:8px;}
  .ctx-select{cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;charset=US-ASCII,%3Csvg width='10' height='6' viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23606070' stroke-width='1.2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:30px;}
  .ctx-field{display:flex;flex-direction:column;gap:4px;}
- .ctx-label{font-size:12px;font-family:'JetBrains Mono',monospace;color:#606070;letter-spacing:.06em;text-transform:uppercase;}
+ .ctx-label{font-size:11.5px;font-family:'JetBrains Mono',monospace;color:#9A93C8;letter-spacing:.06em;text-transform:uppercase;}
  .ctx-input{background:#111116;border:0.5px solid #252530;border-radius:7px;padding:8px 12px;font-size:13px;font-family:'Sora',sans-serif;color:#909098;outline:none;width:100%;transition:border-color .15s;}
  .ctx-input:focus{border-color:#383848;}
  .ctx-input::placeholder{color:#404050;}
  .ctx-textarea{resize:none;overflow:hidden;line-height:1.6;min-height:52px;}
  .ctx-save-btn{padding:5px 16px;background:#0F6E56;border:0.5px solid #148A6A;border-radius:6px;font-size:12px;color:#D6F5E8;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .15s;font-weight:500;}
  .ctx-save-btn:hover{background:#14846A;border-color:#1CA383;color:#EAFBF4;}
- .ctx-clear-btn{padding:5px 14px;background:transparent;border:0.5px solid #1e1e24;border-radius:6px;font-size:12px;color:#333340;cursor:pointer;font-family:'JetBrains Mono',monospace;}
- .ctx-clear-btn:hover{color:#666;border-color:#333;}
+ .ctx-clear-btn{padding:5px 14px;background:transparent;border:0.5px solid #3a3a48;border-radius:6px;font-size:12px;color:#9C96AE;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .15s;}
+ .ctx-clear-btn:hover{color:#D5D0E4;border-color:#585868;background:#16161e;}
  .ctx-saved-note{font-size:10px;font-family:'JetBrains Mono',monospace;color:#534AB7;}
  .att-btn-slack{border-color:#c070d840;color:#c070d8;}
  .att-btn-slack:hover{border-color:#d490e8;color:#d490e8;}
@@ -539,7 +539,7 @@
  .ex-item-txt{font-size:12px;color:#808090;font-family:'Sora',sans-serif;line-height:1.5;flex:1;}
  .ex-item-rm{background:transparent;border:none;color:#404050;font-size:14px;cursor:pointer;padding:0 2px;line-height:1;flex-shrink:0;}
  .ex-item-rm:hover{color:#8a6070;}
- .ex-count{font-size:9px;font-family:'JetBrains Mono',monospace;color:#505060;margin-left:4px;}
+ .ex-count{font-size:10.5px;font-family:'JetBrains Mono',monospace;color:#8A84B0;margin-left:5px;}
  /* v4.0 — evidence, originType, confidence */
  .origin-chip{display:inline-flex;align-items:center;font-size:10px;font-family:'JetBrains Mono',monospace;padding:2px 8px;border-radius:4px;letter-spacing:.04em;}
  .origin-explicit{background:#141420;color:#7a7a90;border:0.5px solid #2a2a38;}
@@ -745,7 +745,7 @@
             <div class="cp-custom-wrap" id="ctx-game-wrap" style="margin-top:6px;"><input class="ctx-input cp-custom-inp" id="ctx-game-custom" placeholder="Type game name, press Enter…" onkeydown="if(event.key==='Enter'){event.preventDefault();ctxCommitGame();}" onblur="ctxCommitGame()"/><button class="cp-custom-x" onmousedown="event.preventDefault()" onclick="ctxCancelGame()" title="cancel">×</button></div>
           </div>
           <div class="ctx-field">
-            <label class="ctx-label">Slack Channels <span style="color:#5a5470;text-transform:none;letter-spacing:0;font-size:10px;">— paste channel link or #name</span></label>
+            <label class="ctx-label">Slack Channels <span style="color:#8F89A8;text-transform:none;letter-spacing:0;font-size:10.5px;">— paste channel link or #name</span></label>
             <input class="ctx-input" id="ctx-slack" oninput="saveContext()" onblur="normalizeSlackChannels()" placeholder="Paste Slack channel link or #channel"/>
           </div>
         </div>
@@ -754,7 +754,7 @@
           <input class="ctx-input" id="ctx-qa-focus" oninput="saveContext()" placeholder="e.g. LiveOps, IAP flows, tournament logic, low connectivity, regression"/>
         </div>
         <div class="ctx-field">
-          <label class="ctx-label">Reference Documents <span style="color:#5a5470;text-transform:none;letter-spacing:0;font-size:10px;">— name docs to look up</span></label>
+          <label class="ctx-label">Reference Documents <span style="color:#8F89A8;text-transform:none;letter-spacing:0;font-size:10.5px;">— name docs to look up</span></label>
           <input class="ctx-input" id="ctx-refs" oninput="saveContext()" placeholder="e.g. Tournament spec, Naming conventions"/>
         </div>
         <div class="ctx-field">
@@ -764,11 +764,12 @@
         <div class="ctx-section-divider"></div>
         <div class="ctx-section-label">TC training</div>
         <div class="ctx-field">
-          <label class="ctx-label">TC Style &amp; Standards <span style="color:#5a5470;text-transform:none;letter-spacing:0;font-size:10px;">— standing rules injected into every QA generation</span></label>
+          <label class="ctx-label">TC Style &amp; Standards <span style="color:#8F89A8;text-transform:none;letter-spacing:0;font-size:10.5px;">— standing rules injected into every QA generation</span></label>
           <textarea class="ctx-input ctx-textarea" id="ctx-tc-style" oninput="autoResize(this);saveContext()" placeholder="e.g. Steps must be device-action level (tap, swipe, wait). Always test Android first. Preconditions must name build/branch. Expected result must reference both UI state and server response." rows="3"></textarea>
         </div>
         <div class="ctx-field" style="margin-top:10px;">
-          <label class="ctx-label">Cheat commands <span style="color:#5a5470;text-transform:none;letter-spacing:0;font-size:10px;margin-left:4px;">— command-sheet.md from the build you are testing; only the commands for the feature under test are used</span></label>
+          <label class="ctx-label">Cheat commands</label>
+          <div style="font-size:10.5px;color:#8F89A8;font-family:'Sora',sans-serif;margin-top:3px;line-height:1.5;">command-sheet.md from the build you are testing — only the commands for the feature under test are used</div>
           <div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap;">
             <button class="ctx-clear-btn" onclick="document.getElementById('cheat-sheet-input').click()">↑ load command-sheet.md</button>
             <input type="file" id="cheat-sheet-input" accept=".md,.txt" onchange="handleCheatSheet(this)" style="display:none;"/>
@@ -786,7 +787,7 @@
             </button>
           </div>
           <details style="margin-top:10px;">
-            <summary style="cursor:pointer;font-size:11px;color:#6a6a88;font-family:'JetBrains Mono',monospace;">⚙ team reference cases &amp; style override</summary>
+            <summary style="cursor:pointer;font-size:11.5px;color:#9A93C8;font-family:'JetBrains Mono',monospace;">⚙ team reference cases &amp; style override</summary>
             <div style="display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap;">
               <div style="display:flex;gap:2px;background:#0d0d10;border-radius:8px;padding:3px;border:0.5px solid #2a2a3e;">
                 <button id="style-auto-btn" onclick="setQaStyle('auto')" style="font-size:11px;padding:5px 14px;border-radius:6px;border:none;background:#0a1a14;color:#5DCAA5;font-family:'JetBrains Mono',monospace;cursor:pointer;letter-spacing:.03em;font-weight:500;">Auto</button>
@@ -1604,6 +1605,7 @@ function saveContext() {
 
 // ── Game dropdown custom-add (mirrors the Checkpoint pattern, persisted) ──
 function onCtxGameChange() {
+  try { renderCheatStatus(); } catch(e) {}
   var sel = document.getElementById('ctx-game');
   var wrap = document.getElementById('ctx-game-wrap');
   if (sel.value === '__custom__') {
@@ -6460,9 +6462,6 @@ function renderQA(items) {
         '<button class="icon-btn" id="qi-slack-btn-'+i+'" onclick="event.stopPropagation();copySlackTC('+i+',this)" title="Copy for Slack" style="color:#9b59b6;">'+
           '<svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M6 2a2 2 0 0 0 0 4h2V2H6zM6 7H2a2 2 0 0 0 0 4h4V7zM10 7v4a2 2 0 0 0 4 0V7h-4zM10 6h4a2 2 0 0 0 0-4h-4v4z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>'+
         '</button>'+
-        '<button class="icon-btn" onclick="event.stopPropagation();toggleReview('+i+')" title="Review / edit steps" style="color:#534AB7;">'+
-          '<svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2 3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H9l-3 2v-2H3a1 1 0 0 1-1-1V3z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>'+
-        '</button>'+
         '<button class="icon-btn" onclick="event.stopPropagation();toggleQA('+i+')" title="expand"><svg id="chev-'+i+'" width="13" height="13" viewBox="0 0 12 12" fill="none" style="transition:transform .18s"><path d="M3 4.5l3 3 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>'+
       '</div>'+
       '<div class="qi-detail" id="qid-'+i+'">'+
@@ -6473,6 +6472,14 @@ function renderQA(items) {
         '</div>' : '')+
         buildWhyThisTestRow(i, item)+
         '<div class="tc-block" id="tc-'+i+'"></div>'+
+        '<div style="display:flex;justify-content:flex-end;margin-top:8px;">'+
+          '<button onclick="event.stopPropagation();toggleReview('+i+')" title="Review and edit this test case" '+
+            'style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;background:#16121e;border:0.5px solid #534AB760;border-radius:6px;font-size:11px;color:#AFA9EC;cursor:pointer;font-family:JetBrains Mono,monospace;transition:all .13s;" '+
+            'onmouseover="this.style.borderColor=&quot;#7F77DD&quot;;this.style.color=&quot;#CFCAF5&quot;" onmouseout="this.style.borderColor=&quot;#534AB760&quot;;this.style.color=&quot;#AFA9EC&quot;">'+
+            '<svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2 3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H9l-3 2v-2H3a1 1 0 0 1-1-1V3z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>'+
+            'review / edit steps'+
+          '</button>'+
+        '</div>'+
         '<div class="review-panel" id="rv-'+i+'" style="display:none;margin-top:10px;background:#0e0c18;border:0.5px solid #2a2230;border-radius:8px;padding:11px 13px;">'+
           '<div style="font-size:9px;font-family:JetBrains Mono,monospace;color:#534AB7;letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px;">✎ review / edit steps</div>'+
           '<textarea id="rv-comment-'+i+'" placeholder="Paste updated steps (1. 2. 3.) to replace steps, or type a comment to append to detail…" '+
@@ -8274,8 +8281,22 @@ function bvLbl(label, rest, cls){
    The sheet is BUILD-SPECIFIC: a branch build only carries its own feature's commands. */
 var _NI_CHEAT_KEY = 'ni_cheat_sheet', _NI_CHEAT_NAME_KEY = 'ni_cheat_sheet_name';
 
-function getCheatSheet(){ try { return localStorage.getItem(_NI_CHEAT_KEY) || ''; } catch(e){ return ''; } }
-function getCheatSheetName(){ try { return localStorage.getItem(_NI_CHEAT_NAME_KEY) || ''; } catch(e){ return ''; } }
+// Sheets are per GAME (and per build): Hema works across titles, and a sheet for one
+// game is useless for another. Key the storage by the Project Context game so switching
+// games switches sheets. Unkeyed values are still read as a fallback for sheets loaded
+// before this change.
+function _cheatGame(){
+  try {
+    var sel = document.getElementById('ctx-game');
+    var g = sel ? (sel.value || '') : '';
+    if (!g || g === '__custom__') { try { g = (JSON.parse(localStorage.getItem('ni_project_context') || '{}').game) || ''; } catch(e){ g = ''; } }
+    return String(g).toLowerCase().replace(/[^a-z0-9]/g, '');
+  } catch(e){ return ''; }
+}
+function _cheatKey(base){ var g = _cheatGame(); return g ? (base + '::' + g) : base; }
+
+function getCheatSheet(){ try { return localStorage.getItem(_cheatKey(_NI_CHEAT_KEY)) || localStorage.getItem(_NI_CHEAT_KEY) || ''; } catch(e){ return ''; } }
+function getCheatSheetName(){ try { return localStorage.getItem(_cheatKey(_NI_CHEAT_NAME_KEY)) || localStorage.getItem(_NI_CHEAT_NAME_KEY) || ''; } catch(e){ return ''; } }
 
 function handleCheatSheet(input){
   var file = input.files[0];
@@ -8290,8 +8311,8 @@ function handleCheatSheet(input){
       return;
     }
     try {
-      localStorage.setItem(_NI_CHEAT_KEY, txt);
-      localStorage.setItem(_NI_CHEAT_NAME_KEY, file.name);
+      localStorage.setItem(_cheatKey(_NI_CHEAT_KEY), txt);
+      localStorage.setItem(_cheatKey(_NI_CHEAT_NAME_KEY), file.name);
     } catch(ex){ alert('Could not save the sheet (too large for local storage).'); return; }
     renderCheatStatus();
   };
@@ -8299,7 +8320,7 @@ function handleCheatSheet(input){
 }
 
 function clearCheatSheet(){
-  try { localStorage.removeItem(_NI_CHEAT_KEY); localStorage.removeItem(_NI_CHEAT_NAME_KEY); } catch(e){}
+  try { localStorage.removeItem(_cheatKey(_NI_CHEAT_KEY)); localStorage.removeItem(_cheatKey(_NI_CHEAT_NAME_KEY)); localStorage.removeItem(_NI_CHEAT_KEY); localStorage.removeItem(_NI_CHEAT_NAME_KEY); } catch(e){}
   renderCheatStatus();
 }
 
