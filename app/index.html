@@ -315,11 +315,11 @@
  .confluence-status.error{color:#F09595;display:block;}
  .gist-edit-textarea{width:100%;background:#111116;border:0.5px solid #252530;border-radius:8px;padding:11px 13px;font-size:14px;font-family:'Sora',sans-serif;color:#a0a0b4;line-height:1.7;resize:none;outline:none;min-height:120px;overflow:hidden;height:auto;}
  .gist-edit-textarea:focus{border-color:#383848;}
- .gist-save-btn{padding:4px 14px;background:#1a1a22;border:0.5px solid #2a2a38;border-radius:6px;font-size:11px;color:#888898;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .12s;}
- .gist-save-btn:hover{background:#1e1e28;border-color:#404050;}
+ .gist-save-btn{padding:5px 18px;background:#5DCAA5;border:0.5px solid #5DCAA5;border-radius:6px;font-size:11px;color:#08120e;font-weight:500;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .12s;}
+ .gist-save-btn:hover{background:#7FE0BD;border-color:#7FE0BD;}
  .gist-cancel-btn{padding:4px 14px;background:transparent;border:0.5px solid #1e1e24;border-radius:6px;font-size:11px;color:#3e3e4a;cursor:pointer;font-family:'JetBrains Mono',monospace;}
  .gist-cancel-btn:hover{color:#666;}
- #gist-edit-btn.active{color:#5DCAA5;}
+ #gist-edit-btn.active{color:#5DCAA5 !important;border-color:#5DCAA5 !important;background:#12241d !important;}
  .context-zone{padding:13px 18px;}
 
  .context-header{display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;}
@@ -950,9 +950,6 @@
       <div class="card-top">
         <div class="card-head"><div class="card-pip" style="background:#5DCAA5"></div><span class="card-lbl" style="color:#5DCAA5">gist</span></div>
         <div style="display:flex;align-items:center;gap:6px;">
-          <button class="icon-btn" id="gist-edit-btn" onclick="toggleGistEdit()" title="edit">
-            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M11.5 2.5a1.5 1.5 0 0 1 2 2L5 13H3v-2L11.5 2.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
-          </button>
           <button class="icon-btn" onclick="copyGistSlack(this)" title="copy for Slack"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="9" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M11 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h1" stroke="currentColor" stroke-width="1.2"/></svg></button>
           <button class="icon-btn" onclick="copyGistAsImage(this)" title="copy as image"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.2"/><circle cx="5.5" cy="7.5" r="1.5" stroke="currentColor" stroke-width="1"/><path d="M1 10l3.5-3 3 3 2.5-2.5 4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <button class="dl-html-btn" onclick="downloadGistAsHTML(this)" title="download as HTML">
@@ -969,6 +966,14 @@
         </div>
       </div>
       <div id="gist-body"><div class="skeleton" style="width:100%"></div><div class="skeleton" style="width:88%"></div><div class="skeleton"></div></div>
+      <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+        <button id="gist-edit-btn" onclick="toggleGistEdit()" title="Review and edit the gist"
+          style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;background:#0f1a16;border:0.5px solid #2c5f4c;border-radius:6px;font-size:11px;color:#8FD9BF;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .13s;"
+          onmouseover="this.style.borderColor='#5DCAA5';this.style.color='#BFEEDC'" onmouseout="this.style.borderColor='#2c5f4c';this.style.color='#8FD9BF'">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M11.5 2.5a1.5 1.5 0 0 1 2 2L5 13H3v-2L11.5 2.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+          review / edit gist
+        </button>
+      </div>
       <div id="slack-disc-wrap" style="display:none;">
         <div id="slack-disc-results"></div>
         <div class="slack-disc-toolbar">
