@@ -1380,6 +1380,8 @@
 var currentMode = 'notes';
 var attachedImage = null; // {base64, mediaType, name}
 var attachedWalkthrough = null; // {name, text} — video kept as REFERENCE, never pasted into the content box
+var wtIssue = '';    // what went wrong — turns the run into reproduction steps
+var wtExpected = ''; // what should have happened
 var attachedLinks = [];
 var qaData = [];
 var _qaIsDeep = false;
@@ -1439,6 +1441,48 @@ window.addEventListener('unhandledrejection', function(e) {
 });
 
 function buildGistInstruction(textBase) {
+  /* REPRODUCTION MODE - a recording plus a stated problem is a bug report, not a feature
+     briefing. Reuses the gist card as-is: title + summary + groups render unchanged, so
+     copy for Slack, copy as image, download HTML and review/edit all keep working. */
+  if (attachedWalkthrough && wtIssue && wtIssue.trim()) {
+    var expLine = (wtExpected && wtExpected.trim())
+      ? wtExpected.trim()
+      : 'the flow completes as intended, or a clear error is shown';
+    return 'Write REPRODUCTION STEPS a programmer can follow to hit this bug. Return ONLY a JSON object, no markdown, no explanation.\n' +
+      '\n' +
+      'THE TESTER REPORTS: ' + wtIssue.trim() + '\n' +
+      'EXPECTED: ' + expLine + '\n' +
+      '\n' +
+      'The tester statement is GROUND TRUTH. Silent frames cannot show which control was tapped, so never ' +
+      'contradict it, never call something missing, and never write a step that hunts for a control ' +
+      '(no Attempt to find, no Check whether X exists). Take the symptom and the screens from the ' +
+      'recording, and the intent and the trigger from the statement.\n' +
+      '\n' +
+      'Format:\n' +
+      '{\n' +
+      '  "title": "one line naming the defect, not the feature - what fails and where",\n' +
+      '  "summary": "Precondition: the state a tester must be in before step 1. One sentence. Include the values that matter (a balance, a price, a flag), nothing else.",\n' +
+      '  "groups": [\n' +
+      '    {"label":"Steps to Reproduce","icon":"🔁","style":"bullets","points":["one action per step, in order"]},\n' +
+      '    {"label":"Expected","icon":"✅","style":"bullets","points":["one line"]}\n' +
+      '  ]\n' +
+      '}\n' +
+      '\n' +
+      'RULES:\n' +
+      '- Exactly these two groups, in this order. No other groups.\n' +
+      '- 3 to 6 steps. Shortest path that reaches the failure - start where the flow starts, not at app launch.\n' +
+      '- A step is a purposeful action, not a tap-by-tap script. Merge taps that form one action.\n' +
+      '- The final steps state what is observed, each beginning Observe: . Include the observation that ' +
+      'proves nothing changed (an unchanged balance, an absent dialog) when the recording shows it.\n' +
+      '- Name screens and controls by their on-screen labels. Quote on-screen text in single quotes.\n' +
+      '- Keep the concrete values the recording shows when they are part of the repro (a balance, a price).\n' +
+      '- Do not describe the recording, do not narrate what is on screen, do not add coverage or extra cases.\n' +
+      '- Report ONE problem - the one the tester stated. Omit everything that is not it.\n' +
+      '- Never put an unescaped double quote inside a JSON string value.\n' +
+      '\n' +
+      '- Output the JSON object only.';
+  }
+
   return 'Read all input content and return a QA briefing card as a JSON object. Return ONLY the JSON, no markdown, no explanation.\n' +
     '\n' +
     'Think of this like a team lead briefing a QA engineer in 30 seconds before they start testing.\n' +
@@ -3115,8 +3159,17 @@ function renderAttTags() {
     html += '<span class="att-tag" title="Flow reference read from this recording — used when generating the gist and test cases">' +
       '<div class="att-dot" style="background:#6fb5e8"></div>' +
       '<span style="color:#6fb5e8;">🎬 ' + esc(attachedWalkthrough.name) + '</span>' +
-      '<span class="x" onclick="attachedWalkthrough=null;renderAttTags();" style="cursor:pointer;">×</span>' +
+      '<span class="x" onclick="attachedWalkthrough=null;wtIssue=&quot;&quot;;wtExpected=&quot;&quot;;renderAttTags();" style="cursor:pointer;">×</span>' +
     '</span>';
+    // Silent frames show the EFFECT of a tap, never the tap itself. These two lines are what
+    // turn a recording into reproduction steps. Filling the first switches the run from a
+    // feature briefing to repro steps.
+    html += '<div style="flex-basis:100%;display:flex;flex-direction:column;gap:5px;margin-top:7px;">' +
+      '<input id="wt-issue" class="ctx-input" placeholder="What went wrong? e.g. tapped the 0.99 coin pack, stalls on Please wait and never completes" ' +
+        'value="' + esc(wtIssue) + '" oninput="wtIssue=this.value" style="font-size:12px;">' +
+      '<input id="wt-expected" class="ctx-input" placeholder="What should have happened? e.g. purchase completes and coins are credited" ' +
+        'value="' + esc(wtExpected) + '" oninput="wtExpected=this.value" style="font-size:12px;">' +
+    '</div>';
   }
   el.innerHTML = html;
 }
