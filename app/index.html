@@ -882,6 +882,10 @@
       </div>
       <input type="file" id="walkthrough-input" accept="video/*,image/png,image/jpeg,image/webp,image/gif" multiple onchange="handleWalkthrough(this)" style="display:none;"/>
       <span id="wt-status" style="display:none;font-size:11px;font-family:'JetBrains Mono',monospace;color:#6fb5e8;"></span>
+      <div class="att-btn att-btn-repro" onclick="toggleReproInput()" title="Write reproduction steps for a problem you hit - one test case, straight to QA Focus">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2.5l6 11H2l6-11z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M8 6.5v3.2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="8" cy="11.6" r=".7" fill="currentColor"/></svg>
+        issue repro
+      </div>
       <div class="att-sep"></div>
       <div class="att-tags" id="att-tags"></div>
       <div id="img-preview-wrap" style="display:none;position:relative;">
@@ -914,6 +918,20 @@
         <button class="link-add-btn" onclick="addCortexRef()" style="background:#0d1e28;color:#38BDF8;">add</button>
         <button class="link-cancel-btn" onclick="toggleCortexInput()">✕</button>
       </div>
+    <div id="repro-input-row" style="display:none;flex-direction:column;gap:7px;margin-top:9px;padding:11px 13px;background:#140f0f;border:0.5px solid #4a2c2c;border-radius:9px;">
+      <div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:#E5745A;letter-spacing:.09em;text-transform:uppercase;">issue repro steps</div>
+      <input class="link-input" id="repro-issue" placeholder="What went wrong? e.g. tapped the 0.99 coin pack, stalls on Please wait and never completes"/>
+      <input class="link-input" id="repro-expected" placeholder="What should have happened? e.g. purchase completes and coins are credited"/>
+      <label style="display:flex;align-items:center;gap:7px;font-size:11.5px;color:#a8a8c0;font-family:'Sora',sans-serif;cursor:pointer;">
+        <input type="checkbox" id="repro-use-media" style="accent-color:#E5745A;cursor:pointer;"/>
+        Use the attached video / screenshot
+      </label>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <button class="link-add-btn" id="repro-go-btn" onclick="generateRepro()" style="background:#2a1512;color:#E5745A;">Generate repro steps →</button>
+        <button class="link-cancel-btn" onclick="toggleReproInput()">✕</button>
+        <span id="repro-status" style="font-size:11px;font-family:'JetBrains Mono',monospace;color:#8a8a9a;"></span>
+      </div>
+    </div>
     <div class="input-tip" id="input-tip" style="color:#787880;">💡 Attach tickets, docs, chats, screenshots, or HTML reports individually—or combine them for deeper insights.</div>
     <div class="err-bar" id="err-bar"></div>
     <div class="run-row">
@@ -1380,8 +1398,6 @@
 var currentMode = 'notes';
 var attachedImage = null; // {base64, mediaType, name}
 var attachedWalkthrough = null; // {name, text} — video kept as REFERENCE, never pasted into the content box
-var wtIssue = '';    // what went wrong — turns the run into reproduction steps
-var wtExpected = ''; // what should have happened
 var attachedLinks = [];
 var qaData = [];
 var _qaIsDeep = false;
@@ -1441,47 +1457,6 @@ window.addEventListener('unhandledrejection', function(e) {
 });
 
 function buildGistInstruction(textBase) {
-  /* REPRODUCTION MODE - a recording plus a stated problem is a bug report, not a feature
-     briefing. Reuses the gist card as-is: title + summary + groups render unchanged, so
-     copy for Slack, copy as image, download HTML and review/edit all keep working. */
-  if (attachedWalkthrough && wtIssue && wtIssue.trim()) {
-    var expLine = (wtExpected && wtExpected.trim())
-      ? wtExpected.trim()
-      : 'the flow completes as intended, or a clear error is shown';
-    return 'Write REPRODUCTION STEPS a programmer can follow to hit this bug. Return ONLY a JSON object, no markdown, no explanation.\n' +
-      '\n' +
-      'THE TESTER REPORTS: ' + wtIssue.trim() + '\n' +
-      'EXPECTED: ' + expLine + '\n' +
-      '\n' +
-      'The tester statement is GROUND TRUTH. Silent frames cannot show which control was tapped, so never ' +
-      'contradict it, never call something missing, and never write a step that hunts for a control ' +
-      '(no Attempt to find, no Check whether X exists). Take the symptom and the screens from the ' +
-      'recording, and the intent and the trigger from the statement.\n' +
-      '\n' +
-      'Format:\n' +
-      '{\n' +
-      '  "title": "one line naming the defect, not the feature - what fails and where",\n' +
-      '  "summary": "Precondition: the state a tester must be in before step 1. One sentence. Include the values that matter (a balance, a price, a flag), nothing else.",\n' +
-      '  "groups": [\n' +
-      '    {"label":"Steps to Reproduce","icon":"🔁","style":"bullets","points":["one action per step, in order"]},\n' +
-      '    {"label":"Expected","icon":"✅","style":"bullets","points":["one line"]}\n' +
-      '  ]\n' +
-      '}\n' +
-      '\n' +
-      'RULES:\n' +
-      '- Exactly these two groups, in this order. No other groups.\n' +
-      '- 3 to 6 steps. Shortest path that reaches the failure - start where the flow starts, not at app launch.\n' +
-      '- A step is a purposeful action, not a tap-by-tap script. Merge taps that form one action.\n' +
-      '- The final steps state what is observed, each beginning Observe: . Include the observation that ' +
-      'proves nothing changed (an unchanged balance, an absent dialog) when the recording shows it.\n' +
-      '- Name screens and controls by their on-screen labels. Quote on-screen text in single quotes.\n' +
-      '- Keep the concrete values the recording shows when they are part of the repro (a balance, a price).\n' +
-      '- Do not describe the recording, do not narrate what is on screen, do not add coverage or extra cases.\n' +
-      '- Report ONE problem - the one the tester stated. Omit everything that is not it.\n' +
-      '- Never put an unescaped double quote inside a JSON string value.\n' +
-      '\n' +
-      '- Output the JSON object only.';
-  }
 
   return 'Read all input content and return a QA briefing card as a JSON object. Return ONLY the JSON, no markdown, no explanation.\n' +
     '\n' +
@@ -3159,17 +3134,8 @@ function renderAttTags() {
     html += '<span class="att-tag" title="Flow reference read from this recording — used when generating the gist and test cases">' +
       '<div class="att-dot" style="background:#6fb5e8"></div>' +
       '<span style="color:#6fb5e8;">🎬 ' + esc(attachedWalkthrough.name) + '</span>' +
-      '<span class="x" onclick="attachedWalkthrough=null;wtIssue=&quot;&quot;;wtExpected=&quot;&quot;;renderAttTags();" style="cursor:pointer;">×</span>' +
+      '<span class="x" onclick="attachedWalkthrough=null;renderAttTags();" style="cursor:pointer;">×</span>' +
     '</span>';
-    // Silent frames show the EFFECT of a tap, never the tap itself. These two lines are what
-    // turn a recording into reproduction steps. Filling the first switches the run from a
-    // feature briefing to repro steps.
-    html += '<div style="flex-basis:100%;display:flex;flex-direction:column;gap:5px;margin-top:7px;">' +
-      '<input id="wt-issue" class="ctx-input" placeholder="What went wrong? e.g. tapped the 0.99 coin pack, stalls on Please wait and never completes" ' +
-        'value="' + esc(wtIssue) + '" oninput="wtIssue=this.value" style="font-size:12px;">' +
-      '<input id="wt-expected" class="ctx-input" placeholder="What should have happened? e.g. purchase completes and coins are credited" ' +
-        'value="' + esc(wtExpected) + '" oninput="wtExpected=this.value" style="font-size:12px;">' +
-    '</div>';
   }
   el.innerHTML = html;
 }
@@ -3741,6 +3707,148 @@ async function generateQA(tier) {
 }
 
 // Append a tier's results to qaData (edge) or replace (critical), then render
+// -- ISSUE REPRO -- one problem, one test case, no gist.
+// A gist briefs someone on a feature; for a bug you already know what happened, so the gist
+// pass is pure latency. This runs ONE call and drops a single test case straight into QA
+// Focus, where review/edit, copy for Slack, approve and push-to-Jira already work.
+function toggleReproInput() {
+  var row = document.getElementById('repro-input-row');
+  if (!row) return;
+  var open = row.style.display !== 'none';
+  row.style.display = open ? 'none' : 'flex';
+  if (!open) { var i = document.getElementById('repro-issue'); if (i) i.focus(); }
+}
+
+function buildReproInstruction(issue, expected, useMedia) {
+  var expLine = expected || 'the flow completes as intended, or a clear error is shown';
+  var mediaLine = useMedia
+    ? 'A recording or screenshot of the problem is attached. Take the screen names, the on-screen labels and the visible symptom from it. It cannot show which control was tapped, so never contradict the tester statement and never call something missing.'
+    : 'No recording is attached. Work only from the statement below and any notes above. Do not invent screens, labels or values you were not given.';
+  return 'Write REPRODUCTION STEPS for ONE problem, as a single test case. Return ONLY a JSON array containing exactly ONE object. No markdown, no explanation.\n' +
+    '\n' +
+    'THE TESTER REPORTS: ' + issue + '\n' +
+    'EXPECTED: ' + expLine + '\n' +
+    '\n' +
+    mediaLine + '\n' +
+    '\n' +
+    'The tester statement is GROUND TRUTH. Never contradict it, never call a control missing, and never write a step that hunts for one (no Attempt to find, no Check whether X exists).\n' +
+    '\n' +
+    'Return exactly this shape:\n' +
+    '[{\n' +
+    '  "title":"max 70 chars - name the defect and where it happens, not the feature",\n' +
+    '  "severity":"high|med|low",\n' +
+    '  "originType":"explicit_requirement",\n' +
+    '  "confidence":"high",\n' +
+    '  "confidenceReason":"reported by the tester",\n' +
+    '  "detail":"max 90 chars - what fails and why it matters",\n' +
+    '  "howToTrigger":"max 140 chars - the shortest way to provoke it",\n' +
+    '  "whatYouSee":"max 120 chars - the observable symptom",\n' +
+    '  "whereToLook":"max 100 chars - the screen or state to watch",\n' +
+    '  "testcase":{"objective":"max 90 chars","preconditions":"max 90 chars - the state needed before step 1, including values that matter such as a balance or a price","steps":["step"],"expected":"max 200 chars"}\n' +
+    '}]\n' +
+    '\n' +
+    'RULES:\n' +
+    '- EXACTLY ONE object in the array. Report only the problem stated, never a second finding.\n' +
+    '- steps: 3 to 8 entries. Shortest path that reaches the failure - start where the flow starts, not at app launch.\n' +
+    '- A step is a purposeful action, not a tap-by-tap script. Merge the taps that form one action.\n' +
+    '- The final steps state what is observed, each beginning Observe: . Include the observation that proves nothing changed (an unchanged balance, an absent dialog) when it is visible.\n' +
+    '- Name screens and controls by their on-screen labels, in single quotes. Keep concrete values that are part of the repro.\n' +
+    '- severity: a crash, lost money or blocked progress is high.\n' +
+    '- Do not describe the recording, do not narrate the screen, do not add extra coverage or edge cases.\n' +
+    '- Every string on a single line. Straight ASCII quotes only. Never an unescaped double quote inside a string value.\n' +
+    'Output the JSON array only.';
+}
+
+async function generateRepro() {
+  var issue = ((document.getElementById('repro-issue') || {}).value || '').trim();
+  var expected = ((document.getElementById('repro-expected') || {}).value || '').trim();
+  var useMedia = !!(document.getElementById('repro-use-media') || {}).checked;
+  var statusEl = document.getElementById('repro-status');
+  var btn = document.getElementById('repro-go-btn');
+  function status(t) { if (statusEl) statusEl.textContent = t || ''; }
+
+  if (!issue) { showErr('Say what went wrong first - that is the one thing a recording cannot tell us.'); return; }
+  if (useMedia && !attachedWalkthrough && !attachedImage) {
+    showErr('Ticked means a video or screenshot is required - attach one, or untick to work from the text alone.');
+    return;
+  }
+  if (window._reproRunning) return;
+  window._reproRunning = true;
+  if (btn) { btn.disabled = true; btn.style.opacity = '.6'; }
+  status('writing repro steps...');
+
+  try {
+    var parts = [];
+    try { if (typeof buildContextBlock === 'function') parts.push(buildContextBlock()); } catch (e) {}
+    var mi = document.getElementById('main-input');
+    var typed = mi ? mi.value.trim() : '';
+    if (typed) parts.push('NOTES FROM THE TESTER:' + '\n' + typed);
+    if (useMedia && attachedWalkthrough && attachedWalkthrough.text) {
+      parts.push('FLOW OBSERVED IN THE ATTACHED RECORDING (' + attachedWalkthrough.name + '):' + '\n' + attachedWalkthrough.text);
+    }
+    var base = parts.join('\n');
+    var instruction = buildReproInstruction(issue, expected, useMedia);
+    var content = (useMedia && attachedImage)
+      ? [{ type: 'image', source: { type: 'base64', media_type: attachedImage.mediaType, data: attachedImage.base64 } },
+         { type: 'text', text: base + '\n' + instruction }]
+      : (base ? base + '\n' + instruction : instruction);
+
+    var r = await fetch(getApiUrl(), {
+      method: 'POST',
+      headers: getApiHeaders(),
+      body: JSON.stringify(wrapBody({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 2000,
+        temperature: 0,
+        system: 'You output only a raw JSON array. No markdown, no explanation. Every string value on a single line. Straight ASCII quotes only.',
+        messages: [{ role: 'user', content: content }]
+      }))
+    });
+    if (!r.ok) { var et = await r.text(); throw new Error('API error ' + r.status + ': ' + et.substring(0, 80)); }
+    var raw = extractText(await r.json());
+    var clean = raw.replace(/```json|```/g, '').trim();
+    var arr = null;
+    try { arr = JSON.parse(clean); } catch (e1) {
+      try { arr = JSON.parse(bvBalancedJson(clean)); } catch (e2) {
+        try { arr = JSON.parse(bvRepairInnerQuotes(bvBalancedJson(clean))); } catch (e3) {}
+      }
+    }
+    if (!Array.isArray(arr) && arr && Array.isArray(arr.qa)) arr = arr.qa;
+    if (!Array.isArray(arr) || !arr.length) throw new Error('could not read the reproduction steps from the reply');
+    arr = arr.slice(0, 1);
+
+    var outSec = document.getElementById('output-section');
+    if (outSec) {
+      outSec.style.display = 'flex';
+      outSec.style.flexDirection = 'column';
+      outSec.style.alignItems = 'stretch';
+    }
+    // no gist on this path - the test case IS the output
+    var gw = document.getElementById('gist-card-wrap'); if (gw) gw.style.display = 'none';
+    var qaSec = document.getElementById('qa-section'); if (qaSec) qaSec.style.display = 'block';
+    var tc = document.getElementById('title-card'); if (tc) tc.style.display = 'none';
+    selectedItems.clear();
+    _qaIsDeep = false;
+    renderQATier(arr, false);
+    // One problem, one test case - open it straight away. toggleTC is local rendering,
+    // not another API call, so the steps are already here.
+    try {
+      toggleQA(0);
+      var cb = document.querySelector('#qa-body .convert-btn');
+      if (cb) toggleTC(0, cb);
+    } catch (e) {}
+    status('');
+    var row = document.getElementById('repro-input-row'); if (row) row.style.display = 'none';
+    try { historySnapshot(); } catch (e) {}
+  } catch (err) {
+    status('');
+    showErr('Repro steps failed: ' + (err && err.message ? err.message : err));
+  } finally {
+    window._reproRunning = false;
+    if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+  }
+}
+
 function renderQATier(arr, isEdge) {
   if (!Array.isArray(arr)) arr = [];
   if (isEdge) {
