@@ -1178,6 +1178,11 @@
         <div class="sel-summary" id="sel-summary">
           <span class="sel-count" id="sel-count">0 selected</span>
           <div class="sel-tags" id="sel-tags"><span class="sel-empty">— select QA items above to push as test cases</span></div>
+          <button id="combine-btn" onclick="combineSelected(this)" title="Merge the selected test cases into one"
+            style="display:none;margin-left:auto;align-items:center;gap:5px;padding:4px 10px;background:#0d1e28;border:0.5px solid #38BDF840;border-radius:5px;font-size:10px;color:#38BDF8;cursor:pointer;font-family:JetBrains Mono,monospace;flex-shrink:0;">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M2 4h5l3 4 4 0M2 12h5l3-4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 6l2 2-2 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Combine into one
+          </button>
           <button id="copy-all-slack-btn" onclick="copyAllSelectedSlack(this)" style="display:none;margin-left:auto;align-items:center;gap:5px;padding:4px 10px;background:#1a0d28;border:0.5px solid #9b59b640;border-radius:5px;font-size:10px;color:#9b59b6;cursor:pointer;font-family:JetBrains Mono,monospace;flex-shrink:0;">
             <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M6 2a2 2 0 0 0 0 4h2V2H6zM6 7H2a2 2 0 0 0 0 4h4V7zM10 7v4a2 2 0 0 0 4 0V7h-4zM10 6h4a2 2 0 0 0 0-4h-4v4z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>
             Copy all for Slack
@@ -7370,6 +7375,89 @@ function updateSelectedWithRisks() {
   updatePushState();
 }
 
+// Merge several generated cases into one. Kept as an OPT-IN action rather than a
+// prompt rule: how many cases a team wants is a preference, and baking one
+// persons taste into generation would impose it on everyone.
+//
+// The merge is a model call, not string concatenation, because it needs judgement:
+// two cases that both start with fail a level share ONE precondition, not two, and
+// two entry points into the same flow are alternatives, not sequential steps.
+async function combineSelected(btn) {
+  var idx = Array.from(selectedItems).sort(function (x, y) { return x - y; });
+  if (idx.length < 2) { showErr("Select at least two test cases to combine."); return; }
+  if (window._combineRunning) return;
+  window._combineRunning = true;
+  var label = btn ? btn.innerHTML : "";
+  if (btn) { btn.disabled = true; btn.style.opacity = ".6"; btn.textContent = "combining..."; }
+
+  try {
+    var picked = idx.map(function (i) { return qaData[i]; }).filter(Boolean);
+    var payload = picked.map(function (it, n) {
+      var tc = it.testcase || {};
+      return "CASE " + (n + 1) + ": " + (it.title || "") +
+        "\nobjective: " + (tc.objective || "") +
+        "\npreconditions: " + (tc.preconditions || "") +
+        "\nsteps: " + (tc.steps || []).join(" | ") +
+        "\nexpected: " + (tc.expected || "");
+    }).join("\n\n");
+
+    var instruction = "Merge the test cases below into ONE. Return ONLY a JSON array with exactly one object." + '\\n' +
+      '\\n' + payload + '\\n' +
+      '\\n' +
+      "RULES:" + '\\n' +
+      "- Keep every distinct thing being verified. Merging must not drop coverage." + '\\n' +
+      "- Preconditions that say the same thing become ONE line; keep the ones that differ." + '\\n' +
+      "- Do not repeat a shared setup step. If the cases differ only by entry point, make the second entry point its own step in the same flow rather than repeating the setup." + '\\n' +
+      "- Order the steps as a tester would actually run them, in one sitting." + '\\n' +
+      "- expected: at most 4 assertions separated by semicolons, each under 15 words." + '\\n' +
+      "- severity: the highest of the merged cases." + '\\n' +
+      "- title: max 70 chars naming the combined behaviour, not a list joined by and." + '\\n' +
+      "- Invent nothing that was not in the cases above." + '\\n' +
+      '\\n' +
+      '[{"title":"","severity":"high|med|low","originType":"explicit_requirement","confidence":"high","confidenceReason":"merged from N cases","detail":"max 90 chars","testcase":{"objective":"max 90 chars","preconditions":"max 90 chars","steps":["step"],"expected":"max 200 chars"}}]';
+
+    var r = await fetch(getApiUrl(), {
+      method: "POST",
+      headers: getApiHeaders(),
+      body: JSON.stringify(wrapBody({
+        model: "claude-sonnet-4-6",
+        max_tokens: 1500,
+        temperature: 0,
+        system: "You output only a raw JSON array. No markdown, no explanation. Every string value on a single line.",
+        messages: [{ role: "user", content: instruction }]
+      }))
+    });
+    if (!r.ok) { var et = await r.text(); throw new Error("API error " + r.status + ": " + et.substring(0, 80)); }
+    var clean = extractText(await r.json()).replace(/```json|```/g, "").trim();
+    var arr = null;
+    try { arr = JSON.parse(clean); } catch (e1) {
+      try { arr = JSON.parse(bvBalancedJson(clean)); } catch (e2) {
+        try { arr = JSON.parse(bvRepairInnerQuotes(bvBalancedJson(clean))); } catch (e3) {}
+      }
+    }
+    if (!Array.isArray(arr) && arr && Array.isArray(arr.qa)) arr = arr.qa;
+    if (!Array.isArray(arr) || !arr.length || !arr[0] || !arr[0].testcase) {
+      throw new Error("could not read the merged case from the reply");
+    }
+    var merged = arr[0];
+
+    // put the merged case where the first selected one was, drop the rest
+    var at = idx[0];
+    var kept = qaData.filter(function (_, i) { return idx.indexOf(i) === -1; });
+    var before = qaData.slice(0, at).filter(function (_, i) { return idx.indexOf(i) === -1; }).length;
+    kept.splice(before, 0, merged);
+    selectedItems.clear();
+    renderQA(kept);
+    updateSelected();
+    try { historySnapshot(); } catch (e) {}
+  } catch (err) {
+    showErr("Combine failed: " + (err && err.message ? err.message : err));
+  } finally {
+    window._combineRunning = false;
+    if (btn) { btn.disabled = false; btn.style.opacity = "1"; btn.innerHTML = label; }
+  }
+}
+
 function updateSelected() {
   var count = selectedItems.size;
   var selCount = document.getElementById('sel-count');
@@ -7387,6 +7475,9 @@ function updateSelected() {
   }
   var copyAllBtn = document.getElementById('copy-all-slack-btn');
   if (copyAllBtn) copyAllBtn.style.display = (count + selectedRisks.size) >= 2 ? 'flex' : 'none';
+  // combining only makes sense for QA items, so risks are not counted here
+  var combineBtn = document.getElementById('combine-btn');
+  if (combineBtn) combineBtn.style.display = count >= 2 ? 'flex' : 'none';
   // Always reach updatePushState — never bail early
   updatePushState();
 }
