@@ -2272,7 +2272,7 @@ async function runDeepAnalysis() {
     'Content type: ' + currentMode + '. ' + (modeHints[currentMode] || '') + '\n\n';
   if (contentText) _textBase += 'Content:\n' + smartTruncate(contentText) + '\n\n';
   if (attachedImage) _textBase += 'A screenshot has been attached.\n\n';
-  if (attachedWalkthrough) _textBase += 'REFERENCE — flow observed from an attached screen recording (' + attachedWalkthrough.name + '). It records the REAL screens, on-screen labels and device-level steps of this flow. Use it as source material: take screen names, button labels and step wording from it so any test cases match the real UI. Do not describe or summarise the recording itself, and do not treat it as a defect report. On-screen labels below appear in single quotes — keep single quotes when you refer to them, and NEVER place an unescaped double quote inside a JSON string value. HOW TO USE IT: this is BACKGROUND so you understand the feature — the real screen names, the real flow between them, and what each control does. It is NOT content to reproduce. Write test cases about the FEATURE UNDER TEST and its relevant preconditions only; do not describe the recording, do not list what is on screen, and do not add coverage for screens or controls the feature does not involve. Carry over only the naming and flow accuracy. Never carry incidental values from that session (move counts, currency totals, timers, level numbers, item quantities) into steps or expected results.\n' + attachedWalkthrough.text + '\n\n';
+  if (attachedWalkthrough) _textBase += 'REFERENCE — flow observed from an attached screen recording (' + attachedWalkthrough.name + '). It records the REAL screens, on-screen labels and device-level steps of this flow. Use it as source material: take screen names, button labels and step wording from it so any test cases match the real UI. Do not describe or summarise the recording itself, and do not treat it as a defect report. On-screen labels below appear in single quotes — keep single quotes when you refer to them, and NEVER place an unescaped double quote inside a JSON string value. HOW TO USE IT: this is BACKGROUND so you understand the feature — the real screen names, the real flow between them, and what each control does. It is NOT content to reproduce. Write test cases about the FEATURE UNDER TEST and its relevant preconditions only; do not describe the recording, do not list what is on screen, and do not add coverage for screens or controls the feature does not involve. Carry over only the naming and flow accuracy. SOURCE PRECEDENCE: the recording is ONE tester session, so its numbers are incidental, not facts - the tester may have picked a level or a balance at random. Take flow, screen names and on-screen labels from the recording. Take every number, threshold, price, level and rule from the attached spec, config, GDD or ticket. Where they disagree the SPEC WINS: if the spec states an unlock level, use it even when the recording shows a different one. If no source states a value, describe it in words rather than copying the session value.\n' + attachedWalkthrough.text + '\n\n';
 
   var confPages = attachedLinks.filter(function(l){ return l.confluenceId; });
   var slackThreads = attachedLinks.filter(function(l){ return l.slackChannelId; });
@@ -3209,7 +3209,7 @@ async function runAnalysis() {
     'Content type: ' + currentMode + '. ' + modeHints[currentMode] + '\n\n';
   if (contentText) _textBase += 'Content:\n' + smartTruncate(contentText) + '\n\n';
   if (attachedImage) _textBase += 'A screenshot has been attached.\n\n';
-  if (attachedWalkthrough) _textBase += 'REFERENCE — flow observed from an attached screen recording (' + attachedWalkthrough.name + '). It records the REAL screens, on-screen labels and device-level steps of this flow. Use it as source material: take screen names, button labels and step wording from it so any test cases match the real UI. Do not describe or summarise the recording itself, and do not treat it as a defect report. On-screen labels below appear in single quotes — keep single quotes when you refer to them, and NEVER place an unescaped double quote inside a JSON string value. HOW TO USE IT: this is BACKGROUND so you understand the feature — the real screen names, the real flow between them, and what each control does. It is NOT content to reproduce. Write test cases about the FEATURE UNDER TEST and its relevant preconditions only; do not describe the recording, do not list what is on screen, and do not add coverage for screens or controls the feature does not involve. Carry over only the naming and flow accuracy. Never carry incidental values from that session (move counts, currency totals, timers, level numbers, item quantities) into steps or expected results.\n' + attachedWalkthrough.text + '\n\n';
+  if (attachedWalkthrough) _textBase += 'REFERENCE — flow observed from an attached screen recording (' + attachedWalkthrough.name + '). It records the REAL screens, on-screen labels and device-level steps of this flow. Use it as source material: take screen names, button labels and step wording from it so any test cases match the real UI. Do not describe or summarise the recording itself, and do not treat it as a defect report. On-screen labels below appear in single quotes — keep single quotes when you refer to them, and NEVER place an unescaped double quote inside a JSON string value. HOW TO USE IT: this is BACKGROUND so you understand the feature — the real screen names, the real flow between them, and what each control does. It is NOT content to reproduce. Write test cases about the FEATURE UNDER TEST and its relevant preconditions only; do not describe the recording, do not list what is on screen, and do not add coverage for screens or controls the feature does not involve. Carry over only the naming and flow accuracy. SOURCE PRECEDENCE: the recording is ONE tester session, so its numbers are incidental, not facts - the tester may have picked a level or a balance at random. Take flow, screen names and on-screen labels from the recording. Take every number, threshold, price, level and rule from the attached spec, config, GDD or ticket. Where they disagree the SPEC WINS: if the spec states an unlock level, use it even when the recording shows a different one. If no source states a value, describe it in words rather than copying the session value.\n' + attachedWalkthrough.text + '\n\n';
   var confPages = attachedLinks.filter(function(l){ return l.confluenceId; });
   var slackThreads = attachedLinks.filter(function(l){ return l.slackChannelId; });
   var jiraTickets = attachedLinks.filter(function(l){ return l.jiraTicketKey; });
@@ -3473,7 +3473,12 @@ function buildQaInstruction(tier) {
     '- Do NOT split one behaviour into separate per-platform test cases (Android / iOS / Kindle) unless the change genuinely behaves differently per platform. Default to ONE case noting parity; separate only on a real, described platform difference. ' +
     '- "smoke", "regression", "sanity" are test-pass TYPES, never test subjects. Never put these words in a test title or treat them as a feature. They only signal scope: "smoke" = core happy paths only; "regression" = also adjacent behaviours that could break. ' +
     '- PRECONDITIONS: if the input mentions a test build, branch, or APK, include it explicitly (e.g. "Build: CTS branch r4821 on device · flag enabled"). ' +
-    '- FLOW-AWARE: if multiple checks belong to one user flow, COMBINE into a single test case with sequential steps and semicolon-separated expected results. Never split a coherent flow just to add more cases. ' +
+    '- PRECONDITIONS must also carry every state a step silently relies on - existing progress on a meter, items already owned, a starting balance, an unlocked feature. If a step only works because something was already true, say it here instead of letting the tester discover it mid-run. ' +
+    '- CONSISTENCY: a value must mean the same thing everywhere in one case. Never let one step say 92+ and another say 100. Check the numbers in the steps against the preconditions and the expected result before returning. ' +
+    '- MEASURABLE CHECKS: never write verify X is deducted or verify the counter updates. Note the value before the action, perform it, note it after, and state the exact difference to expect (note the coin balance, purchase, note it again - it must be lower by 1900). Applies to any quantity: currency, lives, moves, timers, meters. ' +
+    '- DOCUMENTED ALTERNATIVE PATHS: when the spec describes what happens on a branch the recording did not take - insufficient funds routing to the shop, a cap being hit, a cooldown - give that branch its own test case. Only when a source describes it; never invent one to add coverage. ' +
+    '- FLOW-AWARE: if multiple checks belong to one user flow, COMBINE into a single test case with sequential steps. Never split a coherent flow just to add more cases. ' +
+    '- EXPECTED RESULT: at most 4 assertions, separated by semicolons, each under 15 words and each independently checkable. One assertion per thing that can fail. Do not restate the steps, do not chain a whole flow into one sentence. ' +
     '- Each item must cover a DISTINCT area — no overlapping verification points. ' +
     '- Order by severity desc. Steps array up to 5 entries unless a test type above raises that limit. Output the JSON array only — no markdown, no commentary.' +
     examplesBlock;
@@ -5686,7 +5691,7 @@ function downloadFullReport(btn) {
         (tc.objective ? '<div class="tc-row"><span class="tc-lbl">Objective</span><span>'+esc(tc.objective)+'</span></div>' : '')+
         (tc.preconditions ? '<div class="tc-row"><span class="tc-lbl">Preconditions</span><span>'+esc(tc.preconditions)+'</span></div>' : '')+
         (steps ? '<div class="tc-row"><span class="tc-lbl">Steps</span><ol>'+steps+'</ol></div>' : '')+
-        (tc.expected ? '<div class="tc-row"><span class="tc-lbl">Expected</span><span>'+esc(tc.expected)+'</span></div>' : '')+
+        (tc.expected ? '<div class="tc-row"><span class="tc-lbl">Expected</span><span>'+fmtExpected(tc.expected)+'</span></div>' : '')+
         '</div>'
       ) : '';
       return '<div class="qa-item">'+
@@ -6741,6 +6746,21 @@ function buildWhyThisTestRow(i, item) {
     evBlock;
 }
 
+// An expected result carries several assertions joined by semicolons. As one
+// paragraph it is unreadable and nobody can tell which part failed, so split it
+// into one line per assertion. Single-assertion results render unchanged.
+function fmtExpected(txt) {
+  var raw = String(txt == null ? '' : txt);
+  var parts = raw.split(/;\s+/).map(function (p) { return p.trim(); })
+                 .filter(function (p) { return p.length; });
+  if (parts.length < 2) return esc(raw);
+  return parts.map(function (p) {
+    return '<div style="display:flex;gap:7px;align-items:baseline;">' +
+           '<span style="color:#5DCAA5;flex:none;">\u2022</span>' +
+           '<span>' + esc(p.replace(/[;.]$/, '')) + '</span></div>';
+  }).join('');
+}
+
 function renderTCBlock(i) {
   var block = document.getElementById('tc-'+i);
   var item = qaData[i];
@@ -6766,7 +6786,7 @@ function renderTCBlock(i) {
     '<div class="tc-row"><div class="tc-key">objective</div><div class="tc-val tc-bold">'+esc(item.testcase.objective)+'</div></div>'+
     '<div class="tc-row"><div class="tc-key">preconditions</div><div class="tc-val">'+esc(item.testcase.preconditions)+'</div></div>'+
     '<div class="tc-row"><div class="tc-key">steps</div><div class="tc-steps">'+steps+'</div></div>'+
-    '<div class="tc-row"><div class="tc-key">expected result</div><div class="tc-val tc-bold">'+esc(item.testcase.expected)+'</div></div>'+
+    '<div class="tc-row"><div class="tc-key">expected result</div><div class="tc-val tc-bold">'+fmtExpected(item.testcase.expected)+'</div></div>'+
     '<div style="margin-top:9px;padding-top:8px;border-top:0.5px solid #252530;display:flex;align-items:center;gap:7px;flex-wrap:wrap;">'+
       '<button onclick="copySlackTC('+i+',this)" style="display:flex;align-items:center;gap:6px;padding:5px 12px;background:#0d0b06;border:0.5px solid #BA751740;border-radius:5px;font-size:10px;color:#EF9F27;cursor:pointer;font-family:JetBrains Mono,monospace;transition:all .12s;">'+
         '<svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M6 2a2 2 0 0 0 0 4h2V2H6zM6 7H2a2 2 0 0 0 0 4h4V7zM10 7v4a2 2 0 0 0 4 0V7h-4zM10 6h4a2 2 0 0 0 0-4h-4v4z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>'+
@@ -7117,7 +7137,7 @@ function toggleRiskTC(i, btn) {
     '<div class="tc-row"><div class="tc-key">objective</div><div class="tc-val tc-bold">'+esc(item.testcase.objective)+'</div></div>'+
     '<div class="tc-row"><div class="tc-key">preconditions</div><div class="tc-val">'+esc(item.testcase.preconditions)+'</div></div>'+
     '<div class="tc-row"><div class="tc-key">steps</div><div class="tc-steps">'+steps+'</div></div>'+
-    '<div class="tc-row"><div class="tc-key">expected result</div><div class="tc-val tc-bold">'+esc(item.testcase.expected)+'</div></div>'+
+    '<div class="tc-row"><div class="tc-key">expected result</div><div class="tc-val tc-bold">'+fmtExpected(item.testcase.expected)+'</div></div>'+
     '<div style="margin-top:8px;padding-top:7px;border-top:0.5px solid #2a2010;display:flex;gap:7px;flex-wrap:wrap;">'+
       '<button onclick="copyRiskSlack('+i+',this)" style="display:flex;align-items:center;gap:5px;padding:4px 11px;background:#0d0b06;border:0.5px solid #BA751740;border-radius:5px;font-size:10px;color:#EF9F27;cursor:pointer;font-family:JetBrains Mono,monospace;">'+
         '<svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M6 2a2 2 0 0 0 0 4h2V2H6zM6 7H2a2 2 0 0 0 0 4h4V7zM10 7v4a2 2 0 0 0 4 0V7h-4zM10 6h4a2 2 0 0 0 0-4h-4v4z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>'+
