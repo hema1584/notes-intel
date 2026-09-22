@@ -667,7 +667,7 @@
     <div class="logo-icon"><svg width="26" height="26" viewBox="0 0 20 20" fill="none"><ellipse cx="10" cy="10" rx="8" ry="3.4" stroke="#5DCAA5" stroke-width="1"/><ellipse cx="10" cy="10" rx="8" ry="3.4" transform="rotate(60 10 10)" stroke="#7F77DD" stroke-width="1"/><ellipse cx="10" cy="10" rx="8" ry="3.4" transform="rotate(-60 10 10)" stroke="#EF9F27" stroke-width="1"/><path d="M8.2 10l1.3 1.3 2.3-2.6" stroke="#5DCAA5" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     <div class="logo-div"></div>
     <div>
-      <div class="logo-name-row"><span class="logo-name">Notes Intel</span><span class="logo-dot"></span><span class="logo-ver" id="logo-ver">v5.0.0</span></div>
+      <div class="logo-name-row"><span class="logo-name">Notes Intel</span><span class="logo-dot"></span><span class="logo-ver" id="logo-ver" onclick="toggleWhatsNew()" style="cursor:pointer;" title="What changed recently">v5.0.0</span></div>
       <div class="logo-tag">QA intelligence engine</div>
     </div>
   </div>
@@ -718,7 +718,14 @@
     <div style="margin-top:12px;padding-top:10px;border-top:0.5px solid #1c2630;font-size:11.5px;color:#6a7a86;font-family:'Sora',sans-serif;">Reopen this guide anytime via the <span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;border:0.5px solid #245244;color:#5DCAA5;font-size:10px;line-height:1;vertical-align:middle;">?</span> in the top bar.</div>
   </div>
 
-  <div class="card" id="context-card" style="margin-bottom:12px;">
+  <div id="whats-new" style="display:none;margin-bottom:12px;padding:14px 16px;background:#0d1117;border:0.5px solid #2a2a3e;border-radius:10px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+    <span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:#5DCAA5;letter-spacing:.1em;text-transform:uppercase;">what is new</span>
+    <span onclick="toggleWhatsNew()" style="cursor:pointer;color:#52526a;font-size:13px;">×</span>
+  </div>
+  <div id="whats-new-list"></div>
+</div>
+<div class="card" id="context-card" style="margin-bottom:12px;">
   <div class="context-zone">
     <div class="context-header" onclick="toggleContext()">
       <div style="display:flex;align-items:center;gap:8px;">
@@ -1123,6 +1130,11 @@
       <div class="card-top">
         <div class="card-head"><div class="card-pip" style="background:#EF9F27"></div><span class="card-lbl" style="color:#EF9F27">qa focus</span><span id="qa-deep-badge" style="display:none;font-size:9px;font-family:'JetBrains Mono',monospace;padding:2px 7px;background:#16121e;color:#AFA9EC;border:0.5px solid #2a2240;border-radius:3px;margin-left:7px;letter-spacing:.05em;">deep · mobile-aware</span></div>
         <span class="qa-meta">› expand &nbsp;·&nbsp; ☐ select to push</span>
+        <button id="combine-btn" onclick="combineSelected(this)" title="Merge the selected test cases into one"
+          style="display:none;align-items:center;gap:5px;margin-left:10px;padding:3px 9px;background:#0d1e28;border:0.5px solid #38BDF840;border-radius:5px;font-size:10px;color:#38BDF8;cursor:pointer;font-family:JetBrains Mono,monospace;flex-shrink:0;">
+          <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M2 4h5l3 4 4 0M2 12h5l3-4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 6l2 2-2 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Combine into one
+        </button>
       </div>
       <div class="qa-list" id="qa-body">
         <div class="skeleton" style="height:12px;margin-bottom:14px;width:95%"></div>
@@ -1178,11 +1190,6 @@
         <div class="sel-summary" id="sel-summary">
           <span class="sel-count" id="sel-count">0 selected</span>
           <div class="sel-tags" id="sel-tags"><span class="sel-empty">— select QA items above to push as test cases</span></div>
-          <button id="combine-btn" onclick="combineSelected(this)" title="Merge the selected test cases into one"
-            style="display:none;margin-left:auto;align-items:center;gap:5px;padding:4px 10px;background:#0d1e28;border:0.5px solid #38BDF840;border-radius:5px;font-size:10px;color:#38BDF8;cursor:pointer;font-family:JetBrains Mono,monospace;flex-shrink:0;">
-            <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M2 4h5l3 4 4 0M2 12h5l3-4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 6l2 2-2 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            Combine into one
-          </button>
           <button id="copy-all-slack-btn" onclick="copyAllSelectedSlack(this)" style="display:none;margin-left:auto;align-items:center;gap:5px;padding:4px 10px;background:#1a0d28;border:0.5px solid #9b59b640;border-radius:5px;font-size:10px;color:#9b59b6;cursor:pointer;font-family:JetBrains Mono,monospace;flex-shrink:0;">
             <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M6 2a2 2 0 0 0 0 4h2V2H6zM6 7H2a2 2 0 0 0 0 4h4V7zM10 7v4a2 2 0 0 0 4 0V7h-4zM10 6h4a2 2 0 0 0 0-4h-4v4z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>
             Copy all for Slack
@@ -1707,6 +1714,32 @@ function clearContext() {
   var wrap = document.getElementById('ctx-game-wrap'); if (wrap) wrap.style.display = 'none';
   try { localStorage.removeItem('ni_project_context'); } catch(e) {}
   updateContextStatus();
+}
+
+// A short, human list of what changed. Hand-written on purpose: commit messages
+// are written for developers, and this is read by QAs who want to know whether the
+// tool behaves differently today than it did last week.
+var NI_WHATS_NEW = [
+  { d: '22 Sep', t: 'Offline, cloud save and asset-bundle cases', b: 'Generation now asks for these when the feature touches purchases, saved state or downloaded art.' },
+  { d: '22 Sep', t: 'Combine test cases', b: 'Tick two or more in QA Focus and merge them into one.' },
+  { d: '22 Sep', t: 'Spec beats the recording', b: 'Numbers come from the config or GDD, not from whatever the video happened to show. Expected results are shorter and split into lines.' },
+  { d: '21 Sep', t: 'Issue \u2192 Test Steps', b: 'Describe a problem, optionally attach a video, and get reproduction steps as one test case without waiting for a gist.' },
+  { d: '21 Sep', t: 'Project Context stops being wiped', b: 'A blank context can no longer overwrite your saved one.' },
+  { d: '20 Sep', t: 'Review / edit gist', b: 'The gist edit control is a labelled button at the end of the gist instead of a small icon.' }
+];
+
+function toggleWhatsNew() {
+  var el = document.getElementById('whats-new');
+  if (!el) return;
+  var open = el.style.display !== 'none';
+  el.style.display = open ? 'none' : 'block';
+  if (open) return;
+  document.getElementById('whats-new-list').innerHTML = NI_WHATS_NEW.map(function (u) {
+    return '<div style="display:flex;gap:11px;padding:7px 0;border-top:0.5px solid #1b1b26;">' +
+      '<span style="font-size:10px;font-family:\'JetBrains Mono\',monospace;color:#52526a;min-width:44px;flex:none;padding-top:2px;">' + esc(u.d) + '</span>' +
+      '<span><b style="font-size:12.5px;color:#e8e8f0;font-weight:500;">' + esc(u.t) + '</b>' +
+      '<div style="font-size:12px;color:#8a8a9a;line-height:1.6;margin-top:2px;">' + esc(u.b) + '</div></span></div>';
+  }).join('');
 }
 
 function toggleContext() {
